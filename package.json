@@ -1,0 +1,32 @@
+{
+  "name": "wildcatter",
+  "version": "0.1.0",
+  "description": "Energy Asset Intelligence Platform",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "migrate:up": "node-pg-migrate up --migrations-dir migrations --envPath .env",
+    "migrate:down": "node-pg-migrate down --migrations-dir migrations --envPath .env",
+    "migrate:create": "node-pg-migrate create --migrations-dir migrations"
+  },
+  "dependencies": {
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.7.5",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.12.0",
+    "@types/pg": "^8.11.11",
+    "node-pg-migrate": "^7.9.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

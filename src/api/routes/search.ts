@@ -1,0 +1,9 @@
+import { Router, Request, Response } from 'express';
+
+const router = Router();
+
+router.get('/', (_req: Request, res: Response) => {
+  res.status(501).json({ error: 'Not implemented' });
+});
+
+export default router;
