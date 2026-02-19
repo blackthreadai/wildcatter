@@ -70,7 +70,7 @@ function SearchContent() {
 
       {loading && (
         <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-amber-500" />
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-[#DAA520]" />
         </div>
       )}
 
@@ -90,7 +90,7 @@ function SearchContent() {
               </div>
               <p className="text-xs text-gray-500">{a.basin} · {a.county}, {a.state}</p>
               <div className="flex items-center justify-between mt-3 text-sm">
-                {a.currentProduction != null && <span className="text-amber-500">{formatNumber(a.currentProduction)} bbl/mo</span>}
+                {a.currentProduction != null && <span className="text-[#DAA520]">{formatNumber(a.currentProduction)} bbl/mo</span>}
                 {a.declineRate != null && <span className="text-gray-500">Decline: {a.declineRate.toFixed(1)}%</span>}
               </div>
               <p className="text-xs text-gray-500 mt-1">{a.operatorName}</p>
@@ -112,8 +112,8 @@ function SearchContent() {
               <p className="text-xs text-gray-500 mt-1">{o.hqLocation}</p>
               <div className="flex items-center gap-4 mt-3 text-sm">
                 <span>{o.activeAssets} assets</span>
-                {o.totalProduction != null && <span className="text-amber-500">{formatNumber(o.totalProduction)} bbl/mo</span>}
-                <span className={o.riskScore <= 3 ? 'text-green-400' : o.riskScore <= 6 ? 'text-amber-400' : 'text-red-400'}>
+                {o.totalProduction != null && <span className="text-[#DAA520]">{formatNumber(o.totalProduction)} bbl/mo</span>}
+                <span className={o.riskScore <= 3 ? 'text-green-400' : o.riskScore <= 6 ? 'text-[#E6BE44]' : 'text-red-400'}>
                   Risk: {o.riskScore}/10
                 </span>
               </div>
@@ -128,7 +128,7 @@ function SearchContent() {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-amber-500" /></div>}>
+    <Suspense fallback={<div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-[#DAA520]" /></div>}>
       <SearchContent />
     </Suspense>
   );

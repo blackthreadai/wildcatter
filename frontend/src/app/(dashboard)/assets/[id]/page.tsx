@@ -48,7 +48,7 @@ export default function AssetDetailPage() {
   if (!asset) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-amber-500" />
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-[#DAA520]" />
       </div>
     );
   }
@@ -76,7 +76,7 @@ export default function AssetDetailPage() {
       {/* Summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard label="Status" value={asset.status} color={asset.status === 'active' ? 'text-green-400' : 'text-gray-400'} />
-        <StatCard label="Production" value={formatNumber(asset.currentProduction)} sub="bbl/mo" color="text-amber-500" />
+        <StatCard label="Production" value={formatNumber(asset.currentProduction)} sub="bbl/mo" color="text-[#DAA520]" />
         <StatCard label="Decline Rate" value={asset.declineRate.toFixed(1) + '%'} color="text-red-400" />
         <StatCard label="Est. Life" value={asset.estimatedLife + ' yr'} />
       </div>
@@ -100,7 +100,7 @@ export default function AssetDetailPage() {
             <div className="grid grid-cols-2 gap-2 text-sm">
               <span className="text-gray-500">Revenue</span><span className="text-green-400">{formatCurrency(financials.revenue)}</span>
               <span className="text-gray-500">Operating Cost</span><span className="text-red-400">{formatCurrency(financials.operatingCost)}</span>
-              <span className="text-gray-500">Net Cash Flow</span><span className="text-amber-500">{formatCurrency(financials.netCashFlow)}</span>
+              <span className="text-gray-500">Net Cash Flow</span><span className="text-[#DAA520]">{formatCurrency(financials.netCashFlow)}</span>
               <span className="text-gray-500">Breakeven</span><span>{formatCurrency(financials.breakevenPrice)}/bbl</span>
             </div>
           </div>
@@ -145,7 +145,7 @@ export default function AssetDetailPage() {
               >
                 <p className="font-medium text-white">{a.name}</p>
                 <p className="text-xs text-gray-500 mt-1">{a.operatorName} · {a.status}</p>
-                <p className="text-sm text-amber-500 mt-2">{formatNumber(a.currentProduction)} bbl/mo</p>
+                <p className="text-sm text-[#DAA520] mt-2">{formatNumber(a.currentProduction)} bbl/mo</p>
               </div>
             ))}
           </div>

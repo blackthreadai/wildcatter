@@ -50,7 +50,7 @@ export default function ExportPage() {
           <button
             onClick={exportAllAssets}
             disabled={loading}
-            className="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-500 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 bg-[#B8860B] text-white rounded-lg text-sm font-medium hover:bg-[#DAA520] disabled:opacity-50 transition-colors"
           >
             {loading ? 'Exporting...' : '📥 Download Assets CSV'}
           </button>
@@ -62,7 +62,7 @@ export default function ExportPage() {
           <button
             onClick={exportProduction}
             disabled={loading}
-            className="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-500 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 bg-[#B8860B] text-white rounded-lg text-sm font-medium hover:bg-[#DAA520] disabled:opacity-50 transition-colors"
           >
             {loading ? 'Exporting...' : '📥 Download Production CSV'}
           </button>

@@ -32,7 +32,7 @@ export default function ProductionChart({ data, showDeclineCurve }: Props) {
             labelStyle={{ color: '#9ca3af' }}
           />
           <Legend />
-          <Line type="monotone" dataKey="oil" stroke="#f59e0b" strokeWidth={2} dot={false} name="Oil (bbl)" />
+          <Line type="monotone" dataKey="oil" stroke="#DAA520" strokeWidth={2} dot={false} name="Oil (bbl)" />
           <Line type="monotone" dataKey="gas" stroke="#22c55e" strokeWidth={2} dot={false} name="Gas (mcf)" />
           <Line type="monotone" dataKey="water" stroke="#3b82f6" strokeWidth={1} dot={false} name="Water Cut" />
           {showDeclineCurve && (

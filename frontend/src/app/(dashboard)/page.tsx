@@ -41,7 +41,7 @@ export default function DashboardPage() {
       <div>
         <h2 className="text-sm font-medium text-gray-400 mb-3">Market Snapshot</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard label="WTI Crude" value="$72.40" sub="/bbl" color="text-amber-500" />
+          <StatCard label="WTI Crude" value="$72.40" sub="/bbl" color="text-[#DAA520]" />
           <StatCard label="Henry Hub Gas" value="$2.85" sub="/mmbtu" color="text-green-500" />
           <StatCard label="Total Assets" value={formatNumber(stats.totalAssets)} />
           <StatCard label="Active Wells" value={formatNumber(stats.activeWells)} color="text-blue-400" />
@@ -73,7 +73,7 @@ export default function DashboardPage() {
               >
                 <p className="font-medium text-white">{a.name}</p>
                 <p className="text-xs text-gray-500 mt-1">{a.basin} · {a.state}</p>
-                <p className="text-sm text-amber-500 mt-2">{formatNumber(a.currentProduction)} bbl/mo</p>
+                <p className="text-sm text-[#DAA520] mt-2">{formatNumber(a.currentProduction)} bbl/mo</p>
               </div>
             ))}
           </div>
@@ -95,7 +95,7 @@ export default function DashboardPage() {
                   <p className="text-sm font-medium text-white">{op.name}</p>
                   <p className="text-xs text-gray-500">{op.activeAssets} assets</p>
                 </div>
-                <p className="text-sm text-amber-500">{formatNumber(op.totalProduction)} bbl/mo</p>
+                <p className="text-sm text-[#DAA520]">{formatNumber(op.totalProduction)} bbl/mo</p>
               </div>
             ))}
           </div>

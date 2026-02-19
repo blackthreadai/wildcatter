@@ -83,7 +83,7 @@ delete (L.Icon.Default.prototype as any)._getIconUrl;
             <span style="color:${color}">${asset.type.toUpperCase()}</span> · ${asset.status}<br/>
             ${asset.basin} · ${asset.state}<br/>
             Production: ${asset.currentProduction.toLocaleString()} bbl/mo<br/>
-            <a href="/assets/${asset.id}" style="color:#f59e0b">View Detail →</a>
+            <a href="/assets/${asset.id}" style="color:#DAA520">View Detail →</a>
           </div>
         `);
 

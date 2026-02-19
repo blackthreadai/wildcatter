@@ -45,12 +45,12 @@ export default function AssetsPage() {
     { key: 'status', label: 'Status', render: (r) => (
       <span className={`px-2 py-0.5 rounded text-xs font-medium ${
         r.status === 'active' ? 'bg-green-500/10 text-green-400' :
-        r.status === 'shut-in' ? 'bg-amber-500/10 text-amber-400' :
+        r.status === 'shut-in' ? 'bg-[#DAA520]/10 text-[#E6BE44]' :
         'bg-gray-500/10 text-gray-400'
       }`}>{r.status}</span>
     )},
     { key: 'type', label: 'Type', render: (r) => (
-      <span className={`text-xs ${r.type === 'oil' ? 'text-amber-500' : r.type === 'gas' ? 'text-green-500' : 'text-gray-400'}`}>
+      <span className={`text-xs ${r.type === 'oil' ? 'text-[#DAA520]' : r.type === 'gas' ? 'text-green-500' : 'text-gray-400'}`}>
         {r.type.toUpperCase()}
       </span>
     )},
@@ -89,7 +89,7 @@ export default function AssetsPage() {
 
       {loading && (
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-amber-500" />
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-[#DAA520]" />
         </div>
       )}
 

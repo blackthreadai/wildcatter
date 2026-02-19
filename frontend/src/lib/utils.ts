@@ -43,7 +43,7 @@ export function addRecentlyViewed(id: string) {
 
 export function assetTypeColor(type: string) {
   switch (type) {
-    case 'oil': return '#f59e0b';
+    case 'oil': return '#DAA520';
     case 'gas': return '#22c55e';
     case 'mining': return '#6b7280';
     case 'energy': return '#3b82f6';

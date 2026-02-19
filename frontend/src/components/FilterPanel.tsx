@@ -20,7 +20,7 @@ export default function FilterPanel({ filters, onChange }: Props) {
     onChange({ ...filters, [key]: value || undefined });
   }
 
-  const selectClass = 'w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500';
+  const selectClass = 'w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#DAA520]';
   const inputClass = selectClass;
 
   return (
