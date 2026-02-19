@@ -59,10 +59,7 @@ export default function AssetsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Assets</h1>
-          <p className="text-sm text-gray-500 mt-1">Browse and manage energy assets</p>
-        </div>
+        <h2 className="text-sm font-medium text-gray-400">BROWSE AND MANAGE ENERGY ASSETS</h2>
         <div className="flex items-center gap-3">
           <button
             onClick={() => exportAssetsCSV(assets)}
