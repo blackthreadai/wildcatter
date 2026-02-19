@@ -1,3 +1,18 @@
+// Server-side entity types (used by API routes)
+export { type JwtPayload } from './entities';
+export {
+  type Asset as DbAsset,
+  type Operator as DbOperator,
+  type ProductionRecord as DbProductionRecord,
+  type FinancialEstimate as DbFinancialEstimate,
+  type User as DbUser,
+  type AssetType,
+  type AssetStatus,
+  type DataProvenance,
+} from './entities';
+
+// Frontend types used by components (camelCase, matching API response shapes)
+
 export interface Asset {
   id: string;
   name: string;
