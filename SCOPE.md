@@ -82,6 +82,14 @@ Scheduled ingestion → Normalization → Deduplication → Asset/operator linki
 - Scalable ingestion pipeline
 - Clear data provenance tags
 
+## Phase 5 — Renewable Energy (Future)
+- Add asset types: solar, wind, hydro
+- Production metrics: MWh instead of bbl/mcf
+- Data sources: EIA, FERC, state utility commissions
+- Financial benchmarks: capacity factor, PPA rates
+- Separate "Power" section in UI
+- Data model already supports this via asset_type field
+
 ## Tech Stack
 - Backend: REST API
 - Database: PostgreSQL (+ TimescaleDB extension)
