@@ -4,6 +4,11 @@
   "description": "Energy Asset Intelligence Platform",
   "main": "dist/index.js",
   "scripts": {
+    "ingest:texas": "tsx src/ingestion/texas/index.ts",
+    "ingest:oklahoma": "tsx src/ingestion/oklahoma/index.ts",
+    "ingest:new-mexico": "tsx src/ingestion/new-mexico/index.ts",
+    "ingest:all": "tsx src/ingestion/index.ts --all --download",
+    "ingest:schedule": "tsx src/ingestion/index.ts --schedule",
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
@@ -12,11 +17,14 @@
     "migrate:create": "node-pg-migrate create --migrations-dir migrations"
   },
   "dependencies": {
+    "@types/node-cron": "^3.0.11",
+    "axios": "^1.7.9",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "helmet": "^8.0.0",
+    "node-cron": "^4.2.1",
     "pg": "^8.13.1"
   },
   "devDependencies": {
