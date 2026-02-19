@@ -33,7 +33,7 @@ export default function DashboardPage() {
       <SearchBar onSearch={(q) => q && router.push(`/search?q=${encodeURIComponent(q)}`)} />
 
       {/* Market Snapshot */}
-      <div>
+      <div className="pb-8 border-b border-gray-800">
         <h2 className="text-sm font-medium text-gray-400 mb-3">MARKET SNAPSHOT</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard label="WTI Crude" value="$72.40" sub="/bbl" color="text-green-500" />
@@ -46,7 +46,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Platform Stats */}
-      <div>
+      <div className="pb-8 border-b border-gray-800">
         <h2 className="text-sm font-medium text-gray-400 mb-3">PLATFORM DATA</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard label="Total Assets" value={formatNumber(stats.totalAssets)} />
@@ -56,7 +56,7 @@ export default function DashboardPage() {
 
       {/* Top Basins */}
       {stats.topBasins.length > 0 && (
-        <div>
+        <div className="pb-8 border-b border-gray-800">
           <h2 className="text-sm font-medium text-gray-400 mb-3">TOP BASINS</h2>
           <div className="flex flex-wrap gap-2">
             {stats.topBasins.map((b) => (
@@ -68,7 +68,7 @@ export default function DashboardPage() {
 
       {/* Top Operators */}
       {topOperators.length > 0 && (
-        <div>
+        <div className="pb-8 border-b border-gray-800">
           <h2 className="text-sm font-medium text-gray-400 mb-3">TOP OPERATORS BY PRODUCTION</h2>
           <div className="bg-gray-900 border border-gray-800 rounded-xl divide-y divide-gray-800">
             {topOperators.map((op) => (
