@@ -63,9 +63,9 @@ export default function AssetsPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => exportAssetsCSV(assets)}
-            className="px-3 py-2 bg-gray-800 text-gray-300 text-sm rounded-lg hover:bg-gray-700 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 bg-gray-800 text-gray-300 text-sm rounded-lg hover:bg-gray-700 transition-colors"
           >
-            📥 Export CSV
+            <span className="text-[#DAA520]">↓</span> Export CSV
           </button>
           <div className="flex bg-gray-800 rounded-lg p-0.5">
             <button
