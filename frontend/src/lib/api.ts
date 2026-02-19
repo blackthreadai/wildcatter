@@ -57,6 +57,30 @@ function transformKeys(obj: any): any {
   return obj;
 }
 
+/** Convert numeric string fields to actual numbers */
+const NUMERIC_FIELDS = new Set([
+  'latitude', 'longitude', 'declineRate', 'currentProduction', 'cashFlow',
+  'revenue', 'operatingCost', 'netCashFlow', 'breakevenPrice', 'priceSensitivity',
+  'riskScore', 'oilVolume', 'gasVolume', 'oreVolume', 'waterCut', 'downtime',
+  'totalProduction',
+]);
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function coerceNumbers(obj: any): any {
+  if (Array.isArray(obj)) return obj.map(coerceNumbers);
+  if (obj !== null && typeof obj === 'object' && !(obj instanceof Date)) {
+    for (const key of Object.keys(obj)) {
+      if (NUMERIC_FIELDS.has(key) && typeof obj[key] === 'string') {
+        const n = parseFloat(obj[key]);
+        if (!isNaN(n)) obj[key] = n;
+      } else if (typeof obj[key] === 'object') {
+        obj[key] = coerceNumbers(obj[key]);
+      }
+    }
+  }
+  return obj;
+}
+
 /**
  * Flatten `{ data: [...], pagination: { page, limit, total, totalPages } }`
  * into `{ data: [...], page, limit, total, totalPages }` so components
@@ -90,7 +114,7 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (res) => {
-    res.data = flattenPagination(transformKeys(res.data));
+    res.data = coerceNumbers(flattenPagination(transformKeys(res.data)));
     return res;
   },
   (err) => {
