@@ -30,7 +30,7 @@ export default function FilterPanel({ filters, onChange }: Props) {
         className="flex items-center justify-between w-full text-sm font-medium text-gray-300"
       >
         <span>Filters</span>
-        <span className="text-gray-500">{open ? '▲' : '▼'}</span>
+        <span className={`text-[#DAA520] transition-transform ${open ? 'rotate-180' : ''}`}>↓</span>
       </button>
 
       {open && (

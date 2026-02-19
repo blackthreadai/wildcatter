@@ -44,10 +44,7 @@ function SearchContent() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Search</h1>
-        <p className="text-sm text-gray-500 mt-1">Find assets and operators</p>
-      </div>
+      <h2 className="text-sm font-medium text-gray-400">FIND ASSETS AND OPERATORS</h2>
 
       <SearchBar onSearch={handleSearch} />
       <FilterPanel filters={filters} onChange={handleFilterChange} />
