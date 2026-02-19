@@ -12,4 +12,8 @@ export const config = {
     user: process.env.PGUSER || 'wildcatter',
     password: process.env.PGPASSWORD || 'wildcatter',
   },
+  jwt: {
+    secret: process.env.JWT_SECRET || 'wildcatter-dev-secret-change-me',
+    expiresIn: process.env.JWT_EXPIRES_IN || '24h',
+  },
 } as const;

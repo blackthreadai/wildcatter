@@ -5,14 +5,18 @@ import production from './production';
 import search from './search';
 import exportRoutes from './export';
 import auth from './auth';
+import { requireAuth } from '../middleware/auth';
 
 const router = Router();
 
-router.use('/assets', assets);
-router.use('/operators', operators);
-router.use('/production', production);
-router.use('/search', search);
-router.use('/export', exportRoutes);
+// Public routes
 router.use('/auth', auth);
+
+// Protected routes
+router.use('/assets', requireAuth, assets);
+router.use('/operators', requireAuth, operators);
+router.use('/production', requireAuth, production);
+router.use('/search', requireAuth, search);
+router.use('/export', requireAuth, exportRoutes);
 
 export default router;

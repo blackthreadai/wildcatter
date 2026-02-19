@@ -77,3 +77,19 @@ export interface DataProvenance {
   status: 'success' | 'partial' | 'failed';
   notes: string | null;
 }
+
+// ── User ──────────────────────────────────────────────
+
+export interface User {
+  id: string;
+  email: string;
+  password_hash: string;
+  created_at: Date;
+}
+
+// ── Auth ──────────────────────────────────────────────
+
+export interface JwtPayload {
+  userId: string;
+  email: string;
+}
