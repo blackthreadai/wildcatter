@@ -39,8 +39,8 @@ export default function DashboardPage() {
           <StatCard label="WTI Crude" value="$72.40" sub="/bbl" color="text-green-500" />
           <StatCard label="Brent Crude" value="$76.15" sub="/bbl" color="text-green-500" />
           <StatCard label="Henry Hub Gas" value="$2.85" sub="/mmbtu" color="text-green-500" />
-          <StatCard label="RBOB Gasoline" value="$2.18" sub="/gal" color="text-green-500" />
           <StatCard label="OPEC Basket" value="$74.60" sub="/bbl" color="text-green-500" />
+          <StatCard label="RBOB Gasoline" value="$2.18" sub="/gal" color="text-green-500" />
           <StatCard label="Baker Hughes Rigs" value="584" sub="active" color="text-green-500" />
         </div>
       </div>
