@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
     const dataQuery = `
       SELECT
         a.id, a.asset_type, a.name, a.state, a.county,
-        ST_Y(a.location) AS latitude, ST_X(a.location) AS longitude,
+        a.latitude, a.longitude,
         a.basin, a.operator_id, a.status, a.spud_date, a.depth_ft,
         a.commodity, a.decline_rate, a.estimated_remaining_life_months,
         a.created_at, a.updated_at,

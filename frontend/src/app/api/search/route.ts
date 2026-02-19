@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     assetParams.push(limit);
     const assetQuery = `
       SELECT a.id, a.name, a.asset_type, a.status, a.state, a.county, a.basin,
-             ST_Y(a.location) AS latitude, ST_X(a.location) AS longitude,
+             a.latitude, a.longitude,
              o.legal_name AS operator_name
       FROM assets a
       LEFT JOIN operators o ON o.id = a.operator_id

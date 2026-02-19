@@ -21,7 +21,7 @@ export async function GET(
 
     const dataResult = await pool.query(
       `SELECT id, asset_type, name, state, county, basin, status, decline_rate,
-              ST_Y(location) AS latitude, ST_X(location) AS longitude, created_at
+              latitude, longitude, created_at
        FROM assets WHERE operator_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3`,
       [id, limit, offset]
     );
