@@ -60,26 +60,6 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Recently Viewed */}
-      {recentAssets.length > 0 && (
-        <div>
-          <h2 className="text-sm font-medium text-gray-400 mb-3">Recently Viewed</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {recentAssets.map((a) => (
-              <div
-                key={a.id}
-                onClick={() => router.push(`/assets/${a.id}`)}
-                className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-600 transition-colors"
-              >
-                <p className="font-medium text-white">{a.name}</p>
-                <p className="text-xs text-gray-500 mt-1">{a.basin} · {a.state}</p>
-                <p className="text-sm text-[#DAA520] mt-2">{formatNumber(a.currentProduction)} bbl/mo</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Top Operators */}
       {topOperators.length > 0 && (
         <div>
@@ -96,6 +76,26 @@ export default function DashboardPage() {
                   <p className="text-xs text-gray-500">{op.activeAssets} assets</p>
                 </div>
                 <p className="text-sm text-[#DAA520]">{formatNumber(op.totalProduction)} bbl/mo</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recently Viewed */}
+      {recentAssets.length > 0 && (
+        <div>
+          <h2 className="text-sm font-medium text-gray-400 mb-3">Recently Viewed</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {recentAssets.map((a) => (
+              <div
+                key={a.id}
+                onClick={() => router.push(`/assets/${a.id}`)}
+                className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-600 transition-colors"
+              >
+                <p className="font-medium text-white">{a.name}</p>
+                <p className="text-xs text-gray-500 mt-1">{a.basin} · {a.state}</p>
+                <p className="text-sm text-[#DAA520] mt-2">{formatNumber(a.currentProduction)} bbl/mo</p>
               </div>
             ))}
           </div>
