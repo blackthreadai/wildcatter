@@ -33,7 +33,7 @@ delete (L.Icon.Default.prototype as any)._getIconUrl;
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
       });
 
-      const map = L.map(mapRef.current!, { zoomControl: true }).setView(center, zoom);
+      const map = L.map(mapRef.current!, { zoomControl: true, scrollWheelZoom: true }).setView(center, zoom);
       L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
       }).addTo(map);
@@ -52,6 +52,9 @@ delete (L.Icon.Default.prototype as any)._getIconUrl;
           });
         });
       }
+
+      // Fix zoom/drag issues from container size not being ready
+      setTimeout(() => map.invalidateSize(), 100);
 
       setMapInstance(map);
     });
