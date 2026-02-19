@@ -7,11 +7,11 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
 const NAV = [
-  { href: '/', label: 'Dashboard', icon: '◈' },
-  { href: '/assets', label: 'Assets', icon: '⛽' },
-  { href: '/operators', label: 'Operators', icon: '🏢' },
-  { href: '/search', label: 'Search', icon: '🔍' },
-  { href: '/export', label: 'Export', icon: '📥' },
+  { href: '/', label: 'DASHBOARD' },
+  { href: '/assets', label: 'ASSETS' },
+  { href: '/operators', label: 'OPERATORS' },
+  { href: '/search', label: 'SEARCH' },
+  { href: '/export', label: 'EXPORT' },
 ];
 
 export default function Sidebar() {
@@ -52,7 +52,7 @@ export default function Sidebar() {
           <p className="text-xs text-gray-500 mt-1">Energy Intelligence</p>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 pt-2">
           {NAV.map((item) => {
             const active = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
             return (
@@ -61,13 +61,12 @@ export default function Sidebar() {
                 href={item.href}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                  'block px-6 py-3 text-sm font-semibold tracking-wider border-b border-gray-800 transition-colors',
                   active
-                    ? 'bg-[#DAA520]/10 text-[#DAA520]'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                    ? 'text-[#DAA520] bg-[#DAA520]/5'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
                 )}
               >
-                <span className="text-lg">{item.icon}</span>
                 {item.label}
               </Link>
             );
