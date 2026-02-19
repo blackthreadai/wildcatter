@@ -20,12 +20,9 @@ function SearchContent() {
   const search = useCallback(async (f: SearchFilters) => {
     setLoading(true);
     try {
-      const [a, o] = await Promise.all([
-        api.get('/assets/search', { params: f }),
-        api.get('/operators/search', { params: { query: f.query } }),
-      ]);
-      setAssets(a.data.data || a.data || []);
-      setOperators(o.data.data || o.data || []);
+      const res = await api.get('/search', { params: { q: f.query, state: f.state, basin: f.basin, type: f.assetType, status: f.status } });
+      setAssets(res.data.assets || []);
+      setOperators(res.data.operators || []);
     } catch { /* empty */ }
     setLoading(false);
   }, []);
@@ -93,8 +90,8 @@ function SearchContent() {
               </div>
               <p className="text-xs text-gray-500">{a.basin} · {a.county}, {a.state}</p>
               <div className="flex items-center justify-between mt-3 text-sm">
-                <span className="text-amber-500">{formatNumber(a.currentProduction)} bbl/mo</span>
-                <span className="text-gray-500">Decline: {a.declineRate.toFixed(1)}%</span>
+                {a.currentProduction != null && <span className="text-amber-500">{formatNumber(a.currentProduction)} bbl/mo</span>}
+                {a.declineRate != null && <span className="text-gray-500">Decline: {a.declineRate.toFixed(1)}%</span>}
               </div>
               <p className="text-xs text-gray-500 mt-1">{a.operatorName}</p>
             </div>
@@ -115,7 +112,7 @@ function SearchContent() {
               <p className="text-xs text-gray-500 mt-1">{o.hqLocation}</p>
               <div className="flex items-center gap-4 mt-3 text-sm">
                 <span>{o.activeAssets} assets</span>
-                <span className="text-amber-500">{formatNumber(o.totalProduction)} bbl/mo</span>
+                {o.totalProduction != null && <span className="text-amber-500">{formatNumber(o.totalProduction)} bbl/mo</span>}
                 <span className={o.riskScore <= 3 ? 'text-green-400' : o.riskScore <= 6 ? 'text-amber-400' : 'text-red-400'}>
                   Risk: {o.riskScore}/10
                 </span>

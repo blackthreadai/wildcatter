@@ -21,7 +21,10 @@ export default function OperatorDetailPage() {
   useEffect(() => {
     if (!id) return;
     api.get(`/operators/${id}`).then((r) => setOperator(r.data)).catch(() => {});
-    api.get(`/operators/${id}/production`).then((r) => setProduction(r.data)).catch(() => {});
+    api.get(`/operators/${id}/production`).then((r) => {
+      const records = r.data?.data || r.data;
+      setProduction(Array.isArray(records) ? records : []);
+    }).catch(() => {});
   }, [id]);
 
   useEffect(() => {

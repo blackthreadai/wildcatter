@@ -26,17 +26,23 @@ export default function AssetDetailPage() {
     addRecentlyViewed(id as string);
 
     api.get(`/assets/${id}`).then((r) => {
-      setAsset(r.data);
+      const d = r.data;
+      setAsset(d);
+      // Production and financials come from the combined response
+      if (d.productionHistory) setProduction(d.productionHistory);
+      if (d.financials) setFinancials(d.financials);
+      if (d.relatedAssets) setRelated(d.relatedAssets.filter((a: Asset) => a.id !== id));
       // Fetch operator
-      api.get(`/operators/${r.data.operatorId}`).then((o) => setOperator(o.data)).catch(() => {});
-      // Fetch related
-      api.get('/assets', { params: { basin: r.data.basin, limit: 5 } })
-        .then((rel) => setRelated((rel.data.data || rel.data).filter((a: Asset) => a.id !== id)))
-        .catch(() => {});
+      if (d.operatorId) {
+        api.get(`/operators/${d.operatorId}`).then((o) => setOperator(o.data)).catch(() => {});
+      }
     }).catch(() => {});
 
-    api.get(`/assets/${id}/production`).then((r) => setProduction(r.data)).catch(() => {});
-    api.get(`/assets/${id}/financials`).then((r) => setFinancials(r.data)).catch(() => {});
+    // Also try separate endpoints as fallback
+    api.get(`/assets/${id}/production`).then((r) => {
+      const records = r.data?.data || r.data;
+      if (Array.isArray(records) && records.length > 0) setProduction(records);
+    }).catch(() => {});
   }, [id]);
 
   if (!asset) {
