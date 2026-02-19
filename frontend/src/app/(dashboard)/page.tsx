@@ -47,6 +47,13 @@ export default function DashboardPage() {
           <StatCard label="RBOB Gasoline" value="$2.18" sub="/gal" color="text-green-500" />
           <StatCard label="OPEC Basket" value="$74.60" sub="/bbl" color="text-green-500" />
           <StatCard label="Baker Hughes Rigs" value="584" sub="active" color="text-green-500" />
+        </div>
+      </div>
+
+      {/* Platform Stats */}
+      <div>
+        <h2 className="text-sm font-medium text-gray-400 mb-3">Platform Data</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard label="Total Assets" value={formatNumber(stats.totalAssets)} />
           <StatCard label="Active Wells" value={formatNumber(stats.activeWells)} color="text-blue-400" />
         </div>
