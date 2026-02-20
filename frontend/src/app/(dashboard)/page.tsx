@@ -36,12 +36,12 @@ export default function DashboardPage() {
       <div className="pb-8 border-b border-gray-800">
         <h2 className="text-sm font-medium text-[#DAA520] mb-3">MARKET SNAPSHOT</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard label="WTI Crude" value="$72.40" sub="/bbl" color="text-green-500" />
-          <StatCard label="Brent Crude" value="$76.15" sub="/bbl" color="text-green-500" />
-          <StatCard label="OPEC Basket" value="$74.60" sub="/bbl" color="text-green-500" />
-          <StatCard label="Henry Hub Gas" value="$2.85" sub="/mmbtu" color="text-green-500" />
-          <StatCard label="RBOB Gasoline" value="$2.18" sub="/gal" color="text-green-500" />
-          <StatCard label="Baker Hughes Rigs" value="584" sub="active" color="text-green-500" />
+          <StatCard label="WTI Crude" value="$72.40" sub="/bbl" change={1.24} />
+          <StatCard label="Brent Crude" value="$76.15" sub="/bbl" change={0.87} />
+          <StatCard label="OPEC Basket" value="$74.60" sub="/bbl" change={-0.32} />
+          <StatCard label="Henry Hub Gas" value="$2.85" sub="/mmbtu" change={-1.75} />
+          <StatCard label="RBOB Gasoline" value="$2.18" sub="/gal" change={0.46} />
+          <StatCard label="Baker Hughes Rigs" value="584" sub="active" change={-2} />
         </div>
       </div>
 
@@ -50,7 +50,7 @@ export default function DashboardPage() {
         <h2 className="text-sm font-medium text-[#DAA520] mb-3">PLATFORM DATA</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard label="Total Assets" value={formatNumber(stats.totalAssets)} />
-          <StatCard label="Active Wells" value={formatNumber(stats.activeWells)} color="text-blue-400" />
+          <StatCard label="Active Wells" value={formatNumber(stats.activeWells)} />
         </div>
       </div>
 
