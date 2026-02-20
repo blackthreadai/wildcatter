@@ -34,7 +34,7 @@ export default function DashboardPage() {
 
       {/* Market Snapshot */}
       <div className="pb-8 border-b border-gray-800">
-        <h2 className="text-sm font-medium text-gray-400 mb-3">MARKET SNAPSHOT</h2>
+        <h2 className="text-sm font-medium text-[#DAA520] mb-3">MARKET SNAPSHOT</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard label="WTI Crude" value="$72.40" sub="/bbl" color="text-green-500" />
           <StatCard label="Brent Crude" value="$76.15" sub="/bbl" color="text-green-500" />
@@ -47,7 +47,7 @@ export default function DashboardPage() {
 
       {/* Platform Stats */}
       <div className="pb-8 border-b border-gray-800">
-        <h2 className="text-sm font-medium text-gray-400 mb-3">PLATFORM DATA</h2>
+        <h2 className="text-sm font-medium text-[#DAA520] mb-3">PLATFORM DATA</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard label="Total Assets" value={formatNumber(stats.totalAssets)} />
           <StatCard label="Active Wells" value={formatNumber(stats.activeWells)} color="text-blue-400" />
@@ -57,7 +57,7 @@ export default function DashboardPage() {
       {/* Top Basins */}
       {stats.topBasins.length > 0 && (
         <div className="pb-8 border-b border-gray-800">
-          <h2 className="text-sm font-medium text-gray-400 mb-3">TOP BASINS</h2>
+          <h2 className="text-sm font-medium text-[#DAA520] mb-3">TOP BASINS</h2>
           <div className="flex flex-wrap gap-2">
             {stats.topBasins.map((b) => (
               <span key={b} className="px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-xs text-gray-300">{b}</span>
@@ -69,7 +69,7 @@ export default function DashboardPage() {
       {/* Top Operators */}
       {topOperators.length > 0 && (
         <div className="pb-8 border-b border-gray-800">
-          <h2 className="text-sm font-medium text-gray-400 mb-3">TOP OPERATORS BY PRODUCTION</h2>
+          <h2 className="text-sm font-medium text-[#DAA520] mb-3">TOP OPERATORS BY PRODUCTION</h2>
           <div className="bg-gray-900 border border-gray-800 rounded-xl divide-y divide-gray-800">
             {topOperators.map((op) => (
               <div
@@ -91,7 +91,7 @@ export default function DashboardPage() {
       {/* Recently Viewed */}
       {recentAssets.length > 0 && (
         <div>
-          <h2 className="text-sm font-medium text-gray-400 mb-3">RECENTLY VIEWED</h2>
+          <h2 className="text-sm font-medium text-[#DAA520] mb-3">RECENTLY VIEWED</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {recentAssets.map((a) => (
               <div
