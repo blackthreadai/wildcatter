@@ -6,6 +6,8 @@ import dynamic from 'next/dynamic';
 import api from '@/lib/api';
 import { formatNumber, formatCurrency, addRecentlyViewed, assetTypeColor } from '@/lib/utils';
 import { exportProductionCSV } from '@/lib/export';
+import { useSaved } from '@/hooks/useSaved';
+import SaveButton from '@/components/SaveButton';
 import ProductionChart from '@/components/ProductionChart';
 import StatCard from '@/components/StatCard';
 import type { Asset, ProductionRecord, FinancialEstimate, Operator } from '@/lib/types';
@@ -20,6 +22,11 @@ export default function AssetDetailPage() {
   const [financials, setFinancials] = useState<FinancialEstimate | null>(null);
   const [operator, setOperator] = useState<Operator | null>(null);
   const [related, setRelated] = useState<Asset[]>([]);
+  const { isSaved, saveItem, unsaveItem } = useSaved();
+  const toggleSave = (type: 'asset' | 'operator', itemId: string) => {
+    if (isSaved(type, itemId)) unsaveItem(type, itemId);
+    else saveItem(type, itemId);
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -60,6 +67,7 @@ export default function AssetDetailPage() {
           <button onClick={() => router.back()} className="text-sm text-gray-500 hover:text-gray-300 mb-2">← Back</button>
           <h1 className="text-2xl font-bold text-white flex items-center gap-3">
             {asset.name}
+            <SaveButton itemType="asset" itemId={asset.id} isSaved={isSaved('asset', asset.id)} onToggle={toggleSave} />
             <span className="text-sm px-2 py-0.5 rounded" style={{ backgroundColor: assetTypeColor(asset.type) + '20', color: assetTypeColor(asset.type) }}>
               {asset.type.toUpperCase()}
             </span>

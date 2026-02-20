@@ -6,6 +6,9 @@ import SearchBar from '@/components/SearchBar';
 import FilterPanel from '@/components/FilterPanel';
 import api from '@/lib/api';
 import { formatNumber, assetTypeColor } from '@/lib/utils';
+import { downloadCSV } from '@/lib/export';
+import { useSaved } from '@/hooks/useSaved';
+import SaveButton from '@/components/SaveButton';
 import type { Asset, Operator, SearchFilters } from '@/lib/types';
 
 function SearchContent() {
@@ -16,6 +19,20 @@ function SearchContent() {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [operators, setOperators] = useState<Operator[]>([]);
   const [loading, setLoading] = useState(false);
+  const { isSaved, saveItem, unsaveItem } = useSaved();
+
+  const toggleSave = (type: 'asset' | 'operator', id: string) => {
+    if (isSaved(type, id)) unsaveItem(type, id);
+    else saveItem(type, id);
+  };
+
+  function exportResults() {
+    if (tab === 'assets') {
+      downloadCSV(assets.slice(0, 100) as unknown as Record<string, unknown>[], 'search-assets.csv');
+    } else {
+      downloadCSV(operators.slice(0, 100) as unknown as Record<string, unknown>[], 'search-operators.csv');
+    }
+  }
 
   const search = useCallback(async (f: SearchFilters) => {
     setLoading(true);
@@ -50,6 +67,7 @@ function SearchContent() {
       <FilterPanel filters={filters} onChange={handleFilterChange} />
 
       {/* Tabs */}
+      <div className="flex items-center gap-3">
       <div className="flex gap-1 bg-gray-800 rounded-lg p-0.5 w-fit">
         <button
           onClick={() => setTab('assets')}
@@ -64,6 +82,15 @@ function SearchContent() {
           Operators ({operators.length})
         </button>
       </div>
+      {(assets.length > 0 || operators.length > 0) && (
+        <button
+          onClick={exportResults}
+          className="flex items-center gap-2 px-3 py-2 bg-gray-800 text-gray-300 text-sm rounded-lg hover:bg-gray-700 transition-colors"
+        >
+          <span className="text-[#DAA520]">↓</span> Export Results
+        </button>
+      )}
+      </div>
 
       {loading && (
         <div className="flex justify-center py-8">
@@ -77,11 +104,14 @@ function SearchContent() {
             <div
               key={a.id}
               onClick={() => router.push(`/assets/${a.id}`)}
-              className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-600 transition-colors"
+              className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-600 transition-colors relative"
             >
+              <div className="absolute top-2 right-2">
+                <SaveButton itemType="asset" itemId={a.id} isSaved={isSaved('asset', a.id)} onToggle={toggleSave} />
+              </div>
               <div className="flex items-center justify-between mb-2">
                 <span className="font-medium text-white">{a.name}</span>
-                <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: assetTypeColor(a.type) + '20', color: assetTypeColor(a.type) }}>
+                <span className="text-xs px-2 py-0.5 rounded mr-6" style={{ backgroundColor: assetTypeColor(a.type) + '20', color: assetTypeColor(a.type) }}>
                   {a.type.toUpperCase()}
                 </span>
               </div>
@@ -103,8 +133,11 @@ function SearchContent() {
             <div
               key={o.id}
               onClick={() => router.push(`/operators/${o.id}`)}
-              className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-600 transition-colors"
+              className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-600 transition-colors relative"
             >
+              <div className="absolute top-2 right-2">
+                <SaveButton itemType="operator" itemId={o.id} isSaved={isSaved('operator', o.id)} onToggle={toggleSave} />
+              </div>
               <p className="font-medium text-white">{o.name}</p>
               <p className="text-xs text-gray-500 mt-1">{o.hqLocation}</p>
               <div className="flex items-center gap-4 mt-3 text-sm">

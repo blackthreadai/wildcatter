@@ -7,6 +7,8 @@ import { formatNumber } from '@/lib/utils';
 import StatCard from '@/components/StatCard';
 import ProductionChart from '@/components/ProductionChart';
 import DataTable, { type Column } from '@/components/DataTable';
+import { useSaved } from '@/hooks/useSaved';
+import SaveButton from '@/components/SaveButton';
 import type { Operator, Asset, ProductionRecord } from '@/lib/types';
 
 export default function OperatorDetailPage() {
@@ -17,6 +19,11 @@ export default function OperatorDetailPage() {
   const [production, setProduction] = useState<ProductionRecord[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const { isSaved, saveItem, unsaveItem } = useSaved();
+  const toggleSave = (type: 'asset' | 'operator', itemId: string) => {
+    if (isSaved(type, itemId)) unsaveItem(type, itemId);
+    else saveItem(type, itemId);
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -62,7 +69,10 @@ export default function OperatorDetailPage() {
     <div className="space-y-6">
       <div>
         <button onClick={() => router.back()} className="text-sm text-gray-500 hover:text-gray-300 mb-2">← Back</button>
-        <h1 className="text-2xl font-bold text-white">{operator.name}</h1>
+        <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+          {operator.name}
+          <SaveButton itemType="operator" itemId={operator.id} isSaved={isSaved('operator', operator.id)} onToggle={toggleSave} />
+        </h1>
         <p className="text-sm text-gray-500 mt-1">{operator.hqLocation}</p>
       </div>
 

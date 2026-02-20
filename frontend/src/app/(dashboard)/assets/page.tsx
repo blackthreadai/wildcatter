@@ -6,7 +6,6 @@ import dynamic from 'next/dynamic';
 import DataTable, { type Column } from '@/components/DataTable';
 import api from '@/lib/api';
 import { formatNumber, formatCurrency } from '@/lib/utils';
-import { exportAssetsCSV } from '@/lib/export';
 import type { Asset } from '@/lib/types';
 
 const AssetMap = dynamic(() => import('@/components/AssetMap'), { ssr: false });
@@ -61,12 +60,6 @@ export default function AssetsPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-medium text-gray-400">BROWSE AND MANAGE ENERGY ASSETS</h2>
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => exportAssetsCSV(assets)}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-800 text-gray-300 text-sm rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            <span className="text-[#DAA520]">↓</span> Export CSV
-          </button>
           <div className="flex bg-gray-800 rounded-lg p-0.5">
             <button
               onClick={() => setView('table')}

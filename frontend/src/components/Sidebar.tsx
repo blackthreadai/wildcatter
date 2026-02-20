@@ -11,7 +11,7 @@ const NAV = [
   { href: '/assets', label: 'ASSETS' },
   { href: '/operators', label: 'OPERATORS' },
   { href: '/search', label: 'SEARCH' },
-  { href: '/export', label: 'EXPORT' },
+  { href: '/saved', label: 'SAVED' },
 ];
 
 export default function Sidebar() {
