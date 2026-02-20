@@ -69,11 +69,22 @@ export default function OperatorDetailPage() {
     <div className="space-y-6">
       <div>
         <button onClick={() => router.back()} className="text-sm text-gray-500 hover:text-gray-300 mb-2">← Back</button>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-          {operator.name}
-          <SaveButton itemType="operator" itemId={operator.id} isSaved={isSaved('operator', operator.id)} onToggle={toggleSave} />
-        </h1>
+        <h1 className="text-2xl font-bold text-white">{operator.name}</h1>
         <p className="text-sm text-gray-500 mt-1">{operator.hqLocation}</p>
+      </div>
+
+      {/* Actions bar */}
+      <div className="flex items-center gap-4 pb-4 border-b border-gray-800">
+        <button
+          onClick={() => toggleSave('operator', operator.id)}
+          className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
+            isSaved('operator', operator.id)
+              ? 'bg-[#DAA520]/10 text-[#DAA520]'
+              : 'bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700'
+          }`}
+        >
+          {isSaved('operator', operator.id) ? '★ SAVED' : '☆ SAVE'}
+        </button>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

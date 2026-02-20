@@ -67,18 +67,32 @@ export default function AssetDetailPage() {
           <button onClick={() => router.back()} className="text-sm text-gray-500 hover:text-gray-300 mb-2">← Back</button>
           <h1 className="text-2xl font-bold text-white flex items-center gap-3">
             {asset.name}
-            <SaveButton itemType="asset" itemId={asset.id} isSaved={isSaved('asset', asset.id)} onToggle={toggleSave} />
             <span className="text-sm px-2 py-0.5 rounded" style={{ backgroundColor: assetTypeColor(asset.type) + '20', color: assetTypeColor(asset.type) }}>
               {asset.type.toUpperCase()}
             </span>
           </h1>
           <p className="text-sm text-gray-500 mt-1">{asset.basin} · {asset.county}, {asset.state}</p>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => exportProductionCSV(production)} className="px-3 py-2 bg-gray-800 text-gray-300 text-sm rounded-lg hover:bg-gray-700">
-            📥 Export CSV
-          </button>
-        </div>
+      </div>
+
+      {/* Actions bar */}
+      <div className="flex items-center gap-4 pb-4 border-b border-gray-800">
+        <button
+          onClick={() => toggleSave('asset', asset.id)}
+          className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
+            isSaved('asset', asset.id)
+              ? 'bg-[#DAA520]/10 text-[#DAA520]'
+              : 'bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700'
+          }`}
+        >
+          {isSaved('asset', asset.id) ? '★ SAVED' : '☆ SAVE'}
+        </button>
+        <button
+          onClick={() => exportProductionCSV(production)}
+          className="flex items-center gap-2 px-3 py-2 bg-gray-800 text-gray-300 text-sm rounded-lg hover:bg-gray-700 transition-colors"
+        >
+          <span className="text-[#DAA520]">↓</span> Export CSV
+        </button>
       </div>
 
       {/* Summary */}
