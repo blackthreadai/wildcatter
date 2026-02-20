@@ -53,12 +53,12 @@ export default function DataTable<T extends Record<string, any>>({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-800">
-              {columns.map((col) => (
+              {columns.map((col, idx) => (
                 <th
                   key={col.key}
-                  className={`text-left px-4 py-3 text-xs text-gray-500 uppercase tracking-wider font-medium ${
-                    col.sortable ? 'cursor-pointer hover:text-gray-300' : ''
-                  }`}
+                  className={`text-left px-4 py-3 text-xs text-[#DAA520] uppercase tracking-wider font-medium ${
+                    idx < columns.length - 1 ? 'border-r border-gray-800' : ''
+                  } ${col.sortable ? 'cursor-pointer hover:text-[#E6BE44]' : ''}`}
                   onClick={() => col.sortable && toggleSort(col.key)}
                 >
                   {col.label}
