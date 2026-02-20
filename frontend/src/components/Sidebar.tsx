@@ -76,10 +76,16 @@ export default function Sidebar() {
         <div className="p-4 border-t border-gray-800">
           {user && (
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-400 truncate">{user.email}</span>
+              <Link
+                href="/profile"
+                onClick={() => setOpen(false)}
+                className="text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                Profile
+              </Link>
               <button
                 onClick={logout}
-                className="text-xs text-gray-500 hover:text-red-400 transition-colors"
+                className="text-sm text-[#DAA520] hover:text-[#E6BE44] transition-colors"
               >
                 Logout
               </button>
