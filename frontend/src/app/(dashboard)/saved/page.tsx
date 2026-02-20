@@ -65,14 +65,14 @@ export default function SavedPage() {
             <div
               key={a.id}
               onClick={() => router.push(`/assets/${a.id}`)}
-              className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-600 transition-colors relative"
+              className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-600 transition-colors"
             >
-              <div className="absolute top-2 right-2">
-                <SaveButton itemType="asset" itemId={a.id} isSaved={isSaved('asset', a.id)} onToggle={toggleSave} />
-              </div>
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-white">{a.name}</span>
-                <span className="text-xs px-2 py-0.5 rounded mr-6" style={{ backgroundColor: assetTypeColor(a.type) + '20', color: assetTypeColor(a.type) }}>
+                <div className="flex items-center gap-2">
+                  <SaveButton itemType="asset" itemId={a.id} isSaved={isSaved('asset', a.id)} onToggle={toggleSave} />
+                  <span className="font-medium text-white">{a.name}</span>
+                </div>
+                <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: assetTypeColor(a.type) + '20', color: assetTypeColor(a.type) }}>
                   {a.type.toUpperCase()}
                 </span>
               </div>
@@ -93,12 +93,12 @@ export default function SavedPage() {
             <div
               key={o.id}
               onClick={() => router.push(`/operators/${o.id}`)}
-              className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-600 transition-colors relative"
+              className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-600 transition-colors"
             >
-              <div className="absolute top-2 right-2">
+              <div className="flex items-center gap-2">
                 <SaveButton itemType="operator" itemId={o.id} isSaved={isSaved('operator', o.id)} onToggle={toggleSave} />
+                <p className="font-medium text-white">{o.name}</p>
               </div>
-              <p className="font-medium text-white">{o.name}</p>
               <p className="text-xs text-gray-500 mt-1">{o.hqLocation}</p>
               <div className="flex items-center gap-4 mt-3 text-sm">
                 <span>{o.activeAssets} assets</span>
