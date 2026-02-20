@@ -37,7 +37,7 @@ export function useSaved() {
 
   const unsaveItem = useCallback(async (type: 'asset' | 'operator', id: string) => {
     try {
-      await api.delete(`/saved/${id}`, { params: { itemType: type } });
+      await api.delete('/saved', { params: { itemType: type, itemId: id } });
       await fetchSaved();
     } catch { /* empty */ }
   }, [fetchSaved]);
