@@ -84,7 +84,6 @@ export default function SavedPage() {
               <p className="text-xs text-gray-500 mt-1">{a.operatorName}</p>
             </div>
           ))}
-          {savedAssets.length === 0 && <p className="text-gray-500 col-span-full text-center py-8">No saved assets yet. Browse and save assets from Search or Asset pages.</p>}
         </div>
       )}
 
@@ -110,7 +109,6 @@ export default function SavedPage() {
               </div>
             </div>
           ))}
-          {savedOperators.length === 0 && <p className="text-gray-500 col-span-full text-center py-8">No saved operators yet. Browse and save operators from Search or Operator pages.</p>}
         </div>
       )}
     </div>
