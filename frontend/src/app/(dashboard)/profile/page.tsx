@@ -54,7 +54,7 @@ export default function ProfilePage() {
     setPwLoading(false);
   }
 
-  const inputClass = 'w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#DAA520]';
+  const inputClass = 'w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#DAA520]';
 
   return (
     <div className="space-y-8 max-w-lg">
@@ -63,13 +63,17 @@ export default function ProfilePage() {
       {/* Email */}
       <form onSubmit={handleEmailUpdate} className="pb-8 border-b border-gray-800 space-y-4">
         <h3 className="text-sm font-medium text-gray-400">EMAIL ADDRESS</h3>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className={inputClass}
-          required
-        />
+        <div>
+          <label className="text-xs text-gray-500 mb-1 block">Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="your@email.com"
+            className={inputClass}
+            required
+          />
+        </div>
         <div className="flex items-center gap-3">
           <button
             type="submit"
@@ -85,30 +89,39 @@ export default function ProfilePage() {
       {/* Password */}
       <form onSubmit={handlePasswordChange} className="pb-8 border-b border-gray-800 space-y-4">
         <h3 className="text-sm font-medium text-gray-400">CHANGE PASSWORD</h3>
-        <input
-          type="password"
-          placeholder="Current password"
-          value={currentPassword}
-          onChange={(e) => setCurrentPassword(e.target.value)}
-          className={inputClass}
-          required
-        />
-        <input
-          type="password"
-          placeholder="New password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          className={inputClass}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Confirm new password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          className={inputClass}
-          required
-        />
+        <div>
+          <label className="text-xs text-gray-500 mb-1 block">Current Password</label>
+          <input
+            type="password"
+            placeholder="Enter current password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            className={inputClass}
+            required
+          />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 mb-1 block">New Password</label>
+          <input
+            type="password"
+            placeholder="Enter new password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            className={inputClass}
+            required
+          />
+        </div>
+        <div>
+          <label className="text-xs text-gray-500 mb-1 block">Confirm New Password</label>
+          <input
+            type="password"
+            placeholder="Confirm new password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className={inputClass}
+            required
+          />
+        </div>
         <div className="flex items-center gap-3">
           <button
             type="submit"
