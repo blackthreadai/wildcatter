@@ -21,7 +21,7 @@ export default function ProductionChart({ data, showDeclineCurve }: Props) {
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-      <h3 className="text-sm font-medium text-gray-400 mb-4">Production History</h3>
+      <h3 className="text-sm font-medium text-[#DAA520] mb-4">Production History</h3>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />

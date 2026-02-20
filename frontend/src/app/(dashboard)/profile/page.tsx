@@ -58,11 +58,11 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-8 max-w-lg">
-      <h2 className="text-sm font-medium text-gray-400">ACCOUNT SETTINGS</h2>
+      <h2 className="text-sm font-medium text-[#DAA520]">ACCOUNT SETTINGS</h2>
 
       {/* Email */}
       <form onSubmit={handleEmailUpdate} className="pb-8 border-b border-gray-800 space-y-4">
-        <h3 className="text-sm font-medium text-gray-400">EMAIL ADDRESS</h3>
+        <h3 className="text-sm font-medium text-[#DAA520]">EMAIL ADDRESS</h3>
         <div>
           <label className="text-xs text-gray-500 mb-1 block">Email</label>
           <input
@@ -88,7 +88,7 @@ export default function ProfilePage() {
 
       {/* Password */}
       <form onSubmit={handlePasswordChange} className="pb-8 border-b border-gray-800 space-y-4">
-        <h3 className="text-sm font-medium text-gray-400">CHANGE PASSWORD</h3>
+        <h3 className="text-sm font-medium text-[#DAA520]">CHANGE PASSWORD</h3>
         <div>
           <label className="text-xs text-gray-500 mb-1 block">Current Password</label>
           <input
@@ -136,7 +136,7 @@ export default function ProfilePage() {
 
       {/* Subscription placeholder */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-gray-400">SUBSCRIPTION</h3>
+        <h3 className="text-sm font-medium text-[#DAA520]">SUBSCRIPTION</h3>
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
           <p className="text-sm text-gray-500">Subscription management coming soon.</p>
         </div>

@@ -45,7 +45,7 @@ export default function OperatorsPage() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-sm font-medium text-gray-400">BROWSE ENERGY OPERATORS AND THEIR PROFILES</h2>
+      <h2 className="text-sm font-medium text-[#DAA520]">BROWSE ENERGY OPERATORS AND THEIR PROFILES</h2>
       <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
         <DataTable
           columns={columns}

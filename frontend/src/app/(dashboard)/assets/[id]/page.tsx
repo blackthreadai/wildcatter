@@ -106,7 +106,7 @@ export default function AssetDetailPage() {
       {/* Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-3">
-          <h3 className="text-sm font-medium text-gray-400">Asset Details</h3>
+          <h3 className="text-sm font-medium text-[#DAA520]">Asset Details</h3>
           <div className="grid grid-cols-2 gap-2 text-sm">
             <span className="text-gray-500">Commodity</span><span>{asset.commodity}</span>
             <span className="text-gray-500">Spud Date</span><span>{asset.spudDate}</span>
@@ -118,7 +118,7 @@ export default function AssetDetailPage() {
         {/* Financials */}
         {financials && (
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-3">
-            <h3 className="text-sm font-medium text-gray-400">Financial Estimates</h3>
+            <h3 className="text-sm font-medium text-[#DAA520]">Financial Estimates</h3>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <span className="text-gray-500">Revenue</span><span className="text-green-400">{formatCurrency(financials.revenue)}</span>
               <span className="text-gray-500">Operating Cost</span><span className="text-red-400">{formatCurrency(financials.operatingCost)}</span>
@@ -138,7 +138,7 @@ export default function AssetDetailPage() {
           onClick={() => router.push(`/operators/${operator.id}`)}
           className="bg-gray-900 border border-gray-800 rounded-xl p-5 cursor-pointer hover:border-gray-600 transition-colors"
         >
-          <h3 className="text-sm font-medium text-gray-400 mb-2">Operator</h3>
+          <h3 className="text-sm font-medium text-[#DAA520] mb-2">Operator</h3>
           <p className="text-lg font-medium text-white">{operator.name}</p>
           <p className="text-sm text-gray-500">{operator.hqLocation} · {operator.activeAssets} active assets</p>
           <div className="flex gap-2 mt-2">
@@ -157,7 +157,7 @@ export default function AssetDetailPage() {
       {/* Related Assets */}
       {related.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium text-gray-400 mb-3">Related Assets in {asset.basin}</h3>
+          <h3 className="text-sm font-medium text-[#DAA520] mb-3">Related Assets in {asset.basin}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {related.map((a) => (
               <div

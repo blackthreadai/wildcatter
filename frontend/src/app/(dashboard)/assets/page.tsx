@@ -58,7 +58,7 @@ export default function AssetsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium text-gray-400">BROWSE AND MANAGE ENERGY ASSETS</h2>
+        <h2 className="text-sm font-medium text-[#DAA520]">BROWSE AND MANAGE ENERGY ASSETS</h2>
         <div className="flex items-center gap-3">
           <div className="flex bg-gray-800 rounded-lg p-0.5">
             <button

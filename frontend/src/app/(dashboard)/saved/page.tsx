@@ -26,7 +26,7 @@ export default function SavedPage() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-sm font-medium text-gray-400">YOUR SAVED ASSETS AND OPERATORS</h2>
+      <h2 className="text-sm font-medium text-[#DAA520]">YOUR SAVED ASSETS AND OPERATORS</h2>
 
       <div className="flex items-center gap-3">
         <div className="flex gap-1 bg-gray-800 rounded-lg p-0.5 w-fit">

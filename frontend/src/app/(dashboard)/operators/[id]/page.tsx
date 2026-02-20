@@ -108,7 +108,7 @@ export default function OperatorDetailPage() {
 
       {/* Assets */}
       <div>
-        <h3 className="text-sm font-medium text-gray-400 mb-3">Assets</h3>
+        <h3 className="text-sm font-medium text-[#DAA520] mb-3">Assets</h3>
         <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
           <DataTable
             columns={columns}
