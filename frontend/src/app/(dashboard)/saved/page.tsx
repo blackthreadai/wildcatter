@@ -68,13 +68,13 @@ export default function SavedPage() {
               className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-600 transition-colors"
             >
               <div className="flex items-center justify-between mb-2">
+                <span className="font-medium text-white">{a.name}</span>
                 <div className="flex items-center gap-2">
+                  <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: assetTypeColor(a.type) + '20', color: assetTypeColor(a.type) }}>
+                    {a.type.toUpperCase()}
+                  </span>
                   <SaveButton itemType="asset" itemId={a.id} isSaved={isSaved('asset', a.id)} onToggle={toggleSave} />
-                  <span className="font-medium text-white">{a.name}</span>
                 </div>
-                <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: assetTypeColor(a.type) + '20', color: assetTypeColor(a.type) }}>
-                  {a.type.toUpperCase()}
-                </span>
               </div>
               <p className="text-xs text-gray-500">{a.basin} · {a.county}, {a.state}</p>
               <div className="flex items-center justify-between mt-3 text-sm">
@@ -95,9 +95,9 @@ export default function SavedPage() {
               onClick={() => router.push(`/operators/${o.id}`)}
               className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-600 transition-colors"
             >
-              <div className="flex items-center gap-2">
-                <SaveButton itemType="operator" itemId={o.id} isSaved={isSaved('operator', o.id)} onToggle={toggleSave} />
+              <div className="flex items-center justify-between">
                 <p className="font-medium text-white">{o.name}</p>
+                <SaveButton itemType="operator" itemId={o.id} isSaved={isSaved('operator', o.id)} onToggle={toggleSave} />
               </div>
               <p className="text-xs text-gray-500 mt-1">{o.hqLocation}</p>
               <div className="flex items-center gap-4 mt-3 text-sm">
