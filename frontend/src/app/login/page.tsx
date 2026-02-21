@@ -30,11 +30,12 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-950 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#DAA520]">◈ WILDCATTER</h1>
-          <p className="text-sm text-gray-500 mt-2">Energy Asset Intelligence</p>
+          <div className="flex items-center justify-center gap-3">
+            <img src="/w-icon.svg" alt="W" className="w-12 h-12" />
+            <span className="text-lg font-light text-[#DAA520] tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>ENERGY INTELLIGENCE</span>
+          </div>
         </div>
         <form onSubmit={handleSubmit} className="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-4">
-          <h2 className="text-lg font-medium text-white">Sign In</h2>
           {error && <p className="text-sm text-red-400 bg-red-500/10 px-3 py-2 rounded-lg">{error}</p>}
           <div>
             <label className="text-xs text-gray-500 mb-1 block">Email</label>
@@ -59,9 +60,9 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 bg-[#B8860B] text-white rounded-lg text-sm font-medium hover:bg-[#DAA520] disabled:opacity-50 transition-colors"
+            className="w-full py-2.5 bg-[#B8860B] text-gray-950 rounded-lg text-sm font-medium hover:bg-[#DAA520] disabled:opacity-50 transition-colors"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'SIGNING IN...' : 'SIGN IN'}
           </button>
           <p className="text-center text-sm text-gray-500">
             No account? <Link href="/register" className="text-[#DAA520] hover:underline">Register</Link>

@@ -120,7 +120,7 @@ api.interceptors.response.use(
   (err) => {
     if (err.response?.status === 401 && typeof window !== 'undefined') {
       localStorage.removeItem('wc_token');
-      window.location.href = '/login';
+      window.location.href = '/welcome';
     }
     return Promise.reject(err);
   }

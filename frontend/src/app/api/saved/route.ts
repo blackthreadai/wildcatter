@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     // Return both
     const [assetRes, opRes] = await Promise.all([
       pool.query(
-        `SELECT s.id as saved_id, s.item_type, s.item_id, s.created_at as saved_at, a.*,
+        `SELECT s.id as saved_id, s.item_type, s.item_id, s.created_at as saved_at, s.note, a.*,
                 o.legal_name as operator_name,
                 COALESCE(lp.latest_production, 0) AS latest_production,
                 fe.estimated_net_cash_flow AS cash_flow
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
         [userId]
       ),
       pool.query(
-        `SELECT s.id as saved_id, s.item_type, s.item_id, s.created_at as saved_at, o.*
+        `SELECT s.id as saved_id, s.item_type, s.item_id, s.created_at as saved_at, s.note, o.*
          FROM saved_items s JOIN operators o ON o.id = s.item_id
          WHERE s.user_id = $1 AND s.item_type = 'operator'
          ORDER BY s.created_at DESC`,
@@ -83,6 +83,35 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error('Error saving item:', err);
     return NextResponse.json({ error: 'Failed to save item' }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  const auth = requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
+
+  try {
+    const { itemType, itemId, note } = await req.json();
+    if (!['asset', 'operator'].includes(itemType) || !itemId) {
+      return NextResponse.json({ error: 'itemType and itemId required' }, { status: 400 });
+    }
+    if (typeof note !== 'string' || note.length > 300) {
+      return NextResponse.json({ error: 'Note must be a string up to 300 characters' }, { status: 400 });
+    }
+
+    const result = await pool.query(
+      `UPDATE saved_items SET note = $1 WHERE user_id = $2 AND item_type = $3 AND item_id = $4 RETURNING *`,
+      [note || null, auth.userId, itemType, itemId]
+    );
+
+    if (result.rows.length === 0) {
+      return NextResponse.json({ error: 'Saved item not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(result.rows[0]);
+  } catch (err) {
+    console.error('Error updating note:', err);
+    return NextResponse.json({ error: 'Failed to update note' }, { status: 500 });
   }
 }
 

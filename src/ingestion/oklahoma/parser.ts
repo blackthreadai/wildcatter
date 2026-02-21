@@ -9,6 +9,7 @@
  * We create Asset and Operator records from the well data.
  */
 
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as readline from 'readline';
 import { Asset, AssetType, AssetStatus, Operator } from '../../types';
@@ -19,6 +20,20 @@ import {
   WELL_STATUS_MAP,
   WELL_TYPE_MAP,
 } from './constants';
+
+/**
+ * Generate a deterministic UUID v5-style id from a namespace string.
+ * Uses SHA-256 truncated to 16 bytes, formatted as a UUID with version 5 bits.
+ */
+function deterministicUuid(input: string): string {
+  const hash = crypto.createHash('sha256').update(input).digest();
+  // Set version 5 (bits 4-7 of byte 6)
+  hash[6] = (hash[6] & 0x0f) | 0x50;
+  // Set variant (bits 6-7 of byte 8)
+  hash[8] = (hash[8] & 0x3f) | 0x80;
+  const hex = hash.subarray(0, 16).toString('hex');
+  return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20,32)}`;
+}
 
 // ── Parsed intermediate types ─────────────────────────
 
@@ -59,7 +74,7 @@ export interface ParseStats {
  */
 export function buildAssetId(api: string): string {
   const cleaned = api.replace(/\D/g, '').padStart(10, '0');
-  return `OK_OCC_${cleaned}`;
+  return deterministicUuid(`OK_OCC_${cleaned}`);
 }
 
 /**
@@ -77,7 +92,7 @@ export function formatApiNumber(api: string): string {
  */
 export function buildOperatorId(operatorName: string): string {
   const normalized = operatorName.trim().toUpperCase().replace(/[^A-Z0-9]/g, '_');
-  return `OK_OP_${normalized}`.substring(0, 64);
+  return deterministicUuid(`OK_OP_${normalized}`);
 }
 
 /**

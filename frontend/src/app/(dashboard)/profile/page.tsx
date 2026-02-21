@@ -136,9 +136,9 @@ export default function ProfilePage() {
 
       {/* Subscription placeholder */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-[#DAA520]">SUBSCRIPTION</h3>
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-          <p className="text-sm text-gray-500">Subscription management coming soon.</p>
+        <h3 className="text-sm font-medium text-red-400">SUBSCRIPTION</h3>
+        <div className="bg-red-950/30 border border-red-900/50 rounded-xl p-5">
+          <p className="text-sm text-red-400/70">Subscription management coming soon.</p>
         </div>
       </div>
     </div>

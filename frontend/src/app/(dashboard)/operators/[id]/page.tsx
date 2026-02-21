@@ -52,7 +52,9 @@ export default function OperatorDetailPage() {
     );
   }
 
-  const riskColor = operator.riskScore <= 3 ? 'text-green-400' : operator.riskScore <= 6 ? 'text-[#E6BE44]' : 'text-red-400';
+  const rs = operator.riskScore;
+  const hasRisk = rs != null && rs > 0;
+  const riskColor = !hasRisk ? 'text-gray-500' : rs <= 3 ? 'text-green-400' : rs <= 6 ? 'text-[#E6BE44]' : 'text-red-400';
 
   const columns: Column<Asset>[] = [
     { key: 'name', label: 'Name', sortable: true },
@@ -90,7 +92,7 @@ export default function OperatorDetailPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard label="Active Assets" value={String(operator.activeAssets)} />
         <StatCard label="Total Production" value={formatNumber(operator.totalProduction)} sub="bbl/mo" color="text-[#DAA520]" />
-        <StatCard label="Risk Score" value={`${operator.riskScore}/10`} color={riskColor} />
+        <StatCard label="Risk Score" value={hasRisk ? `${rs}/10` : 'NA'} color={riskColor} />
         <StatCard label="Compliance" value={operator.complianceFlags.length === 0 ? 'Clean' : `${operator.complianceFlags.length} flags`} color={operator.complianceFlags.length === 0 ? 'text-green-400' : 'text-red-400'} />
       </div>
 

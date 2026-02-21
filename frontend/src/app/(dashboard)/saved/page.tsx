@@ -7,10 +7,84 @@ import SaveButton from '@/components/SaveButton';
 import { downloadCSV } from '@/lib/export';
 import { formatNumber, assetTypeColor } from '@/lib/utils';
 
+function NoteEditor({
+  itemType,
+  itemId,
+  initialNote,
+  onSave,
+}: {
+  itemType: 'asset' | 'operator';
+  itemId: string;
+  initialNote: string;
+  onSave: (type: 'asset' | 'operator', id: string, note: string) => Promise<void>;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [note, setNote] = useState(initialNote || '');
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    await onSave(itemType, itemId, note);
+    setSaving(false);
+    setEditing(false);
+  };
+
+  if (!editing) {
+    return (
+      <div
+        onClick={(e) => { e.stopPropagation(); setEditing(true); }}
+        className="mt-2 cursor-pointer group"
+      >
+        {initialNote ? (
+          <p className="text-xs text-gray-400 italic border-l-2 border-gray-700 pl-2 group-hover:border-[#DAA520] transition-colors">
+            {initialNote}
+          </p>
+        ) : (
+          <p className="text-xs text-gray-600 group-hover:text-gray-400 transition-colors">
+            + Add note
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+      <textarea
+        value={note}
+        onChange={(e) => setNote(e.target.value.slice(0, 300))}
+        maxLength={300}
+        rows={2}
+        autoFocus
+        placeholder="Add a note..."
+        className="w-full px-2 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#DAA520] resize-none"
+      />
+      <div className="flex items-center justify-between mt-1">
+        <span className="text-xs text-gray-600">{note.length}/300</span>
+        <div className="flex gap-2">
+          <button
+            onClick={() => { setNote(initialNote || ''); setEditing(false); }}
+            className="text-xs text-gray-500 hover:text-white transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="text-xs text-[#DAA520] hover:text-[#E6BE44] transition-colors disabled:opacity-50"
+          >
+            {saving ? 'Saving...' : 'Save'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function SavedPage() {
   const router = useRouter();
   const [tab, setTab] = useState<'assets' | 'operators'>('assets');
-  const { savedAssets, savedOperators, isSaved, unsaveItem, loading } = useSaved();
+  const { savedAssets, savedOperators, isSaved, unsaveItem, updateNote, loading } = useSaved();
 
   const toggleSave = (type: 'asset' | 'operator', id: string) => {
     unsaveItem(type, id);
@@ -82,6 +156,12 @@ export default function SavedPage() {
                 {a.declineRate != null && <span className="text-gray-500">Decline: {a.declineRate.toFixed(1)}%</span>}
               </div>
               <p className="text-xs text-gray-500 mt-1">{a.operatorName}</p>
+              <NoteEditor
+                itemType="asset"
+                itemId={a.id}
+                initialNote={(a as unknown as Record<string, string>).note || ''}
+                onSave={updateNote}
+              />
             </div>
           ))}
         </div>
@@ -103,10 +183,16 @@ export default function SavedPage() {
               <div className="flex items-center gap-4 mt-3 text-sm">
                 <span>{o.activeAssets} assets</span>
                 {o.totalProduction != null && <span className="text-[#DAA520]">{formatNumber(o.totalProduction)} bbl/mo</span>}
-                <span className={o.riskScore <= 3 ? 'text-green-400' : o.riskScore <= 6 ? 'text-[#E6BE44]' : 'text-red-400'}>
-                  Risk: {o.riskScore}/10
+                <span className={!o.riskScore ? 'text-gray-500' : o.riskScore <= 3 ? 'text-green-400' : o.riskScore <= 6 ? 'text-[#E6BE44]' : 'text-red-400'}>
+                  Risk: {o.riskScore ? `${o.riskScore}/10` : 'NA'}
                 </span>
               </div>
+              <NoteEditor
+                itemType="operator"
+                itemId={o.id}
+                initialNote={(o as unknown as Record<string, string>).note || ''}
+                onSave={updateNote}
+              />
             </div>
           ))}
         </div>

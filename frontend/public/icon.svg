@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="72" ry="72" fill="#111111"/>
+  <rect x="26" y="26" width="460" height="460" rx="52" ry="52" fill="none" stroke="#DAA520" stroke-width="14"/>
+  <g transform="translate(101.3, 365.5) scale(0.1408, -0.1408)">
+    <path d="M522 1251 766 528 997 1251H858V1507H1401V1251H1262L1509 528L1747 1251H1595V1507H2200V1251H2036L1618 -8H1339L1102 680L877 -8H588L158 1251H-2V1507H678V1251Z" fill="#DAA520"/>
+  </g>
+</svg>

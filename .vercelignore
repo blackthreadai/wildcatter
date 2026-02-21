@@ -1,0 +1,5 @@
+data/
+migrations/
+scripts/
+*.csv
+*.sql

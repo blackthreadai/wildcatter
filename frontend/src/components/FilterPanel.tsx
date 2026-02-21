@@ -8,8 +8,19 @@ interface Props {
   onChange: (filters: SearchFilters) => void;
 }
 
-const STATES = ['Texas', 'Oklahoma', 'New Mexico'];
-const BASINS = ['Permian', 'Anadarko', 'Delaware', 'Midland', 'SCOOP/STACK', 'San Juan'];
+const STATES = [
+  { value: 'TX', label: 'Texas' },
+  { value: 'OK', label: 'Oklahoma' },
+  { value: 'NM', label: 'New Mexico' },
+];
+const BASINS = [
+  { value: 'Anadarko Basin', label: 'Anadarko Basin' },
+  { value: 'Delaware Basin', label: 'Delaware Basin' },
+  { value: 'Midland Basin', label: 'Midland Basin' },
+  { value: 'SCOOP', label: 'SCOOP' },
+  { value: 'STACK', label: 'STACK' },
+  { value: 'San Juan Basin', label: 'San Juan Basin' },
+];
 const TYPES = ['oil', 'gas', 'mining', 'energy'];
 const STATUSES = ['active', 'inactive', 'shut-in'];
 
@@ -39,14 +50,14 @@ export default function FilterPanel({ filters, onChange }: Props) {
             <label className="text-xs text-gray-500 mb-1 block">State</label>
             <select className={selectClass} value={filters.state || ''} onChange={(e) => update('state', e.target.value)}>
               <option value="">All</option>
-              {STATES.map((s) => <option key={s} value={s}>{s}</option>)}
+              {STATES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
           </div>
           <div>
             <label className="text-xs text-gray-500 mb-1 block">Basin</label>
             <select className={selectClass} value={filters.basin || ''} onChange={(e) => update('basin', e.target.value)}>
               <option value="">All</option>
-              {BASINS.map((b) => <option key={b} value={b}>{b}</option>)}
+              {BASINS.map((b) => <option key={b.value} value={b.value}>{b.label}</option>)}
             </select>
           </div>
           <div>

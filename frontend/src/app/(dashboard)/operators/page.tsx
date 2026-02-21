@@ -29,10 +29,11 @@ export default function OperatorsPage() {
     { key: 'totalProduction', label: 'Production', sortable: true, render: (r) => formatNumber(r.totalProduction) + ' bbl/mo' },
     { key: 'riskScore', label: 'Risk', sortable: true, render: (r) => (
       <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+        !r.riskScore ? 'bg-gray-500/10 text-gray-500' :
         r.riskScore <= 3 ? 'bg-green-500/10 text-green-400' :
         r.riskScore <= 6 ? 'bg-[#DAA520]/10 text-[#E6BE44]' :
         'bg-red-500/10 text-red-400'
-      }`}>{r.riskScore}/10</span>
+      }`}>{r.riskScore ? `${r.riskScore}/10` : 'NA'}</span>
     )},
     { key: 'complianceFlags', label: 'Flags', render: (r) => (
       <div className="flex gap-1">

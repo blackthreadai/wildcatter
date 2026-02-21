@@ -99,8 +99,8 @@ export default function AssetDetailPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard label="Status" value={asset.status} color={asset.status === 'active' ? 'text-green-400' : 'text-gray-400'} />
         <StatCard label="Production" value={formatNumber(asset.currentProduction)} sub="bbl/mo" color="text-[#DAA520]" />
-        <StatCard label="Decline Rate" value={asset.declineRate.toFixed(1) + '%'} color="text-red-400" />
-        <StatCard label="Est. Life" value={asset.estimatedLife + ' yr'} />
+        <StatCard label="Decline Rate" value={asset.declineRate != null ? asset.declineRate.toFixed(1) + '%' : '—'} color="text-red-400" />
+        <StatCard label="Est. Life" value={asset.estimatedLife != null ? asset.estimatedLife + ' mo' : '—'} />
       </div>
 
       {/* Details Grid */}

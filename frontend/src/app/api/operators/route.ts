@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     const sortCol = sp.get('sort') === 'name' ? 'o.legal_name'
       : sp.get('sort') === 'assets' ? 'o.active_asset_count'
       : sp.get('sort') === 'totalProduction' ? 'total_production'
-      : 'o.created_at';
+      : 'o.active_asset_count';
 
     const params: unknown[] = [];
     const conditions: string[] = [];
@@ -36,16 +36,18 @@ export async function GET(req: NextRequest) {
 
     params.push(limit, offset);
     const dataResult = await pool.query(
-      `SELECT o.*,
-         COALESCE(tp.total_production, 0) AS total_production
-       FROM operators o
-       LEFT JOIN LATERAL (
-         SELECT SUM(COALESCE(pr.oil_volume_bbl, 0) + COALESCE(pr.gas_volume_mcf, 0)) AS total_production
+      `WITH op_prod AS (
+         SELECT a.operator_id,
+                SUM(COALESCE(pr.oil_volume_bbl, 0) + COALESCE(pr.gas_volume_mcf, 0)) AS total_production
          FROM production_records pr
          JOIN assets a ON a.id = pr.asset_id
-         WHERE a.operator_id = o.id
-           AND pr.month = (SELECT MAX(month) FROM production_records)
-       ) tp ON true
+         WHERE a.operator_id IS NOT NULL
+         GROUP BY a.operator_id
+       )
+       SELECT o.*,
+         COALESCE(op.total_production, 0) AS total_production
+       FROM operators o
+       LEFT JOIN op_prod op ON op.operator_id = o.id
        ${where}
        ORDER BY ${sortCol} ${sortDir} NULLS LAST
        LIMIT $${params.length - 1} OFFSET $${params.length}`,

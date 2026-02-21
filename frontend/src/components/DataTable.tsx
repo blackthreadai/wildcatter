@@ -7,6 +7,10 @@ export interface Column<T> {
   label: string;
   sortable?: boolean;
   render?: (row: T) => ReactNode;
+  /** Hide this column in mobile card view */
+  hideOnMobile?: boolean;
+  /** Use as the card title (first prominent line) */
+  primary?: boolean;
 }
 
 interface DataTableProps<T> {
@@ -47,9 +51,32 @@ export default function DataTable<T extends Record<string, any>>({
     }
   }
 
+  const Pagination = () => totalPages > 1 && onPageChange ? (
+    <div className="flex items-center justify-between px-4 py-3 border-t border-gray-800">
+      <button
+        onClick={() => onPageChange(page - 1)}
+        disabled={page <= 1}
+        className="px-3 py-1 text-sm bg-gray-800 text-gray-300 rounded disabled:opacity-30"
+      >
+        Previous
+      </button>
+      <span className="text-sm text-gray-500">
+        Page {page} of {totalPages}
+      </span>
+      <button
+        onClick={() => onPageChange(page + 1)}
+        disabled={page >= totalPages}
+        className="px-3 py-1 text-sm bg-gray-800 text-gray-300 rounded disabled:opacity-30"
+      >
+        Next
+      </button>
+    </div>
+  ) : null;
+
   return (
     <div>
-      <div className="overflow-x-auto">
+      {/* Desktop: standard table */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-800">
@@ -77,7 +104,7 @@ export default function DataTable<T extends Record<string, any>>({
                 }`}
               >
                 {columns.map((col) => (
-                  <td key={col.key} className="px-4 py-3 text-gray-300">
+                  <td key={col.key} className="px-4 py-3 text-gray-300 text-sm">
                     {col.render ? col.render(row) : String(row[col.key] ?? '')}
                   </td>
                 ))}
@@ -93,27 +120,43 @@ export default function DataTable<T extends Record<string, any>>({
           </tbody>
         </table>
       </div>
-      {totalPages > 1 && onPageChange && (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-800">
-          <button
-            onClick={() => onPageChange(page - 1)}
-            disabled={page <= 1}
-            className="px-3 py-1 text-sm bg-gray-800 text-gray-300 rounded disabled:opacity-30"
-          >
-            Previous
-          </button>
-          <span className="text-sm text-gray-500">
-            Page {page} of {totalPages}
-          </span>
-          <button
-            onClick={() => onPageChange(page + 1)}
-            disabled={page >= totalPages}
-            className="px-3 py-1 text-sm bg-gray-800 text-gray-300 rounded disabled:opacity-30"
-          >
-            Next
-          </button>
-        </div>
-      )}
+
+      {/* Mobile: card layout */}
+      <div className="md:hidden divide-y divide-gray-800">
+        {sorted.length === 0 && (
+          <div className="px-4 py-8 text-center text-gray-500 text-sm">No data available</div>
+        )}
+        {sorted.map((row, i) => {
+          // First column is treated as the card title
+          const titleCol = columns[0];
+          const restCols = columns.slice(1);
+          return (
+            <div
+              key={i}
+              onClick={() => onRowClick?.(row)}
+              className={`px-4 py-3 ${onRowClick ? 'cursor-pointer active:bg-gray-800/50' : ''}`}
+            >
+              <p className="text-sm font-medium text-white truncate">
+                {titleCol.render ? titleCol.render(row) : String(row[titleCol.key] ?? '')}
+              </p>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5">
+                {restCols.map((col) => {
+                  const val = col.render ? col.render(row) : String(row[col.key] ?? '');
+                  if (!val || val === '' || val === 'undefined') return null;
+                  return (
+                    <div key={col.key} className="flex items-center gap-1.5 min-w-0">
+                      <span className="text-[10px] text-gray-600 uppercase tracking-wider flex-shrink-0">{col.label}</span>
+                      <span className="text-xs text-gray-400 truncate">{val}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <Pagination />
     </div>
   );
 }

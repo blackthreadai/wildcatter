@@ -42,9 +42,16 @@ export function useSaved() {
     } catch { /* empty */ }
   }, [fetchSaved]);
 
+  const updateNote = useCallback(async (type: 'asset' | 'operator', id: string, note: string) => {
+    try {
+      await api.patch('/saved', { itemType: type, itemId: id, note });
+      await fetchSaved();
+    } catch { /* empty */ }
+  }, [fetchSaved]);
+
   const isSaved = useCallback((type: 'asset' | 'operator', id: string) => {
     return savedIds.has(`${type}:${id}`);
   }, [savedIds]);
 
-  return { savedAssets, savedOperators, saveItem, unsaveItem, isSaved, loading, fetchSaved };
+  return { savedAssets, savedOperators, saveItem, unsaveItem, updateNote, isSaved, loading, fetchSaved };
 }

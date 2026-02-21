@@ -17,9 +17,27 @@ export async function GET(
       return NextResponse.json({ error: 'Operator not found' }, { status: 404 });
     }
 
+    // Compute total production from latest month of each asset
+    const prodResult = await pool.query(
+      `SELECT COALESCE(SUM(lp.latest), 0) AS total_production
+       FROM assets a
+       LEFT JOIN LATERAL (
+         SELECT COALESCE(oil_volume_bbl, 0) + COALESCE(gas_volume_mcf, 0) AS latest
+         FROM production_records pr WHERE pr.asset_id = a.id ORDER BY month DESC LIMIT 1
+       ) lp ON true
+       WHERE a.operator_id = $1`,
+      [id]
+    );
+
     const assetsResult = await pool.query(
-      `SELECT id, name, asset_type, status, state, county, basin, decline_rate
-       FROM assets WHERE operator_id = $1 ORDER BY created_at DESC LIMIT 20`,
+      `SELECT a.id, a.name, a.asset_type, a.status, a.state, a.county, a.basin, a.decline_rate,
+              COALESCE(lp.latest, 0) AS latest_production
+       FROM assets a
+       LEFT JOIN LATERAL (
+         SELECT COALESCE(oil_volume_bbl, 0) + COALESCE(gas_volume_mcf, 0) AS latest
+         FROM production_records pr WHERE pr.asset_id = a.id ORDER BY month DESC LIMIT 1
+       ) lp ON true
+       WHERE a.operator_id = $1 ORDER BY a.created_at DESC LIMIT 20`,
       [id]
     );
 
@@ -37,8 +55,11 @@ export async function GET(
       [id]
     );
 
+    const op = opResult.rows[0];
     return NextResponse.json({
-      ...opResult.rows[0],
+      ...op,
+      risk_score: op.risk_score ?? 0,
+      total_production: Number(prodResult.rows[0]?.total_production || 0),
       assets: assetsResult.rows,
       production_trend: trendResult.rows,
     });
