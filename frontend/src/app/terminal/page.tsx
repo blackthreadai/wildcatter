@@ -92,10 +92,10 @@ export default function TerminalPage() {
     );
   };
 
-  const maxVisibleLayers = 6; // Max layers that fit in the panel
+  const maxVisibleLayers = 10; // Show all layers in full-height panel
   const canScrollUp = layerScrollIndex > 0;
   const canScrollDown = layerScrollIndex + maxVisibleLayers < layers.length;
-  const visibleLayers = layers.slice(layerScrollIndex, layerScrollIndex + maxVisibleLayers);
+  const visibleLayers = layers; // Show all layers
 
   const scrollLayersUp = () => {
     if (canScrollUp) {
@@ -275,17 +275,7 @@ export default function TerminalPage() {
               height: '100%'
             }}
           >
-            {/* Scroll Up Button */}
-            {canScrollUp && (
-              <button
-                onClick={scrollLayersUp}
-                className="w-full py-1 bg-black flex items-center justify-center"
-              >
-                <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                </svg>
-              </button>
-            )}
+            {/* Removed scroll up button */}
 
             {/* Layers List */}
             <div className="p-4">
@@ -324,17 +314,7 @@ export default function TerminalPage() {
               </div>
             </div>
 
-            {/* Scroll Down Button */}
-            {canScrollDown && (
-              <button
-                onClick={scrollLayersDown}
-                className="w-full py-1 bg-black flex items-center justify-center"
-              >
-                <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            )}
+            {/* Removed scroll down button */}
           </div>
         </div>
 
