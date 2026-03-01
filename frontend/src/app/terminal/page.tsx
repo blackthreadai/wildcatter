@@ -116,86 +116,103 @@ export default function TerminalPage() {
         </div>
       </header>
 
-      {/* Main Content - Full Width Map */}
-      <div className="h-[calc(100vh-73px)] relative">
-        {/* Map Header with Date/Time */}
-        <div className="absolute top-0 left-0 right-0 bg-gray-800 border-b border-gray-700 py-2 px-6 z-10">
-          <div className="text-center">
-            <span className="text-white text-sm font-mono">
-              {formatDateTime(currentTime)}
-            </span>
-          </div>
-        </div>
-
-        {/* Map Container - Full Width */}
-        <div className="h-full bg-gray-800 pt-12">
-          <div className="h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-gray-600 rounded-lg flex items-center justify-center">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <p className="text-gray-400 text-sm">World Map Loading...</p>
-              <p className="text-gray-500 text-xs mt-2">Map integration in development</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Layers Panel - Bottom Left */}
-        <div className="absolute bottom-6 left-6 z-20">
-          {/* Layers Toggle Button */}
+      {/* Main Content */}
+      <div className="flex h-[calc(100vh-73px)]">
+        {/* Layers Slider Panel */}
+        <div className={`bg-gray-900 border-r border-gray-800 transition-all duration-300 ${
+          layersOpen ? 'w-80' : 'w-12'
+        }`}>
+          {/* Slider Handle */}
           <button
             onClick={() => setLayersOpen(!layersOpen)}
-            className="flex items-center gap-2 bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white text-sm hover:border-[#DAA520] transition-all"
+            className="w-full h-12 bg-gray-800 border-b border-gray-700 flex items-center justify-center text-white hover:bg-gray-700 transition-all"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-            </svg>
-            LAYERS
-            <svg className={`w-3 h-3 transition-transform ${layersOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-            </svg>
+            {layersOpen ? (
+              <>
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span className="text-xs tracking-wider">LAYERS</span>
+              </>
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            )}
           </button>
 
-          {/* Layers Panel */}
-          <div className={`mt-2 bg-gray-900 border border-gray-700 rounded-lg p-4 w-80 transition-all duration-300 ${
-            layersOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
-          }`}>
-            <h3 className="text-white text-sm font-semibold mb-4 tracking-wider">LAYERS</h3>
-            <div className="space-y-3">
-              {layers.map(layer => (
-                <label
-                  key={layer.id}
-                  className="flex items-center gap-3 p-2 rounded cursor-pointer hover:bg-gray-800 transition-all"
-                >
-                  <input
-                    type="checkbox"
-                    checked={activeLayers.includes(layer.id)}
-                    onChange={() => toggleLayer(layer.id)}
-                    className="sr-only"
-                  />
-                  <div className={`w-4 h-4 border-2 rounded flex items-center justify-center transition-all ${
-                    activeLayers.includes(layer.id) 
-                      ? 'border-white bg-white' 
-                      : 'border-gray-500'
-                  }`}>
-                    {activeLayers.includes(layer.id) && (
-                      <svg className="w-2.5 h-2.5 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    )}
-                  </div>
-                  <div 
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: layer.color }}
-                  />
-                  <span className="text-xs tracking-wider text-gray-300" style={{ fontStretch: 'condensed' }}>
-                    {layer.label}
-                  </span>
-                </label>
-              ))}
+          {/* Layers Content */}
+          <div className={`p-4 transition-all duration-300 ${layersOpen ? 'opacity-100' : 'opacity-0'}`}>
+            {layersOpen && (
+              <>
+                <h3 className="text-white text-sm font-semibold mb-4 tracking-wider">LAYERS</h3>
+                <div className="space-y-3">
+                  {layers.map(layer => (
+                    <label
+                      key={layer.id}
+                      className="flex items-center gap-3 p-2 rounded cursor-pointer hover:bg-gray-800 transition-all"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={activeLayers.includes(layer.id)}
+                        onChange={() => toggleLayer(layer.id)}
+                        className="sr-only"
+                      />
+                      <div className={`w-4 h-4 border-2 rounded flex items-center justify-center transition-all ${
+                        activeLayers.includes(layer.id) 
+                          ? 'border-white bg-white' 
+                          : 'border-gray-500'
+                      }`}>
+                        {activeLayers.includes(layer.id) && (
+                          <svg className="w-2.5 h-2.5 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                      </div>
+                      <div 
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: layer.color }}
+                      />
+                      <span className="text-xs tracking-wider text-gray-300" style={{ fontStretch: 'condensed' }}>
+                        {layer.label}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Map Area */}
+        <div className="flex-1 flex flex-col">
+          {/* Map Header with Date/Time */}
+          <div className="bg-gray-800 border-b border-gray-700 py-2 px-6">
+            <div className="text-center">
+              <span className="text-white text-sm font-mono">
+                {formatDateTime(currentTime)}
+              </span>
             </div>
+          </div>
+
+          {/* Map Container - Half Height */}
+          <div className="h-[50vh] bg-gray-800 relative">
+            <div className="h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gray-600 rounded-lg flex items-center justify-center">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-gray-400 text-sm">World Map Loading...</p>
+                <p className="text-gray-500 text-xs mt-2">Map integration in development</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Area */}
+          <div className="flex-1 bg-gray-900 p-6">
+            <p className="text-gray-400 text-sm">Additional content area below map</p>
           </div>
         </div>
       </div>
