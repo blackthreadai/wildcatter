@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function TerminalPage() {
   const [selectedRegion, setSelectedRegion] = useState('global');
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [activeLayers, setActiveLayers] = useState<string[]>([]);
 
   const regions = [
     { value: 'global', label: 'Global' },
@@ -14,6 +16,42 @@ export default function TerminalPage() {
     { value: 'oceania', label: 'Oceania' },
     { value: 'africa', label: 'Africa' },
   ];
+
+  const layers = [
+    { id: 'geopolitical', label: 'GEOPOLITICAL ALERTS', color: '#ef4444' },
+    { id: 'weather', label: 'WEATHER ALERTS', color: '#f59e0b' },
+    { id: 'oil-wells', label: 'ACTIVE OIL WELLS', color: '#10b981' },
+    { id: 'gas-wells', label: 'ACTIVE GAS WELLS', color: '#3b82f6' },
+    { id: 'pipelines', label: 'PIPELINE ROUTES', color: '#8b5cf6' },
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const toggleLayer = (layerId: string) => {
+    setActiveLayers(prev => 
+      prev.includes(layerId) 
+        ? prev.filter(id => id !== layerId)
+        : [...prev, layerId]
+    );
+  };
+
+  const formatDateTime = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZoneName: 'short'
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-950">
@@ -77,18 +115,65 @@ export default function TerminalPage() {
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="p-6">
-        <div className="text-white">
-          <h1 className="text-2xl font-bold mb-4">Energy Terminal</h1>
-          <p className="text-gray-400 mb-6">Desktop optimized energy data platform</p>
-          
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
-            <h2 className="text-lg font-semibold mb-3">Region: {regions.find(r => r.value === selectedRegion)?.label}</h2>
-            <p className="text-gray-400">Terminal interface launching soon...</p>
+      {/* Main Content */}
+      <div className="flex h-[calc(100vh-73px)]">
+        {/* Layers Sidebar */}
+        <div className="w-80 bg-gray-900 border-r border-gray-800 p-4">
+          <h3 className="text-white text-sm font-semibold mb-4 tracking-wider">LAYERS</h3>
+          <div className="space-y-3">
+            {layers.map(layer => (
+              <button
+                key={layer.id}
+                onClick={() => toggleLayer(layer.id)}
+                className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left ${
+                  activeLayers.includes(layer.id)
+                    ? 'bg-gray-800 border-gray-600'
+                    : 'bg-gray-900 border-gray-700 hover:border-gray-600'
+                }`}
+              >
+                <div 
+                  className={`w-3 h-3 rounded-full ${
+                    activeLayers.includes(layer.id) ? 'opacity-100' : 'opacity-40'
+                  }`}
+                  style={{ backgroundColor: layer.color }}
+                />
+                <span className={`text-xs tracking-wider ${
+                  activeLayers.includes(layer.id) ? 'text-white' : 'text-gray-400'
+                }`} style={{ fontStretch: 'condensed' }}>
+                  {layer.label}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
-      </main>
+
+        {/* Map Area */}
+        <div className="flex-1 flex flex-col">
+          {/* Map Header with Date/Time */}
+          <div className="bg-gray-800 border-b border-gray-700 py-2 px-6">
+            <div className="text-center">
+              <span className="text-white text-sm font-mono">
+                {formatDateTime(currentTime)}
+              </span>
+            </div>
+          </div>
+
+          {/* Map Container */}
+          <div className="flex-1 bg-gray-800 relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gray-600 rounded-lg flex items-center justify-center">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-gray-400 text-sm">World Map Loading...</p>
+                <p className="text-gray-500 text-xs mt-2">Map integration in development</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
