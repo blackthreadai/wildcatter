@@ -279,7 +279,7 @@ export default function TerminalPage() {
                 style={{ 
                   margin: '5px',
                   borderColor: '#333333',
-                  boxShadow: '0 0 20px rgba(218, 165, 32, 0.8), 0 0 40px rgba(218, 165, 32, 0.4)'
+                  boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)'
                 }}
               >
                 <NewsWidget />
