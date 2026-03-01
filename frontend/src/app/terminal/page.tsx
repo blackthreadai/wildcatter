@@ -255,7 +255,7 @@ export default function TerminalPage() {
       {/* Main Content */}
       <div className="h-[calc(100vh-73px)] relative">
         {/* Map Header with Date/Time */}
-        <div className="bg-gray-800 border-b border-gray-700 py-2 px-6">
+        <div className="bg-gray-800 border-b border-gray-700 py-2 px-6 pb-3">
           <div className="text-center">
             <span className="text-white text-sm font-mono">
               {formatDateTime(currentTime)}
@@ -324,20 +324,25 @@ export default function TerminalPage() {
         </div>
 
         {/* Bottom Area - Grid */}
-        <div className="flex-1 bg-black p-2">
-          <div className="grid grid-cols-5 grid-rows-3 gap-2 h-full">
+        <div className="flex-1 bg-black p-2 min-h-0">
+          <div 
+            className="grid grid-cols-5 gap-2 h-full"
+            style={{ 
+              gridTemplateRows: '1fr 1fr 1fr',
+              maxHeight: '100%'
+            }}
+          >
             {/* Large YouTube Widget - spans 2x2 */}
             <div 
-              className="bg-black border col-span-2 row-span-2"
+              className="bg-black border col-span-2 row-span-2 overflow-hidden"
               style={{ 
                 margin: '5px',
                 borderColor: '#333333',
                 boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)',
-                height: '100%',
-                minHeight: 0
+                maxHeight: '100%'
               }}
             >
-              <div className="h-full overflow-hidden">
+              <div className="h-full w-full overflow-hidden">
                 <YouTubeWidget />
               </div>
             </div>
@@ -367,16 +372,15 @@ export default function TerminalPage() {
               return (
                 <div 
                   key={position} 
-                  className="bg-black border"
+                  className="bg-black border overflow-hidden"
                   style={{ 
                     margin: '5px',
                     borderColor: '#333333',
                     boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)',
-                    height: '100%',
-                    minHeight: 0
+                    maxHeight: '100%'
                   }}
                 >
-                  <div className="h-full overflow-hidden">
+                  <div className="h-full w-full overflow-hidden">
                     {widgetContent}
                   </div>
                 </div>
