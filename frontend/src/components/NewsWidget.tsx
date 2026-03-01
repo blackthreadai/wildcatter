@@ -117,7 +117,7 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
               rel="noopener noreferrer"
               className="block"
             >
-              <h4 className="text-[#DAA520] text-xs leading-tight mb-1 line-clamp-2 hover:text-yellow-300 transition-colors cursor-pointer">
+              <h4 className="text-[#DAA520] text-xs leading-tight mb-1 line-clamp-2 cursor-pointer">
                 {article.title}
               </h4>
             </a>

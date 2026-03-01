@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import NewsWidget from '@/components/NewsWidget';
 import YouTubeWidget from '@/components/YouTubeWidget';
+import GreedFearWidget from '@/components/GreedFearWidget';
 
 // Dynamically import the map to avoid SSR issues
 const WorldMap = dynamic(() => import('@/components/WorldMap'), {
@@ -293,11 +294,19 @@ export default function TerminalPage() {
               const positions = [2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14]; // Skip 0,1,5,6
               const position = positions[i];
               
-              // Determine region for first three small widgets
-              let region: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' = 'US';
-              if (position === 2) region = 'US';
-              else if (position === 3) region = 'RUSSIAN';
-              else if (position === 4) region = 'SOUTH AMERICAN';
+              // Determine widget type based on position
+              let widgetContent;
+              if (position === 2) {
+                widgetContent = <NewsWidget region="US" />;
+              } else if (position === 3) {
+                widgetContent = <NewsWidget region="RUSSIAN" />;
+              } else if (position === 4) {
+                widgetContent = <NewsWidget region="SOUTH AMERICAN" />;
+              } else if (position === 7) {
+                widgetContent = <GreedFearWidget />;
+              } else {
+                widgetContent = <NewsWidget region="US" />;
+              }
               
               return (
                 <div 
@@ -309,7 +318,7 @@ export default function TerminalPage() {
                     boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)'
                   }}
                 >
-                  <NewsWidget region={region} />
+                  {widgetContent}
                 </div>
               );
             })}
