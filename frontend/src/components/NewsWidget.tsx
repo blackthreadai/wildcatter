@@ -111,9 +111,16 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
       <div className="flex-1 p-2 space-y-2 overflow-hidden bg-black">
         {articles.map((article, i) => (
           <div key={i} className="border-b border-gray-700 pb-1 last:border-b-0">
-            <h4 className="text-white text-xs leading-tight mb-1 line-clamp-2">
-              {article.title}
-            </h4>
+            <a 
+              href={article.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
+            >
+              <h4 className="text-[#DAA520] text-xs leading-tight mb-1 line-clamp-2 hover:text-yellow-300 transition-colors cursor-pointer">
+                {article.title}
+              </h4>
+            </a>
             <div className="flex items-center justify-between">
               <span className="text-gray-400 text-xs">{article.source}</span>
               <span className="text-gray-500 text-xs">{formatTime(article.publishedAt)}</span>
