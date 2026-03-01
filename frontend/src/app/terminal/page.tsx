@@ -25,7 +25,7 @@ export default function TerminalPage() {
             {/* Logo */}
             <div className="flex items-center gap-3">
               <img src="/w-icon.svg" alt="W" className="w-8 h-8" />
-              <span className="text-white font-medium">Terminal</span>
+              <span className="text-[#DAA520] text-sm font-light tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>TERMINAL</span>
             </div>
 
             {/* Version */}
