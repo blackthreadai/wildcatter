@@ -291,10 +291,17 @@ export default function TerminalPage() {
             {Array.from({ length: 11 }, (_, i) => {
               // Skip positions that would be occupied by the large widget
               const positions = [2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14]; // Skip 0,1,5,6
+              const position = positions[i];
+              
+              // Determine region for first three small widgets
+              let region: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' = 'US';
+              if (position === 2) region = 'US';
+              else if (position === 3) region = 'RUSSIAN';
+              else if (position === 4) region = 'SOUTH AMERICAN';
               
               return (
                 <div 
-                  key={positions[i]} 
+                  key={position} 
                   className="bg-black border"
                   style={{ 
                     margin: '5px',
@@ -302,7 +309,7 @@ export default function TerminalPage() {
                     boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)'
                   }}
                 >
-                  <NewsWidget />
+                  <NewsWidget region={region} />
                 </div>
               );
             })}

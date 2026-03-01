@@ -9,40 +9,75 @@ interface NewsArticle {
   source: string;
 }
 
-export default function NewsWidget() {
+interface NewsWidgetProps {
+  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN';
+}
+
+export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await fetch('/api/news');
+        const response = await fetch(`/api/news?region=${region}`);
         const data = await response.json();
         setArticles(data.slice(0, 2)); // Only show 2 articles
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch news:', error);
-        // Fallback to dummy data
-        setArticles([
-          {
-            title: "Oil Prices Rise on Supply Concerns",
-            url: "#",
-            publishedAt: "2026-02-21T12:00:00Z",
-            source: "Reuters"
-          },
-          {
-            title: "Natural Gas Demand Peaks in Winter",
-            url: "#",
-            publishedAt: "2026-02-21T11:30:00Z", 
-            source: "Bloomberg"
-          }
-        ]);
+        // Fallback to dummy data based on region
+        const fallbackData = {
+          'US': [
+            {
+              title: "Oil Prices Rise on Supply Concerns",
+              url: "#",
+              publishedAt: "2026-02-21T12:00:00Z",
+              source: "Reuters"
+            },
+            {
+              title: "Natural Gas Demand Peaks in Winter",
+              url: "#",
+              publishedAt: "2026-02-21T11:30:00Z", 
+              source: "Bloomberg"
+            }
+          ],
+          'RUSSIAN': [
+            {
+              title: "Gazprom Expands Arctic Gas Fields",
+              url: "#",
+              publishedAt: "2026-02-21T10:00:00Z",
+              source: "Moscow Times"
+            },
+            {
+              title: "Lukoil Reports Record Quarterly Profits",
+              url: "#",
+              publishedAt: "2026-02-21T09:30:00Z",
+              source: "RT Energy"
+            }
+          ],
+          'SOUTH AMERICAN': [
+            {
+              title: "Brazil's Petrobras Discovers New Offshore Oil",
+              url: "#",
+              publishedAt: "2026-02-21T11:00:00Z",
+              source: "Latin Oil"
+            },
+            {
+              title: "Argentina Boosts Vaca Muerta Shale Production",
+              url: "#",
+              publishedAt: "2026-02-21T08:45:00Z",
+              source: "Energy SA"
+            }
+          ]
+        };
+        setArticles(fallbackData[region]);
         setLoading(false);
       }
     };
 
     fetchNews();
-  }, []);
+  }, [region]);
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -59,7 +94,7 @@ export default function NewsWidget() {
     return (
       <div className="h-full flex flex-col bg-black">
         <div className="bg-gray-800 p-2">
-          <h3 className="text-white text-xs font-semibold tracking-wider">US NEWS</h3>
+          <h3 className="text-white text-xs font-semibold tracking-wider">{region} NEWS</h3>
         </div>
         <div className="flex-1 p-2 flex items-center justify-center bg-black">
           <div className="text-gray-500 text-xs">Loading...</div>
@@ -71,7 +106,7 @@ export default function NewsWidget() {
   return (
     <div className="h-full flex flex-col bg-black">
       <div className="bg-gray-800 p-2">
-        <h3 className="text-white text-xs font-semibold tracking-wider">US NEWS</h3>
+        <h3 className="text-white text-xs font-semibold tracking-wider">{region} NEWS</h3>
       </div>
       <div className="flex-1 p-2 space-y-2 overflow-hidden bg-black">
         {articles.map((article, i) => (
