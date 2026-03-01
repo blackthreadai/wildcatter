@@ -250,6 +250,26 @@ export default function TerminalPage() {
         </div>
       </header>
 
+      {/* Layers Toggle Button - Always Visible */}
+      <div className="fixed left-4 top-32 z-50">
+        <button
+          onClick={() => setLayersOpen(!layersOpen)}
+          className="bg-black text-white rounded-lg px-3 py-6 shadow-lg border-2"
+          style={{
+            borderColor: '#DAA520',
+            boxShadow: '0 0 15px rgba(218, 165, 32, 0.8), 0 0 30px rgba(218, 165, 32, 0.4)',
+            backgroundColor: '#000000'
+          }}
+        >
+          <div className="flex flex-col items-center gap-1">
+            <svg className={`w-4 h-4 transition-transform duration-300 ${layersOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+            <span className="text-xs tracking-wider" style={{ fontStretch: 'condensed' }}>LAYERS</span>
+          </div>
+        </button>
+      </div>
+
       {/* Main Content */}
       <div className="h-[calc(100vh-73px)] relative">
         {/* Map Header with Date/Time */}
@@ -266,28 +286,7 @@ export default function TerminalPage() {
           <WorldMap activeLayers={activeLayers} />
         </div>
 
-        {/* Layers Toggle Button - Fixed Position */}
-        <div 
-          className="fixed left-4 top-1/2 transform -translate-y-1/2 z-50"
-          style={{ zIndex: 10000 }}
-        >
-          <button
-            onClick={() => setLayersOpen(!layersOpen)}
-            className="bg-black text-white rounded-lg px-3 py-6 shadow-lg border-2"
-            style={{
-              borderColor: '#DAA520',
-              boxShadow: '0 0 15px rgba(218, 165, 32, 0.8), 0 0 30px rgba(218, 165, 32, 0.4)',
-              backgroundColor: '#000000'
-            }}
-          >
-            <div className="flex flex-col items-center gap-1">
-              <svg className={`w-4 h-4 transition-transform duration-300 ${layersOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-              <span className="text-xs tracking-wider" style={{ fontStretch: 'condensed' }}>LAYERS</span>
-            </div>
-          </button>
-        </div>
+        {/* Removed - button moved outside map area */}
 
         {/* Layers Slider Panel - Fixed Position */}
         <div 
@@ -295,9 +294,9 @@ export default function TerminalPage() {
             layersOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
           style={{ 
-            top: '73px', // Header height
-            height: '50vh', // Map height
-            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            top: '120px', // Below header and button
+            height: 'calc(100vh - 120px)', // Full height minus header
+            backgroundColor: 'rgba(0, 0, 0, 0.95)',
             borderColor: '#333333',
             boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)'
           }}
