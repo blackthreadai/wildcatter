@@ -47,7 +47,7 @@ export default function YouTubeWidget() {
 
   if (loading) {
     return (
-      <div className="h-full flex flex-col bg-black">
+      <div className="h-full w-full flex flex-col bg-black max-h-full">
         <div className="bg-gray-800 p-2">
           <h3 className="text-white text-xs font-semibold tracking-wider">ENERGY TV</h3>
         </div>
@@ -60,7 +60,7 @@ export default function YouTubeWidget() {
 
   if (!video) {
     return (
-      <div className="h-full flex flex-col bg-black">
+      <div className="h-full w-full flex flex-col bg-black max-h-full">
         <div className="bg-gray-800 p-2">
           <h3 className="text-white text-xs font-semibold tracking-wider">ENERGY TV</h3>
         </div>
@@ -72,7 +72,7 @@ export default function YouTubeWidget() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-black">
+    <div className="h-full w-full flex flex-col bg-black max-h-full">
       <div className="bg-gray-800 p-2">
         <h3 className="text-white text-xs font-semibold tracking-wider">ENERGY TV</h3>
       </div>

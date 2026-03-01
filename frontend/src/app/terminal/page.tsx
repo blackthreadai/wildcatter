@@ -279,7 +279,7 @@ export default function TerminalPage() {
             {canScrollUp && (
               <button
                 onClick={scrollLayersUp}
-                className="w-full py-1 bg-black hover:bg-gray-800 transition-colors flex items-center justify-center"
+                className="w-full py-1 bg-black flex items-center justify-center"
               >
                 <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -328,7 +328,7 @@ export default function TerminalPage() {
             {canScrollDown && (
               <button
                 onClick={scrollLayersDown}
-                className="w-full py-1 bg-black hover:bg-gray-800 transition-colors flex items-center justify-center"
+                className="w-full py-1 bg-black flex items-center justify-center"
               >
                 <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -340,14 +340,15 @@ export default function TerminalPage() {
 
         {/* Bottom Area - Grid */}
         <div className="flex-1 bg-black" style={{ padding: '5px' }}>
-          <div className="grid grid-cols-5 grid-rows-3 gap-1 h-full">
+          <div className="grid grid-cols-5 gap-1 h-full" style={{ gridTemplateRows: 'repeat(3, 1fr)' }}>
             {/* Large YouTube Widget - spans 2x2 */}
             <div 
-              className="bg-black border col-span-2 row-span-2"
+              className="bg-black border col-span-2 row-span-2 overflow-hidden"
               style={{ 
                 margin: '5px',
                 borderColor: '#333333',
-                boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)'
+                boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)',
+                maxHeight: '100%'
               }}
             >
               <YouTubeWidget />
@@ -378,11 +379,12 @@ export default function TerminalPage() {
               return (
                 <div 
                   key={position} 
-                  className="bg-black border"
+                  className="bg-black border overflow-hidden"
                   style={{ 
                     margin: '5px',
                     borderColor: '#333333',
-                    boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)'
+                    boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)',
+                    maxHeight: '100%'
                   }}
                 >
                   {widgetContent}

@@ -92,7 +92,7 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
 
   if (loading) {
     return (
-      <div className="h-full flex flex-col bg-black">
+      <div className="h-full w-full flex flex-col bg-black max-h-full">
         <div className="bg-gray-800 p-2">
           <h3 className="text-white text-xs font-semibold tracking-wider">{region} NEWS</h3>
         </div>
@@ -104,7 +104,7 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
   }
 
   return (
-    <div className="h-full flex flex-col bg-black">
+    <div className="h-full w-full flex flex-col bg-black max-h-full">
       <div className="bg-gray-800 p-2">
         <h3 className="text-white text-xs font-semibold tracking-wider">{region} NEWS</h3>
       </div>

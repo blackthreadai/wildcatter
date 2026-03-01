@@ -63,7 +63,7 @@ export default function GreedFearWidget() {
 
   if (loading) {
     return (
-      <div className="h-full flex flex-col bg-black">
+      <div className="h-full w-full flex flex-col bg-black max-h-full">
         <div className="bg-gray-800 p-2">
           <h3 className="text-white text-xs font-semibold tracking-wider">FEAR & GREED</h3>
         </div>
@@ -76,7 +76,7 @@ export default function GreedFearWidget() {
 
   if (!data) {
     return (
-      <div className="h-full flex flex-col bg-black">
+      <div className="h-full w-full flex flex-col bg-black max-h-full">
         <div className="bg-gray-800 p-2">
           <h3 className="text-white text-xs font-semibold tracking-wider">FEAR & GREED</h3>
         </div>
@@ -88,7 +88,7 @@ export default function GreedFearWidget() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-black">
+    <div className="h-full w-full flex flex-col bg-black max-h-full">
       <div className="bg-gray-800 p-2">
         <h3 className="text-white text-xs font-semibold tracking-wider">FEAR & GREED</h3>
       </div>
