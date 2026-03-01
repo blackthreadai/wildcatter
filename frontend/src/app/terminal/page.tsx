@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import NewsWidget from '@/components/NewsWidget';
 import YouTubeWidget from '@/components/YouTubeWidget';
 import GreedFearWidget from '@/components/GreedFearWidget';
+import StockWidget from '@/components/StockWidget';
 
 // Dynamically import the map to avoid SSR issues
 const WorldMap = dynamic(() => import('@/components/WorldMap'), {
@@ -127,6 +128,19 @@ export default function TerminalPage() {
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
+        }
+        .scrollbar-thin::-webkit-scrollbar {
+          width: 4px;
+        }
+        .scrollbar-track-gray-800::-webkit-scrollbar-track {
+          background: #1f2937;
+        }
+        .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb {
+          background: #4b5563;
+          border-radius: 2px;
+        }
+        .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb:hover {
+          background: #6b7280;
         }
         .leaflet-popup-content-wrapper {
           background: #1f2937 !important;
@@ -309,6 +323,8 @@ export default function TerminalPage() {
                 widgetContent = <NewsWidget region="SOUTH AMERICAN" />;
               } else if (position === 7) {
                 widgetContent = <GreedFearWidget />;
+              } else if (position === 8) {
+                widgetContent = <StockWidget />;
               } else {
                 widgetContent = <NewsWidget region="US" />;
               }
