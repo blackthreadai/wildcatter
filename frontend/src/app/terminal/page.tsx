@@ -266,18 +266,22 @@ export default function TerminalPage() {
           <WorldMap activeLayers={activeLayers} />
 
           {/* Layers Toggle Button - Left Side */}
-          <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-20">
+          <div className="absolute left-2 top-1/2 transform -translate-y-1/2 z-30">
             <button
               onClick={() => setLayersOpen(!layersOpen)}
-              className="bg-black border border-gray-600 rounded-r-lg px-2 py-4 text-white hover:bg-gray-900 transition-all"
+              className="bg-black text-white rounded-r-lg px-3 py-6 shadow-lg"
               style={{
                 borderColor: '#333333',
-                boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)'
+                boxShadow: '0 0 15px rgba(218, 165, 32, 0.6), 0 0 30px rgba(218, 165, 32, 0.3)',
+                border: '2px solid #333333'
               }}
             >
-              <svg className={`w-4 h-4 transition-transform ${layersOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <div className="flex flex-col items-center gap-1">
+                <svg className={`w-4 h-4 transition-transform duration-300 ${layersOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+                <span className="text-xs tracking-wider" style={{ fontStretch: 'condensed' }}>LAYERS</span>
+              </div>
             </button>
           </div>
 
