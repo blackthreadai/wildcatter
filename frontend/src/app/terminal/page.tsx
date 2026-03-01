@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import NewsWidget from '@/components/NewsWidget';
+import YouTubeWidget from '@/components/YouTubeWidget';
 
 // Dynamically import the map to avoid SSR issues
 const WorldMap = dynamic(() => import('@/components/WorldMap'), {
@@ -227,10 +228,12 @@ export default function TerminalPage() {
 
           {/* Static Layers Panel - Top Left */}
           <div 
-            className="absolute top-4 left-4 w-72 p-4"
+            className="absolute top-4 left-4 w-72 p-4 border"
             style={{ 
               zIndex: 9999,
-              backgroundColor: 'rgba(0, 0, 0, 0.8)'
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              borderColor: '#333333',
+              boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)'
             }}
           >
             <div className="space-y-3">
@@ -272,19 +275,37 @@ export default function TerminalPage() {
         {/* Bottom Area - Grid */}
         <div className="flex-1 bg-black" style={{ padding: '5px' }}>
           <div className="grid grid-cols-5 grid-rows-3 gap-1 h-full">
-            {Array.from({ length: 15 }, (_, i) => (
-              <div 
-                key={i} 
-                className="bg-black border"
-                style={{ 
-                  margin: '5px',
-                  borderColor: '#333333',
-                  boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)'
-                }}
-              >
-                <NewsWidget />
-              </div>
-            ))}
+            {/* Large YouTube Widget - spans 2x2 */}
+            <div 
+              className="bg-black border col-span-2 row-span-2"
+              style={{ 
+                margin: '5px',
+                borderColor: '#333333',
+                boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)'
+              }}
+            >
+              <YouTubeWidget />
+            </div>
+
+            {/* Remaining widgets */}
+            {Array.from({ length: 11 }, (_, i) => {
+              // Skip positions that would be occupied by the large widget
+              const positions = [2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14]; // Skip 0,1,5,6
+              
+              return (
+                <div 
+                  key={positions[i]} 
+                  className="bg-black border"
+                  style={{ 
+                    margin: '5px',
+                    borderColor: '#333333',
+                    boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)'
+                  }}
+                >
+                  <NewsWidget />
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
