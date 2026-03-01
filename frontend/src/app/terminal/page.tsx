@@ -218,9 +218,19 @@ export default function TerminalPage() {
           </div>
         </div>
 
-        {/* Bottom Area */}
-        <div className="flex-1 bg-gray-900 p-6">
-          <p className="text-gray-400 text-sm">Additional content area below map</p>
+        {/* Bottom Area - Grid */}
+        <div className="flex-1 bg-black p-2">
+          <div className="grid grid-cols-5 grid-rows-3 gap-2.5 h-full">
+            {Array.from({ length: 15 }, (_, i) => (
+              <div 
+                key={i} 
+                className="bg-gray-800 border border-gray-700"
+                style={{ margin: '10px' }}
+              >
+                {/* Box content will go here */}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
