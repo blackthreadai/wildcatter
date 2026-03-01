@@ -25,7 +25,6 @@ export default function TerminalPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeLayers, setActiveLayers] = useState<string[]>([]);
-  const [layersOpen, setLayersOpen] = useState(false);
 
   const regions = [
     { value: 'global', label: 'Global' },
@@ -86,6 +85,10 @@ export default function TerminalPage() {
         }
         .leaflet-control-zoom a:hover {
           background-color: #374151 !important;
+        }
+        .leaflet-top.leaflet-left {
+          top: 20px !important;
+          left: 300px !important;
         }
         .leaflet-popup-content-wrapper {
           background: #1f2937 !important;
@@ -171,78 +174,47 @@ export default function TerminalPage() {
         <div className="h-[50vh] bg-gray-800 relative">
           <WorldMap activeLayers={activeLayers} />
 
-          {/* Layers Toggle Button - Bottom Left */}
-          <div className="absolute bottom-4 left-4 z-20">
-            <button
-              onClick={() => setLayersOpen(!layersOpen)}
-              className="bg-black bg-opacity-80 border border-gray-600 rounded-lg px-4 py-2 flex items-center gap-2 text-white hover:bg-opacity-90 transition-all"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-              </svg>
-              <span className="text-xs tracking-wider">LAYERS</span>
-            </button>
-          </div>
-
-          {/* Layers Overlay */}
-          {layersOpen && (
-            <div 
-              className="absolute inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center"
-              onClick={() => setLayersOpen(false)}
-              style={{ zIndex: 9999 }}
-            >
-              <div 
-                className="bg-gray-900 border border-gray-600 rounded-lg p-6 max-w-md w-full mx-4"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-white text-lg font-semibold tracking-wider">LAYERS</h3>
-                  <button
-                    onClick={() => setLayersOpen(false)}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  {layers.map(layer => (
-                    <label
-                      key={layer.id}
-                      className="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:bg-gray-800 transition-all"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={activeLayers.includes(layer.id)}
-                        onChange={() => toggleLayer(layer.id)}
-                        className="sr-only"
-                      />
-                      <div className={`w-5 h-5 border-2 rounded flex items-center justify-center transition-all ${
-                        activeLayers.includes(layer.id) 
-                          ? 'border-white bg-white' 
-                          : 'border-gray-500'
-                      }`}>
-                        {activeLayers.includes(layer.id) && (
-                          <svg className="w-3 h-3 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                        )}
-                      </div>
-                      <div 
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: layer.color }}
-                      />
-                      <span className="text-sm tracking-wider text-gray-300" style={{ fontStretch: 'condensed' }}>
-                        {layer.label}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
+          {/* Static Layers Panel - Top Left */}
+          <div 
+            className="absolute top-4 left-4 w-72 bg-black bg-opacity-80 border border-gray-600 rounded-lg p-4"
+            style={{ zIndex: 9999 }}
+          >
+            <h3 className="text-white text-sm font-semibold mb-4 tracking-wider">LAYERS</h3>
+            
+            <div className="space-y-3">
+              {layers.map(layer => (
+                <label
+                  key={layer.id}
+                  className="flex items-center gap-3 p-2 rounded cursor-pointer hover:bg-gray-800 hover:bg-opacity-50 transition-all"
+                >
+                  <input
+                    type="checkbox"
+                    checked={activeLayers.includes(layer.id)}
+                    onChange={() => toggleLayer(layer.id)}
+                    className="sr-only"
+                  />
+                  <div className={`w-4 h-4 border-2 rounded flex items-center justify-center transition-all ${
+                    activeLayers.includes(layer.id) 
+                      ? 'border-white bg-white' 
+                      : 'border-gray-500'
+                  }`}>
+                    {activeLayers.includes(layer.id) && (
+                      <svg className="w-2.5 h-2.5 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                  <div 
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: layer.color }}
+                  />
+                  <span className="text-xs tracking-wider text-gray-300" style={{ fontStretch: 'condensed' }}>
+                    {layer.label}
+                  </span>
+                </label>
+              ))}
             </div>
-          )}
+          </div>
         </div>
 
         {/* Bottom Area */}
