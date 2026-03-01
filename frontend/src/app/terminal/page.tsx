@@ -6,6 +6,7 @@ import NewsWidget from '@/components/NewsWidget';
 import YouTubeWidget from '@/components/YouTubeWidget';
 import GreedFearWidget from '@/components/GreedFearWidget';
 import StockWidget from '@/components/StockWidget';
+import AsianStockWidget from '@/components/AsianStockWidget';
 
 // Dynamically import the map to avoid SSR issues
 const WorldMap = dynamic(() => import('@/components/WorldMap'), {
@@ -365,6 +366,8 @@ export default function TerminalPage() {
                 widgetContent = <GreedFearWidget />;
               } else if (position === 8) {
                 widgetContent = <StockWidget />;
+              } else if (position === 9) {
+                widgetContent = <AsianStockWidget />;
               } else {
                 widgetContent = <NewsWidget region="US" />;
               }
