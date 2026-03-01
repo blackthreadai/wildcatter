@@ -138,14 +138,14 @@ export default function TerminalPage() {
           scrollbar-width: thin;
         }
         .scrollbar-track-gray-800::-webkit-scrollbar {
-          width: 6px;
+          width: 12px;
         }
         .scrollbar-track-gray-800::-webkit-scrollbar-track {
           background: #1f2937;
         }
         .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb {
           background: #4b5563;
-          border-radius: 3px;
+          border-radius: 6px;
         }
         .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb:hover {
           background: #6b7280;
@@ -284,13 +284,8 @@ export default function TerminalPage() {
               height: '100%'
             }}
           >
-            {/* Header */}
-            <div className="p-4 border-b border-gray-600">
-              <h3 className="text-white text-sm font-semibold tracking-wider">LAYERS</h3>
-            </div>
-
-            {/* Scrollable Layers List */}
-            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600">
+            {/* Scrollable Layers List - Full Height */}
+            <div className="h-full overflow-y-auto scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600">
               <div className="p-4 space-y-3">
                 {layers.map(layer => (
                   <label
