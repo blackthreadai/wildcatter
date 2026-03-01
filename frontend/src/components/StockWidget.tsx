@@ -74,15 +74,15 @@ export default function StockWidget() {
 
   return (
     <div className="h-full flex flex-col bg-black">
-      <div className="bg-gray-800 p-2">
+      <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-semibold tracking-wider">US MARKETS</h3>
       </div>
       
-      <div className="flex-1 bg-black overflow-hidden">
+      <div className="flex-1 bg-black overflow-hidden min-h-0">
         <div className="h-full overflow-y-auto scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600">
-          <div className="p-1 space-y-1">
+          <div className="p-1">
             {stocks.map((stock, i) => (
-              <div key={stock.symbol} className="border-b border-gray-700 pb-1 last:border-b-0">
+              <div key={stock.symbol} className="border-b border-gray-700 pb-1 mb-1 last:border-b-0 last:mb-0">
                 <div className="flex items-center justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="text-[#DAA520] text-xs font-semibold">{stock.symbol}</div>

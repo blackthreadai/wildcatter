@@ -279,7 +279,7 @@ export default function TerminalPage() {
             {canScrollUp && (
               <button
                 onClick={scrollLayersUp}
-                className="w-full py-1 bg-gray-700 hover:bg-gray-600 transition-colors flex items-center justify-center"
+                className="w-full py-1 bg-black hover:bg-gray-800 transition-colors flex items-center justify-center"
               >
                 <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -328,7 +328,7 @@ export default function TerminalPage() {
             {canScrollDown && (
               <button
                 onClick={scrollLayersDown}
-                className="w-full py-1 bg-gray-700 hover:bg-gray-600 transition-colors flex items-center justify-center"
+                className="w-full py-1 bg-black hover:bg-gray-800 transition-colors flex items-center justify-center"
               >
                 <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
