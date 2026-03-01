@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 
 const APPS = [
+  { label: 'ENERGY TERMINAL', href: '/terminal', active: true },
   { label: 'ENERGY INTELLIGENCE', href: '/login', active: true },
   { label: 'ENERGY EXCHANGE', href: '#', active: false },
   { label: 'ENERGY OPERATIONS', href: '#', active: false },
