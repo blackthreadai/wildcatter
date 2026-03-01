@@ -1,6 +1,24 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+
+// Dynamically import the map to avoid SSR issues
+const WorldMap = dynamic(() => import('@/components/WorldMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-16 h-16 mx-auto mb-4 bg-gray-600 rounded-lg flex items-center justify-center">
+          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <p className="text-gray-400 text-sm">Loading World Map...</p>
+      </div>
+    </div>
+  )
+});
 
 export default function TerminalPage() {
   const [selectedRegion, setSelectedRegion] = useState('global');
@@ -56,6 +74,28 @@ export default function TerminalPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
+      {/* Leaflet CSS overrides for dark theme */}
+      <style jsx global>{`
+        .leaflet-container {
+          background: #374151 !important;
+        }
+        .leaflet-control-zoom a {
+          background-color: #1f2937 !important;
+          color: white !important;
+          border-color: #4b5563 !important;
+        }
+        .leaflet-control-zoom a:hover {
+          background-color: #374151 !important;
+        }
+        .leaflet-popup-content-wrapper {
+          background: #1f2937 !important;
+          color: white !important;
+        }
+        .leaflet-popup-tip {
+          background: #1f2937 !important;
+        }
+      `}</style>
+
       {/* Header Bar */}
       <header className="bg-black border-b border-gray-800 px-6 py-4">
         <div className="flex items-center justify-between">
@@ -129,17 +169,7 @@ export default function TerminalPage() {
 
         {/* Map Container - Half Height */}
         <div className="h-[50vh] bg-gray-800 relative">
-          <div className="h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-gray-600 rounded-lg flex items-center justify-center">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <p className="text-gray-400 text-sm">World Map Loading...</p>
-              <p className="text-gray-500 text-xs mt-2">Map integration in development</p>
-            </div>
-          </div>
+          <WorldMap activeLayers={activeLayers} />
 
           {/* Layers Slider - Bottom of Map */}
           <div className="absolute bottom-0 left-0 right-0 z-10">
