@@ -176,8 +176,11 @@ export default function TerminalPage() {
 
           {/* Static Layers Panel - Top Left */}
           <div 
-            className="absolute top-4 left-4 w-72 bg-black bg-opacity-80 rounded-lg p-4"
-            style={{ zIndex: 9999 }}
+            className="absolute top-4 left-4 w-72 p-4"
+            style={{ 
+              zIndex: 9999,
+              backgroundColor: 'rgba(0, 0, 0, 0.8)'
+            }}
           >
             <div className="space-y-3">
               {layers.map(layer => (
