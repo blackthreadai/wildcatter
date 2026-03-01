@@ -171,29 +171,29 @@ export default function TerminalPage() {
         <div className="h-[50vh] bg-gray-800 relative">
           <WorldMap activeLayers={activeLayers} />
 
-          {/* Layers Slider - Bottom of Map */}
-          <div className="absolute bottom-0 left-0 right-0 z-10">
+          {/* Layers Slider - Bottom Left (1/6 width) */}
+          <div className="absolute bottom-0 left-0 w-1/6 z-10">
             {/* Layers Toggle Handle */}
             <button
               onClick={() => setLayersOpen(!layersOpen)}
-              className="w-full bg-black border-t border-gray-600 py-2 flex items-center justify-center text-white hover:bg-gray-900 transition-all"
+              className="w-full bg-black border-t border-r border-gray-600 py-2 flex items-center justify-center text-white hover:bg-gray-900 transition-all"
             >
-              <svg className={`w-4 h-4 mr-2 transition-transform ${layersOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className={`w-4 h-4 mr-1 transition-transform ${layersOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
               </svg>
               <span className="text-xs tracking-wider">LAYERS</span>
             </button>
 
             {/* Layers Panel */}
-            <div className={`bg-black border-t border-gray-600 transition-all duration-300 ${
+            <div className={`bg-black border-t border-r border-gray-600 transition-all duration-300 ${
               layersOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
             } overflow-hidden`}>
-              <div className="p-4">
-                <div className="grid grid-cols-2 gap-3">
+              <div className="p-3">
+                <div className="space-y-2">
                   {layers.map(layer => (
                     <label
                       key={layer.id}
-                      className="flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-gray-900 transition-all"
+                      className="flex items-center gap-2 p-1 rounded cursor-pointer hover:bg-gray-900 transition-all"
                     >
                       <input
                         type="checkbox"
@@ -201,22 +201,22 @@ export default function TerminalPage() {
                         onChange={() => toggleLayer(layer.id)}
                         className="sr-only"
                       />
-                      <div className={`w-4 h-4 border-2 rounded flex items-center justify-center transition-all ${
+                      <div className={`w-3 h-3 border-2 rounded flex items-center justify-center transition-all ${
                         activeLayers.includes(layer.id) 
                           ? 'border-white bg-white' 
                           : 'border-gray-500'
                       }`}>
                         {activeLayers.includes(layer.id) && (
-                          <svg className="w-2.5 h-2.5 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="w-2 h-2 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                           </svg>
                         )}
                       </div>
                       <div 
-                        className="w-2 h-2 rounded-full"
+                        className="w-2 h-2 rounded-full flex-shrink-0"
                         style={{ backgroundColor: layer.color }}
                       />
-                      <span className="text-xs tracking-wider text-gray-300" style={{ fontStretch: 'condensed' }}>
+                      <span className="text-xs tracking-wider text-gray-300 truncate" style={{ fontStretch: 'condensed' }}>
                         {layer.label}
                       </span>
                     </label>
