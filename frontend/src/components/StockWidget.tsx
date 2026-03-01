@@ -46,7 +46,7 @@ export default function StockWidget() {
   if (loading) {
     return (
       <div className="h-full w-full flex flex-col bg-black">
-        <div className="bg-gray-800 p-1 flex-shrink-0">
+        <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-semibold tracking-wider">US MARKETS</h3>
         </div>
         <div className="flex-1 p-2 flex items-center justify-center bg-black min-h-0">
@@ -58,7 +58,7 @@ export default function StockWidget() {
 
   return (
     <div className="h-full w-full flex flex-col bg-black">
-      <div className="bg-gray-800 p-1 flex-shrink-0">
+      <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-semibold tracking-wider">US MARKETS</h3>
       </div>
       
