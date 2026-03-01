@@ -264,39 +264,44 @@ export default function TerminalPage() {
         {/* Map Container - Half Height */}
         <div className="h-[50vh] bg-gray-800 relative">
           <WorldMap activeLayers={activeLayers} />
+        </div>
 
-          {/* Layers Toggle Button - Left Side */}
-          <div className="absolute left-2 top-1/2 transform -translate-y-1/2 z-30">
-            <button
-              onClick={() => setLayersOpen(!layersOpen)}
-              className="bg-black text-white rounded-r-lg px-3 py-6 shadow-lg"
-              style={{
-                borderColor: '#333333',
-                boxShadow: '0 0 15px rgba(218, 165, 32, 0.6), 0 0 30px rgba(218, 165, 32, 0.3)',
-                border: '2px solid #333333'
-              }}
-            >
-              <div className="flex flex-col items-center gap-1">
-                <svg className={`w-4 h-4 transition-transform duration-300 ${layersOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-                <span className="text-xs tracking-wider" style={{ fontStretch: 'condensed' }}>LAYERS</span>
-              </div>
-            </button>
-          </div>
-
-          {/* Layers Slider Panel - Left Side */}
-          <div 
-            className={`absolute left-0 top-0 h-full w-80 border-r transition-transform duration-300 ${
-              layersOpen ? 'translate-x-0' : '-translate-x-full'
-            }`}
-            style={{ 
-              zIndex: 9999,
-              backgroundColor: 'rgba(0, 0, 0, 0.9)',
-              borderColor: '#333333',
-              boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)'
+        {/* Layers Toggle Button - Fixed Position */}
+        <div 
+          className="fixed left-4 top-1/2 transform -translate-y-1/2 z-50"
+          style={{ zIndex: 10000 }}
+        >
+          <button
+            onClick={() => setLayersOpen(!layersOpen)}
+            className="bg-black text-white rounded-lg px-3 py-6 shadow-lg border-2"
+            style={{
+              borderColor: '#DAA520',
+              boxShadow: '0 0 15px rgba(218, 165, 32, 0.8), 0 0 30px rgba(218, 165, 32, 0.4)',
+              backgroundColor: '#000000'
             }}
           >
+            <div className="flex flex-col items-center gap-1">
+              <svg className={`w-4 h-4 transition-transform duration-300 ${layersOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+              <span className="text-xs tracking-wider" style={{ fontStretch: 'condensed' }}>LAYERS</span>
+            </div>
+          </button>
+        </div>
+
+        {/* Layers Slider Panel - Fixed Position */}
+        <div 
+          className={`fixed left-0 w-80 border-r transition-transform duration-300 z-40 ${
+            layersOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+          style={{ 
+            top: '73px', // Header height
+            height: '50vh', // Map height
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            borderColor: '#333333',
+            boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)'
+          }}
+        >
             {/* Header */}
             <div className="p-4 border-b border-gray-600">
               <h3 className="text-white text-sm font-semibold tracking-wider">LAYERS</h3>
