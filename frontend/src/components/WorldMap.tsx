@@ -17,8 +17,8 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
 
     // Initialize map
     const map = L.map(mapRef.current, {
-      center: [20, 0], // Center on world
-      zoom: 2,
+      center: [26.0, 51.0], // Center on Persian Gulf region
+      zoom: 6,
       zoomControl: false, // Hide default zoom controls
       attributionControl: false, // Hide attribution for cleaner look
     });
