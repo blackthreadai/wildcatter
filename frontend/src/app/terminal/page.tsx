@@ -264,15 +264,15 @@ export default function TerminalPage() {
         <div className="h-[50vh] bg-gray-800 relative">
           <WorldMap activeLayers={activeLayers} />
 
-          {/* Static Layers Panel - Top Left */}
+          {/* Static Layers Panel - Left Side Full Height */}
           <div 
-            className="absolute top-4 left-4 w-72 border"
+            className="absolute top-0 left-0 w-72 border-r"
             style={{ 
               zIndex: 1000,
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              backgroundColor: 'rgba(0, 0, 0, 0.6)',
               borderColor: '#333333',
-              boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)',
-              maxHeight: 'calc(50vh - 32px)'
+              boxShadow: '2px 0 10px rgba(218, 165, 32, 0.4), 2px 0 20px rgba(218, 165, 32, 0.2)',
+              height: '100%'
             }}
           >
             {/* Scroll Up Button */}
