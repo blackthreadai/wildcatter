@@ -278,8 +278,8 @@ export default function TerminalPage() {
                 className="bg-black border"
                 style={{ 
                   margin: '5px',
-                  borderColor: '#DAA520',
-                  boxShadow: '0 0 10px rgba(218, 165, 32, 0.3)'
+                  borderColor: '#333333',
+                  boxShadow: '0 0 20px rgba(218, 165, 32, 0.8), 0 0 40px rgba(218, 165, 32, 0.4)'
                 }}
               >
                 <NewsWidget />
