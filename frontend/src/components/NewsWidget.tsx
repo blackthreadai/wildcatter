@@ -1,0 +1,91 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+
+interface NewsArticle {
+  title: string;
+  url: string;
+  publishedAt: string;
+  source: string;
+}
+
+export default function NewsWidget() {
+  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const response = await fetch('/api/news');
+        const data = await response.json();
+        setArticles(data.slice(0, 2)); // Only show 2 articles
+        setLoading(false);
+      } catch (error) {
+        console.error('Failed to fetch news:', error);
+        // Fallback to dummy data
+        setArticles([
+          {
+            title: "Oil Prices Rise on Supply Concerns",
+            url: "#",
+            publishedAt: "2026-02-21T12:00:00Z",
+            source: "Reuters"
+          },
+          {
+            title: "Natural Gas Demand Peaks in Winter",
+            url: "#",
+            publishedAt: "2026-02-21T11:30:00Z", 
+            source: "Bloomberg"
+          }
+        ]);
+        setLoading(false);
+      }
+    };
+
+    fetchNews();
+  }, []);
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    
+    if (diffHours < 1) return 'Just now';
+    if (diffHours === 1) return '1 hour ago';
+    return `${diffHours} hours ago`;
+  };
+
+  if (loading) {
+    return (
+      <div className="h-full flex flex-col">
+        <div className="border-b border-gray-600 p-3">
+          <h3 className="text-white text-xs font-semibold tracking-wider">US NEWS</h3>
+        </div>
+        <div className="flex-1 p-3 flex items-center justify-center">
+          <div className="text-gray-500 text-xs">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full flex flex-col">
+      <div className="border-b border-gray-600 p-3">
+        <h3 className="text-white text-xs font-semibold tracking-wider">US NEWS</h3>
+      </div>
+      <div className="flex-1 p-3 space-y-3 overflow-hidden">
+        {articles.map((article, i) => (
+          <div key={i} className="border-b border-gray-700 pb-2 last:border-b-0">
+            <h4 className="text-white text-xs leading-tight mb-1 line-clamp-2">
+              {article.title}
+            </h4>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-400 text-xs">{article.source}</span>
+              <span className="text-gray-500 text-xs">{formatTime(article.publishedAt)}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

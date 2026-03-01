@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import NewsWidget from '@/components/NewsWidget';
 
 // Dynamically import the map to avoid SSR issues
 const WorldMap = dynamic(() => import('@/components/WorldMap'), {
@@ -113,6 +114,12 @@ export default function TerminalPage() {
         .leaflet-top.leaflet-left {
           top: 20px !important;
           left: 300px !important;
+        }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
         .leaflet-popup-content-wrapper {
           background: #1f2937 !important;
@@ -271,7 +278,7 @@ export default function TerminalPage() {
                 className="bg-gray-800 border border-gray-700"
                 style={{ margin: '10px' }}
               >
-                {/* Box content will go here */}
+                <NewsWidget />
               </div>
             ))}
           </div>
