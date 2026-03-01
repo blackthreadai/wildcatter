@@ -30,6 +30,7 @@ export default function TerminalPage() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeLayers, setActiveLayers] = useState<string[]>([]);
   const [marketData, setMarketData] = useState<{label: string; value: string; change: number}[]>([]);
+  const [layerScrollIndex, setLayerScrollIndex] = useState(0);
 
   const regions = [
     { value: 'global', label: 'GLOBAL' },
@@ -89,6 +90,23 @@ export default function TerminalPage() {
         ? prev.filter(id => id !== layerId)
         : [...prev, layerId]
     );
+  };
+
+  const maxVisibleLayers = 6; // Max layers that fit in the panel
+  const canScrollUp = layerScrollIndex > 0;
+  const canScrollDown = layerScrollIndex + maxVisibleLayers < layers.length;
+  const visibleLayers = layers.slice(layerScrollIndex, layerScrollIndex + maxVisibleLayers);
+
+  const scrollLayersUp = () => {
+    if (canScrollUp) {
+      setLayerScrollIndex(prev => Math.max(0, prev - 1));
+    }
+  };
+
+  const scrollLayersDown = () => {
+    if (canScrollDown) {
+      setLayerScrollIndex(prev => Math.min(layers.length - maxVisibleLayers, prev + 1));
+    }
   };
 
   const formatDateTime = (date: Date) => {
@@ -248,47 +266,75 @@ export default function TerminalPage() {
 
           {/* Static Layers Panel - Top Left */}
           <div 
-            className="absolute top-4 left-4 w-72 p-4 border"
+            className="absolute top-4 left-4 w-72 border"
             style={{ 
               zIndex: 9999,
               backgroundColor: 'rgba(0, 0, 0, 0.8)',
               borderColor: '#333333',
-              boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)'
+              boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)',
+              maxHeight: 'calc(50vh - 32px)' // Map height minus top/bottom margins (16px each)
             }}
           >
-            <div className="space-y-3">
-              {layers.map(layer => (
-                <label
-                  key={layer.id}
-                  className="flex items-center gap-3 p-2 rounded cursor-pointer hover:bg-gray-800 hover:bg-opacity-50 transition-all"
-                >
-                  <input
-                    type="checkbox"
-                    checked={activeLayers.includes(layer.id)}
-                    onChange={() => toggleLayer(layer.id)}
-                    className="sr-only"
-                  />
-                  <div className={`w-4 h-4 border-2 rounded flex items-center justify-center transition-all ${
-                    activeLayers.includes(layer.id) 
-                      ? 'border-white bg-white' 
-                      : 'border-gray-500'
-                  }`}>
-                    {activeLayers.includes(layer.id) && (
-                      <svg className="w-2.5 h-2.5 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    )}
-                  </div>
-                  <div 
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: layer.color }}
-                  />
-                  <span className="text-xs tracking-wider text-gray-300" style={{ fontStretch: 'condensed' }}>
-                    {layer.label}
-                  </span>
-                </label>
-              ))}
+            {/* Scroll Up Button */}
+            {canScrollUp && (
+              <button
+                onClick={scrollLayersUp}
+                className="w-full py-1 bg-gray-700 hover:bg-gray-600 transition-colors flex items-center justify-center"
+              >
+                <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                </svg>
+              </button>
+            )}
+
+            {/* Layers List */}
+            <div className="p-4">
+              <div className="space-y-3">
+                {visibleLayers.map(layer => (
+                  <label
+                    key={layer.id}
+                    className="flex items-center gap-3 p-2 rounded cursor-pointer hover:bg-gray-800 hover:bg-opacity-50 transition-all"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={activeLayers.includes(layer.id)}
+                      onChange={() => toggleLayer(layer.id)}
+                      className="sr-only"
+                    />
+                    <div className={`w-4 h-4 border-2 rounded flex items-center justify-center transition-all ${
+                      activeLayers.includes(layer.id) 
+                        ? 'border-white bg-white' 
+                        : 'border-gray-500'
+                    }`}>
+                      {activeLayers.includes(layer.id) && (
+                        <svg className="w-2.5 h-2.5 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </div>
+                    <div 
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: layer.color }}
+                    />
+                    <span className="text-xs tracking-wider text-gray-300" style={{ fontStretch: 'condensed' }}>
+                      {layer.label}
+                    </span>
+                  </label>
+                ))}
+              </div>
             </div>
+
+            {/* Scroll Down Button */}
+            {canScrollDown && (
+              <button
+                onClick={scrollLayersDown}
+                className="w-full py-1 bg-gray-700 hover:bg-gray-600 transition-colors flex items-center justify-center"
+              >
+                <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            )}
           </div>
         </div>
 
