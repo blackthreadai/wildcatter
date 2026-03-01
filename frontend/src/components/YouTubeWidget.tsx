@@ -47,11 +47,11 @@ export default function YouTubeWidget() {
 
   if (loading) {
     return (
-      <div className="h-full w-full flex flex-col bg-black max-h-full">
-        <div className="bg-gray-800 p-2">
+      <div className="h-full w-full flex flex-col bg-black">
+        <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-semibold tracking-wider">ENERGY TV</h3>
         </div>
-        <div className="flex-1 bg-black flex items-center justify-center">
+        <div className="flex-1 bg-black flex items-center justify-center min-h-0">
           <div className="text-gray-500 text-xs">Loading video...</div>
         </div>
       </div>
@@ -60,11 +60,11 @@ export default function YouTubeWidget() {
 
   if (!video) {
     return (
-      <div className="h-full w-full flex flex-col bg-black max-h-full">
-        <div className="bg-gray-800 p-2">
+      <div className="h-full w-full flex flex-col bg-black">
+        <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-semibold tracking-wider">ENERGY TV</h3>
         </div>
-        <div className="flex-1 bg-black flex items-center justify-center">
+        <div className="flex-1 bg-black flex items-center justify-center min-h-0">
           <div className="text-gray-500 text-xs">No video available</div>
         </div>
       </div>
@@ -72,12 +72,12 @@ export default function YouTubeWidget() {
   }
 
   return (
-    <div className="h-full w-full flex flex-col bg-black max-h-full">
-      <div className="bg-gray-800 p-2">
+    <div className="h-full w-full flex flex-col bg-black">
+      <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-semibold tracking-wider">ENERGY TV</h3>
       </div>
       
-      <div className="flex-1 bg-black p-2 flex flex-col">
+      <div className="flex-1 bg-black p-2 flex flex-col min-h-0">
         {/* Video Thumbnail/Player Area */}
         <div className="bg-gray-700 rounded mb-2 flex-1 flex items-center justify-center relative">
           <div className="absolute inset-0 bg-gradient-to-br from-gray-600 to-gray-800 rounded flex items-center justify-center">

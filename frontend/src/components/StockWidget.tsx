@@ -61,11 +61,11 @@ export default function StockWidget() {
 
   if (loading) {
     return (
-      <div className="h-full w-full flex flex-col bg-black max-h-full">
-        <div className="bg-gray-800 p-2">
+      <div className="h-full w-full flex flex-col bg-black">
+        <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-semibold tracking-wider">US MARKETS</h3>
         </div>
-        <div className="flex-1 p-2 flex items-center justify-center bg-black">
+        <div className="flex-1 p-2 flex items-center justify-center bg-black min-h-0">
           <div className="text-gray-500 text-xs">Loading...</div>
         </div>
       </div>
@@ -73,31 +73,29 @@ export default function StockWidget() {
   }
 
   return (
-    <div className="h-full w-full flex flex-col bg-black max-h-full">
+    <div className="h-full w-full flex flex-col bg-black">
       <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-semibold tracking-wider">US MARKETS</h3>
       </div>
       
-      <div className="flex-1 bg-black overflow-hidden min-h-0">
-        <div className="h-full overflow-y-auto scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600">
-          <div className="p-1">
-            {stocks.map((stock, i) => (
-              <div key={stock.symbol} className="border-b border-gray-700 pb-1 mb-1 last:border-b-0 last:mb-0">
-                <div className="flex items-center justify-between">
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[#DAA520] text-xs font-semibold">{stock.symbol}</div>
-                    <div className="text-gray-400 text-xs truncate">{stock.name}</div>
-                  </div>
-                  <div className="text-right ml-1">
-                    <div className="text-white text-xs font-mono">${stock.price.toFixed(2)}</div>
-                    <div className={`text-xs ${stock.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                      {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)}%
-                    </div>
+      <div className="flex-1 bg-black overflow-y-auto scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600 min-h-0">
+        <div className="p-1 space-y-1">
+          {stocks.map((stock, i) => (
+            <div key={stock.symbol} className="border-b border-gray-700 pb-1 last:border-b-0">
+              <div className="flex items-center justify-between">
+                <div className="min-w-0 flex-1">
+                  <div className="text-[#DAA520] text-xs font-semibold">{stock.symbol}</div>
+                  <div className="text-gray-400 text-xs truncate">{stock.name}</div>
+                </div>
+                <div className="text-right ml-1">
+                  <div className="text-white text-xs font-mono">${stock.price.toFixed(2)}</div>
+                  <div className={`text-xs ${stock.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)}%
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

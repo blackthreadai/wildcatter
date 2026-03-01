@@ -92,11 +92,11 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
 
   if (loading) {
     return (
-      <div className="h-full w-full flex flex-col bg-black max-h-full">
-        <div className="bg-gray-800 p-2">
+      <div className="h-full w-full flex flex-col bg-black">
+        <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-semibold tracking-wider">{region} NEWS</h3>
         </div>
-        <div className="flex-1 p-2 flex items-center justify-center bg-black">
+        <div className="flex-1 p-2 flex items-center justify-center bg-black min-h-0">
           <div className="text-gray-500 text-xs">Loading...</div>
         </div>
       </div>
@@ -104,11 +104,12 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
   }
 
   return (
-    <div className="h-full w-full flex flex-col bg-black max-h-full">
-      <div className="bg-gray-800 p-2">
+    <div className="h-full w-full flex flex-col bg-black">
+      <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-semibold tracking-wider">{region} NEWS</h3>
       </div>
-      <div className="flex-1 p-2 space-y-2 overflow-hidden bg-black">
+      <div className="flex-1 p-2 overflow-y-auto bg-black min-h-0">
+        <div className="space-y-2">
         {articles.map((article, i) => (
           <div key={i} className="border-b border-gray-700 pb-1 last:border-b-0">
             <a 
@@ -127,6 +128,7 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
             </div>
           </div>
         ))}
+        </div>
       </div>
     </div>
   );
