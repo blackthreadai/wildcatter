@@ -159,8 +159,8 @@ export default function TerminalPage() {
             </select>
 
             {/* LIVE Button */}
-            <div className="flex items-center gap-1 bg-green-500 text-black px-3 py-1 rounded text-xs font-bold tracking-wider animate-pulse">
-              <div className="w-2 h-2 bg-green-300 rounded-full"></div>
+            <div className="flex items-center gap-1 bg-[#DAA520] text-black px-3 py-1 rounded text-xs font-bold tracking-wider animate-pulse">
+              <div className="w-2 h-2 bg-yellow-200 rounded-full"></div>
               LIVE
             </div>
 
