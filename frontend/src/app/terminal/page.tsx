@@ -30,7 +30,6 @@ export default function TerminalPage() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeLayers, setActiveLayers] = useState<string[]>([]);
   const [marketData, setMarketData] = useState<{label: string; value: string; change: number}[]>([]);
-  const [layerScrollIndex, setLayerScrollIndex] = useState(0);
 
   const regions = [
     { value: 'global', label: 'GLOBAL' },
@@ -92,22 +91,9 @@ export default function TerminalPage() {
     );
   };
 
-  const maxVisibleLayers = 10; // Show all layers in full-height panel
-  const canScrollUp = layerScrollIndex > 0;
-  const canScrollDown = layerScrollIndex + maxVisibleLayers < layers.length;
-  const visibleLayers = layers; // Show all layers
+  // No longer need scrolling variables - showing all layers with scroll container
 
-  const scrollLayersUp = () => {
-    if (canScrollUp) {
-      setLayerScrollIndex(prev => Math.max(0, prev - 1));
-    }
-  };
-
-  const scrollLayersDown = () => {
-    if (canScrollDown) {
-      setLayerScrollIndex(prev => Math.min(layers.length - maxVisibleLayers, prev + 1));
-    }
-  };
+  // Scroll functions removed - using native scroll container now
 
   const formatDateTime = (date: Date) => {
     return date.toLocaleDateString('en-US', {
@@ -146,6 +132,23 @@ export default function TerminalPage() {
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
+        }
+        /* Scrollbar styles */
+        .scrollbar-thin {
+          scrollbar-width: thin;
+        }
+        .scrollbar-track-gray-800::-webkit-scrollbar {
+          width: 6px;
+        }
+        .scrollbar-track-gray-800::-webkit-scrollbar-track {
+          background: #1f2937;
+        }
+        .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb {
+          background: #4b5563;
+          border-radius: 3px;
+        }
+        .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb:hover {
+          background: #6b7280;
         }
         .scrollbar-thin::-webkit-scrollbar {
           width: 4px;
@@ -261,12 +264,18 @@ export default function TerminalPage() {
         </div>
 
         {/* Map Container - Half Height */}
-        <div className="h-[50vh] bg-gray-800 relative">
+        <div 
+          className="h-[50vh] bg-gray-800 relative border"
+          style={{
+            borderColor: '#333333',
+            boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)'
+          }}
+        >
           <WorldMap activeLayers={activeLayers} />
 
           {/* Static Layers Panel - Left Side Full Height */}
           <div 
-            className="absolute top-0 left-0 w-72 border-r"
+            className="absolute top-0 left-0 w-72 border-r flex flex-col"
             style={{ 
               zIndex: 1000,
               backgroundColor: 'rgba(0, 0, 0, 0.6)',
@@ -275,12 +284,15 @@ export default function TerminalPage() {
               height: '100%'
             }}
           >
-            {/* Removed scroll up button */}
+            {/* Header */}
+            <div className="p-4 border-b border-gray-600">
+              <h3 className="text-white text-sm font-semibold tracking-wider">LAYERS</h3>
+            </div>
 
-            {/* Layers List */}
-            <div className="p-4">
-              <div className="space-y-3">
-                {visibleLayers.map(layer => (
+            {/* Scrollable Layers List */}
+            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600">
+              <div className="p-4 space-y-3">
+                {layers.map(layer => (
                   <label
                     key={layer.id}
                     className="flex items-center gap-3 p-2 rounded cursor-pointer hover:bg-gray-800 hover:bg-opacity-50 transition-all"
@@ -313,8 +325,6 @@ export default function TerminalPage() {
                 ))}
               </div>
             </div>
-
-            {/* Removed scroll down button */}
           </div>
         </div>
 
