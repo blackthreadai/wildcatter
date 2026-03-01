@@ -170,7 +170,7 @@ export default function TerminalPage() {
                 <div key={i} className="flex items-center gap-2">
                   <span className="text-gray-300 text-xs">{item.label.replace(' Crude', '').replace('Henry Hub ', '')}</span>
                   <span className="text-white font-mono">{item.value}</span>
-                  <span className={`text-xs ${item.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  <span className="text-xs text-[#DAA520]">
                     {item.change >= 0 ? '+' : ''}{item.change.toFixed(2)}%
                   </span>
                 </div>
@@ -270,13 +270,17 @@ export default function TerminalPage() {
         </div>
 
         {/* Bottom Area - Grid */}
-        <div className="flex-1 bg-black p-2">
-          <div className="grid grid-cols-5 grid-rows-3 gap-2.5 h-full">
+        <div className="flex-1 bg-black" style={{ padding: '5px' }}>
+          <div className="grid grid-cols-5 grid-rows-3 gap-1 h-full">
             {Array.from({ length: 15 }, (_, i) => (
               <div 
                 key={i} 
-                className="bg-gray-800 border border-gray-700"
-                style={{ margin: '10px' }}
+                className="bg-black border"
+                style={{ 
+                  margin: '5px',
+                  borderColor: '#DAA520',
+                  boxShadow: '0 0 10px rgba(218, 165, 32, 0.3)'
+                }}
               >
                 <NewsWidget />
               </div>

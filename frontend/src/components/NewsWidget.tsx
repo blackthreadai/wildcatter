@@ -57,11 +57,11 @@ export default function NewsWidget() {
 
   if (loading) {
     return (
-      <div className="h-full flex flex-col">
-        <div className="border-b border-gray-600 p-3">
+      <div className="h-full flex flex-col bg-black">
+        <div className="bg-gray-800 p-2">
           <h3 className="text-white text-xs font-semibold tracking-wider">US NEWS</h3>
         </div>
-        <div className="flex-1 p-3 flex items-center justify-center">
+        <div className="flex-1 p-2 flex items-center justify-center bg-black">
           <div className="text-gray-500 text-xs">Loading...</div>
         </div>
       </div>
@@ -69,13 +69,13 @@ export default function NewsWidget() {
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="border-b border-gray-600 p-3">
+    <div className="h-full flex flex-col bg-black">
+      <div className="bg-gray-800 p-2">
         <h3 className="text-white text-xs font-semibold tracking-wider">US NEWS</h3>
       </div>
-      <div className="flex-1 p-3 space-y-3 overflow-hidden">
+      <div className="flex-1 p-2 space-y-2 overflow-hidden bg-black">
         {articles.map((article, i) => (
-          <div key={i} className="border-b border-gray-700 pb-2 last:border-b-0">
+          <div key={i} className="border-b border-gray-700 pb-1 last:border-b-0">
             <h4 className="text-white text-xs leading-tight mb-1 line-clamp-2">
               {article.title}
             </h4>
