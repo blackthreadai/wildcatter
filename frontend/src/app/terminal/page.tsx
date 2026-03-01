@@ -25,14 +25,15 @@ export default function TerminalPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeLayers, setActiveLayers] = useState<string[]>([]);
+  const [marketData, setMarketData] = useState<{label: string; value: string; change: number}[]>([]);
 
   const regions = [
-    { value: 'global', label: 'Global' },
-    { value: 'americas', label: 'Americas' },
-    { value: 'europe', label: 'Europe' },
-    { value: 'asia', label: 'Asia' },
-    { value: 'oceania', label: 'Oceania' },
-    { value: 'africa', label: 'Africa' },
+    { value: 'global', label: 'GLOBAL' },
+    { value: 'americas', label: 'AMERICAS' },
+    { value: 'europe', label: 'EUROPE' },
+    { value: 'asia', label: 'ASIA' },
+    { value: 'oceania', label: 'OCEANIA' },
+    { value: 'africa', label: 'AFRICA' },
   ];
 
   const layers = [
@@ -48,6 +49,29 @@ export default function TerminalPage() {
       setCurrentTime(new Date());
     }, 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    // Fetch market data
+    const fetchMarketData = async () => {
+      try {
+        const response = await fetch('/api/market');
+        const data = await response.json();
+        // Filter for WTI, Brent, and Gas
+        const filtered = data.filter((item: any) => 
+          item.label === 'WTI Crude' || 
+          item.label === 'Brent Crude' || 
+          item.label === 'Henry Hub Gas'
+        );
+        setMarketData(filtered);
+      } catch (error) {
+        console.error('Failed to fetch market data:', error);
+      }
+    };
+
+    fetchMarketData();
+    const interval = setInterval(fetchMarketData, 60000); // Update every minute
+    return () => clearInterval(interval);
   }, []);
 
   const toggleLayer = (layerId: string) => {
@@ -125,6 +149,26 @@ export default function TerminalPage() {
                 </option>
               ))}
             </select>
+
+            {/* LIVE Button */}
+            <div className="flex items-center gap-1 bg-green-500 text-black px-3 py-1 rounded text-xs font-bold tracking-wider animate-pulse">
+              <div className="w-2 h-2 bg-green-300 rounded-full"></div>
+              LIVE
+            </div>
+
+            {/* Market Snapshot */}
+            <div className="flex items-center gap-4 text-sm">
+              <span className="text-gray-400 tracking-wider">MARKET SNAPSHOT</span>
+              {marketData.map((item, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span className="text-gray-300 text-xs">{item.label.replace(' Crude', '').replace('Henry Hub ', '')}</span>
+                  <span className="text-white font-mono">{item.value}</span>
+                  <span className={`text-xs ${item.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                    {item.change >= 0 ? '+' : ''}{item.change.toFixed(2)}%
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Right Side - Search + Settings */}
