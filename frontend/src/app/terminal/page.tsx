@@ -44,7 +44,12 @@ export default function TerminalPage() {
     { id: 'weather', label: 'WEATHER ALERTS', color: '#f59e0b' },
     { id: 'oil-wells', label: 'ACTIVE OIL WELLS', color: '#10b981' },
     { id: 'gas-wells', label: 'ACTIVE GAS WELLS', color: '#3b82f6' },
+    { id: 'drilling-rigs', label: 'ACTIVE DRILLING RIGS', color: '#f97316' },
     { id: 'pipelines', label: 'PIPELINE ROUTES', color: '#8b5cf6' },
+    { id: 'refineries', label: 'REFINERIES', color: '#06b6d4' },
+    { id: 'tanker-ships', label: 'TANKER SHIPS', color: '#84cc16' },
+    { id: 'shipping-lanes', label: 'SHIPPING LANES', color: '#a855f7' },
+    { id: 'seismic-activity', label: 'SEISMIC ACTIVITY', color: '#dc2626' },
   ];
 
   useEffect(() => {
