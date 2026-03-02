@@ -312,7 +312,7 @@ export default function TerminalPage() {
     { id: 'geopolitical', label: 'GEOPOLITICAL ALERTS', color: '#ef4444' },
     { id: 'weather', label: 'WEATHER ALERTS', color: '#DAA520' },
     { id: 'seismic-activity', label: 'SEISMIC ACTIVITY', color: '#4ade80' },
-    { id: 'active-wells', label: 'ACTIVE OIL & GAS WELLS', color: '#10b981' },
+    { id: 'active-wells', label: 'ACTIVE OIL & GAS WELLS', color: '#DAA520' },
     { id: 'drilling-rigs', label: 'ACTIVE DRILLING RIGS', color: '#f97316' },
     { id: 'pipelines', label: 'PIPELINE ROUTES', color: '#8b5cf6' },
     { id: 'refineries', label: 'REFINERIES', color: '#06b6d4' },
@@ -624,10 +624,24 @@ export default function TerminalPage() {
                         </svg>
                       )}
                     </div>
-                    <div 
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: layer.color }}
-                    />
+                    {layer.id === 'active-wells' ? (
+                      <div className="w-3 h-3 flex items-center justify-center">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={layer.color} strokeWidth="2">
+                          <path d="M12 3v18"/>
+                          <path d="M9 3l6 0"/>
+                          <path d="M10 8l4 0"/>
+                          <path d="M9 3l-2 18"/>
+                          <path d="M15 3l2 18"/>
+                          <path d="M7 21l10 0"/>
+                          <rect x="11" y="4" width="2" height="2" fill={layer.color}/>
+                        </svg>
+                      </div>
+                    ) : (
+                      <div 
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: layer.color }}
+                      />
+                    )}
                     <span className="text-xs tracking-wider text-gray-300" style={{ fontStretch: 'condensed' }}>
                       {layer.label}
                     </span>

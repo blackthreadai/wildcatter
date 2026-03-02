@@ -288,42 +288,51 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
     // Add active wells (oil & gas combined) if active
     if (activeLayers.includes('active-wells')) {
       const activeWells = [
-        // Oil wells
-        { lat: 26.0, lng: 50.0, name: "Kuwait Oil Field", type: "Oil", production: "45,000 bbl/day", color: "#10b981" },
-        { lat: 25.0, lng: 51.0, name: "Qatar Oil Platform", type: "Oil", production: "62,000 bbl/day", color: "#10b981" },
-        { lat: 24.5, lng: 54.5, name: "UAE Offshore", type: "Oil", production: "38,000 bbl/day", color: "#10b981" },
-        { lat: 29.0, lng: 48.0, name: "Iraqi Rumaila", type: "Oil", production: "95,000 bbl/day", color: "#10b981" },
-        { lat: 27.5, lng: 49.5, name: "Saudi Ghawar", type: "Oil", production: "125,000 bbl/day", color: "#10b981" },
-        // Gas wells
-        { lat: 25.5, lng: 51.2, name: "North Field Gas", type: "Gas", production: "2.8 BCF/day", color: "#3b82f6" },
-        { lat: 26.8, lng: 50.2, name: "South Pars", type: "Gas", production: "3.2 BCF/day", color: "#3b82f6" },
-        { lat: 24.0, lng: 54.0, name: "Khuff Formation", type: "Gas", production: "1.9 BCF/day", color: "#3b82f6" },
-        { lat: 28.0, lng: 49.0, name: "Kangan Field", type: "Gas", production: "2.1 BCF/day", color: "#3b82f6" },
-        { lat: 23.5, lng: 53.5, name: "Abu Dhabi Gas", type: "Gas", production: "1.6 BCF/day", color: "#3b82f6" }
+        // Oil wells - all gold colored
+        { lat: 26.0, lng: 50.0, name: "Kuwait Oil Field", type: "Oil", production: "45,000 bbl/day", color: "#DAA520" },
+        { lat: 25.0, lng: 51.0, name: "Qatar Oil Platform", type: "Oil", production: "62,000 bbl/day", color: "#DAA520" },
+        { lat: 24.5, lng: 54.5, name: "UAE Offshore", type: "Oil", production: "38,000 bbl/day", color: "#DAA520" },
+        { lat: 29.0, lng: 48.0, name: "Iraqi Rumaila", type: "Oil", production: "95,000 bbl/day", color: "#DAA520" },
+        { lat: 27.5, lng: 49.5, name: "Saudi Ghawar", type: "Oil", production: "125,000 bbl/day", color: "#DAA520" },
+        // Gas wells - all gold colored
+        { lat: 25.5, lng: 51.2, name: "North Field Gas", type: "Gas", production: "2.8 BCF/day", color: "#DAA520" },
+        { lat: 26.8, lng: 50.2, name: "South Pars", type: "Gas", production: "3.2 BCF/day", color: "#DAA520" },
+        { lat: 24.0, lng: 54.0, name: "Khuff Formation", type: "Gas", production: "1.9 BCF/day", color: "#DAA520" },
+        { lat: 28.0, lng: 49.0, name: "Kangan Field", type: "Gas", production: "2.1 BCF/day", color: "#DAA520" },
+        { lat: 23.5, lng: 53.5, name: "Abu Dhabi Gas", type: "Gas", production: "1.6 BCF/day", color: "#DAA520" }
       ];
 
       activeWells.forEach((well) => {
         const wellIcon = L.divIcon({
           html: `<div style="
-            width: 16px; 
-            height: 16px; 
+            width: 20px; 
+            height: 20px; 
             display: flex; 
             align-items: center; 
             justify-content: center;
           ">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="${well.color}">
-              <path d="M12 2v20"/>
-              <path d="M8 6l8 0l-2 4l-4 0l-2-4z"/>
-              <path d="M6 22l12 0"/>
-              <path d="M10 14v8M14 14v8"/>
-              <rect x="11" y="3" width="2" height="3"/>
-              <circle cx="12" cy="8" r="1.5" fill="white"/>
-              ${well.type === 'Gas' ? '<path d="M8 10l8 0M8 12l8 0" stroke="white" stroke-width="0.5"/>' : ''}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${well.color}" stroke-width="2">
+              <!-- Main derrick tower -->
+              <path d="M12 3v18"/>
+              <!-- Derrick top -->
+              <path d="M9 3l6 0"/>
+              <!-- Cross beams -->
+              <path d="M10 6l4 0"/>
+              <path d="M10 9l4 0"/>
+              <path d="M10 12l4 0"/>
+              <!-- Derrick legs -->
+              <path d="M9 3l-2 18"/>
+              <path d="M15 3l2 18"/>
+              <!-- Base platform -->
+              <path d="M7 21l10 0"/>
+              <!-- Drilling equipment -->
+              <rect x="11" y="4" width="2" height="3" fill="${well.color}"/>
+              ${well.type === 'Gas' ? `<circle cx="12" cy="8" r="1" fill="${well.color}"/>` : `<rect x="11.5" y="8" width="1" height="2" fill="${well.color}"/>`}
             </svg>
           </div>`,
           className: '',
-          iconSize: [16, 16],
-          iconAnchor: [8, 8]
+          iconSize: [20, 20],
+          iconAnchor: [10, 10]
         });
 
         const marker = L.marker([well.lat, well.lng], { icon: wellIcon }).addTo(mapInstanceRef.current!);
