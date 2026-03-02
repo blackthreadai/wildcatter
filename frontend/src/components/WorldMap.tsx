@@ -57,7 +57,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
     });
 
     // Add geopolitical alerts if active
-    if (activeLayers.includes('geopolitical-alerts')) {
+    if (activeLayers.includes('geopolitical')) {
       // Mock Middle East geopolitical alerts
       const geopoliticalAlerts = [
         {

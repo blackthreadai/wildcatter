@@ -29,7 +29,7 @@ export default function TerminalPage() {
   const [selectedRegion, setSelectedRegion] = useState('global');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [activeLayers, setActiveLayers] = useState<string[]>(['geopolitical-alerts']); // Default active
+  const [activeLayers, setActiveLayers] = useState<string[]>(['geopolitical']); // Default active
   const [marketData, setMarketData] = useState<{label: string; value: string; change: number}[]>([]);
 
   const regions = [
