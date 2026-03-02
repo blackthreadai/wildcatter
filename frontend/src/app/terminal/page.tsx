@@ -298,7 +298,6 @@ export default function TerminalPage() {
               zIndex: 1000,
               backgroundColor: 'rgba(0, 0, 0, 0.6)',
               borderColor: '#333333',
-              boxShadow: '2px 0 10px rgba(218, 165, 32, 0.4), 2px 0 20px rgba(218, 165, 32, 0.2)',
               height: '100%'
             }}
           >
