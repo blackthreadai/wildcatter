@@ -96,8 +96,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
 
       // Add markers for each alert
       geopoliticalAlerts.forEach((alert) => {
-        const color = alert.severity === 'critical' ? '#dc2626' : 
-                     alert.severity === 'high' ? '#ea580c' : '#eab308';
+        const color = '#ef4444'; // All geopolitical alerts are red
         
         // Create custom icon
         const alertIcon = L.divIcon({
@@ -119,7 +118,10 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
           icon: alertIcon 
         }).addTo(mapInstanceRef.current!);
 
-        // Add popup with alert details
+        // Add popup with alert details (severity shown in text)
+        const severityColor = alert.severity === 'critical' ? '#dc2626' : 
+                             alert.severity === 'high' ? '#ea580c' : '#eab308';
+        
         const popupContent = `
           <div style="min-width: 200px;">
             <h4 style="margin: 0 0 8px 0; color: ${color}; font-size: 14px; font-weight: bold;">
@@ -129,7 +131,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
               ${alert.description}
             </p>
             <div style="font-size: 11px; color: #666;">
-              <strong>Severity:</strong> ${alert.severity.toUpperCase()}<br>
+              <strong>Severity:</strong> <span style="color: ${severityColor}; font-weight: bold;">${alert.severity.toUpperCase()}</span><br>
               <strong>Time:</strong> ${new Date(alert.date).toLocaleString()}
             </div>
           </div>
