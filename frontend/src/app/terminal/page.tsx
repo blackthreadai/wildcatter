@@ -227,13 +227,7 @@ export default function TerminalPage() {
   const [showHidden, setShowHidden] = useState(false);
   const [showHomepagePopup, setShowHomepagePopup] = useState(false);
 
-  // Clear localStorage on component mount to fix widget conflicts
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('terminal-hidden-widgets');
-      localStorage.removeItem('terminal-widget-order');
-    }
-  }, []);
+  // Remove the localStorage clearing to prevent interference
 
   // Tailwind safelist for dynamic classes (ensures they're not purged)
   // col-span-2 row-span-2
