@@ -75,8 +75,8 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
             const lng = start[1] + (lngStep * j);
             
             L.circle([lat, lng], {
-              color: '#a855f7',
-              fillColor: '#a855f7',
+              color: '#4ade80', // Green color
+              fillColor: '#4ade80',
               fillOpacity: 0.9,
               radius: 6000, // Smaller 6km circles for density
               weight: 0
@@ -432,8 +432,17 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
             display: flex; 
             align-items: center; 
             justify-content: center;
-            font-size: 14px;
-          ">🏭</div>`,
+          ">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#DAA520">
+              <rect x="4" y="10" width="16" height="12" rx="1"/>
+              <rect x="6" y="4" width="3" height="8" rx="0.5"/>
+              <rect x="10" y="6" width="3" height="6" rx="0.5"/>
+              <rect x="14" y="3" width="3" height="9" rx="0.5"/>
+              <circle cx="7.5" cy="3" r="1" fill="white"/>
+              <circle cx="11.5" cy="5" r="1" fill="white"/>
+              <circle cx="15.5" cy="2" r="1" fill="white"/>
+            </svg>
+          </div>`,
           className: '',
           iconSize: [18, 18],
           iconAnchor: [9, 9]
@@ -442,7 +451,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         const marker = L.marker([refinery.lat, refinery.lng], { icon: refineryIcon }).addTo(mapInstanceRef.current!);
         marker.bindPopup(`
           <div style="min-width: 160px;">
-            <h4 style="margin: 0 0 8px 0; color: #06b6d4; font-size: 14px; font-weight: bold;">
+            <h4 style="margin: 0 0 8px 0; color: #DAA520; font-size: 14px; font-weight: bold;">
               ${refinery.name}
             </h4>
             <p style="margin: 0 0 4px 0; font-size: 12px; color: #DAA520;">
@@ -482,7 +491,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       ];
 
       pipelines.forEach((pipeline) => {
-        const pipelineColor = '#8b5cf6';
+        const pipelineColor = '#ef4444'; // Red color
         
         // Create pipeline as series of small circles
         const startLat = pipeline.coordinates[0][0];
@@ -514,6 +523,52 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
             </div>
           `);
         }
+      });
+    }
+
+    // Add tanker ships if active
+    if (activeLayers.includes('tanker-ships')) {
+      const tankerShips = [
+        { lat: 26.0, lng: 56.8, name: "Crude Tanker Alpha", cargo: "2.0M barrels", status: "Loading", route: "Persian Gulf to Asia" },
+        { lat: 25.5, lng: 54.0, name: "LNG Carrier Beta", cargo: "125,000 m³ LNG", status: "Transit", route: "Qatar to Europe" },
+        { lat: 28.0, lng: 50.5, name: "Product Tanker Gamma", cargo: "750,000 barrels", status: "Anchored", route: "Kuwait to India" },
+        { lat: 24.8, lng: 57.2, name: "VLCC Delta", cargo: "2.2M barrels", status: "Loading", route: "UAE to Japan" },
+        { lat: 27.2, lng: 52.0, name: "Chemical Tanker Epsilon", cargo: "45,000 tons", status: "Transit", route: "Iran to Turkey" }
+      ];
+
+      tankerShips.forEach((ship) => {
+        const shipIcon = L.divIcon({
+          html: `<div style="
+            width: 20px; 
+            height: 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 16px;
+            filter: hue-rotate(30deg) saturate(2) brightness(1.3) sepia(0.8);
+          ">🚢</div>`,
+          className: '',
+          iconSize: [20, 20],
+          iconAnchor: [10, 10]
+        });
+
+        const marker = L.marker([ship.lat, ship.lng], { icon: shipIcon }).addTo(mapInstanceRef.current!);
+        marker.bindPopup(`
+          <div style="min-width: 160px;">
+            <h4 style="margin: 0 0 8px 0; color: #DAA520; font-size: 14px; font-weight: bold;">
+              ${ship.name}
+            </h4>
+            <p style="margin: 0 0 4px 0; font-size: 12px; color: #DAA520;">
+              Cargo: ${ship.cargo}
+            </p>
+            <p style="margin: 0 0 4px 0; font-size: 12px; color: #666;">
+              Status: ${ship.status}
+            </p>
+            <p style="margin: 0; font-size: 12px; color: #666;">
+              Route: ${ship.route}
+            </p>
+          </div>
+        `);
       });
     }
 

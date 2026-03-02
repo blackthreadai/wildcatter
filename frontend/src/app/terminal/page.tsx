@@ -314,10 +314,10 @@ export default function TerminalPage() {
     { id: 'seismic-activity', label: 'SEISMIC ACTIVITY', color: '#4ade80' },
     { id: 'active-wells', label: 'ACTIVE OIL & GAS WELLS', color: '#DAA520' },
     { id: 'drilling-rigs', label: 'ACTIVE DRILLING RIGS', color: '#4ade80' },
-    { id: 'pipelines', label: 'PIPELINE ROUTES', color: '#8b5cf6' },
-    { id: 'refineries', label: 'REFINERIES', color: '#06b6d4' },
-    { id: 'tanker-ships', label: 'TANKER SHIPS', color: '#84cc16' },
-    { id: 'shipping-lanes', label: 'SHIPPING LANES', color: '#a855f7' },
+    { id: 'pipelines', label: 'PIPELINE ROUTES', color: '#ef4444' },
+    { id: 'refineries', label: 'REFINERIES', color: '#DAA520' },
+    { id: 'tanker-ships', label: 'TANKER SHIPS', color: '#DAA520' },
+    { id: 'shipping-lanes', label: 'SHIPPING LANES', color: '#4ade80' },
   ];
 
   useEffect(() => {
@@ -650,14 +650,26 @@ export default function TerminalPage() {
                         </svg>
                       </div>
                     ) : layer.id === 'refineries' ? (
-                      <div className="w-3 h-3 flex items-center justify-center text-xs">
-                        🏭
+                      <div className="w-3 h-3 flex items-center justify-center">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill={layer.color}>
+                          <rect x="4" y="10" width="16" height="12" rx="1"/>
+                          <rect x="6" y="4" width="3" height="8" rx="0.5"/>
+                          <rect x="10" y="6" width="3" height="6" rx="0.5"/>
+                          <rect x="14" y="3" width="3" height="9" rx="0.5"/>
+                          <circle cx="7.5" cy="3" r="0.8" fill="white"/>
+                          <circle cx="11.5" cy="5" r="0.8" fill="white"/>
+                          <circle cx="15.5" cy="2" r="0.8" fill="white"/>
+                        </svg>
                       </div>
                     ) : layer.id === 'pipelines' ? (
                       <div className="w-3 h-3 flex items-center justify-center">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
                           <path d="M2 12l20 0" stroke={layer.color} strokeWidth="3" strokeLinecap="round"/>
                         </svg>
+                      </div>
+                    ) : layer.id === 'tanker-ships' ? (
+                      <div className="w-3 h-3 flex items-center justify-center text-xs">
+                        🚢
                       </div>
                     ) : (
                       <div 
