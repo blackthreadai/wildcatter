@@ -222,6 +222,7 @@ export default function TerminalPage() {
   const [widgets, setWidgets] = useState<Widget[]>(defaultWidgets);
   const [hiddenWidgets, setHiddenWidgets] = useState<string[]>([]);
   const [showHidden, setShowHidden] = useState(false);
+  const [showHomepagePopup, setShowHomepagePopup] = useState(false);
 
   // Tailwind safelist for dynamic classes (ensures they're not purged)
   // col-span-2 row-span-2
@@ -237,6 +238,28 @@ export default function TerminalPage() {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  // Handle homepage setting
+  const handleSetHomepage = () => {
+    const url = window.location.origin + '/terminal';
+    
+    // Try different browser methods
+    try {
+      // For IE and older browsers
+      if ((window as any).external && 'AddFavorite' in (window as any).external) {
+        (window as any).external.AddFavorite(url, 'Wildcatter Energy Terminal');
+      } else {
+        // For modern browsers, we can't set homepage directly
+        // Show instructions instead
+        alert(`To set as homepage:\n\nChrome: Settings → On startup → Open specific page → Add: ${url}\nFirefox: Preferences → Home → Homepage → Use current page\nSafari: Preferences → General → Homepage`);
+      }
+    } catch (e) {
+      // Fallback to instructions
+      alert(`To set as homepage:\n\nChrome: Settings → On startup → Open specific page → Add: ${url}\nFirefox: Preferences → Home → Homepage → Use current page\nSafari: Preferences → General → Homepage`);
+    }
+    
+    setShowHomepagePopup(false);
+  };
 
   // Handle drag end
   function handleDragEnd(event: DragEndEvent) {
@@ -311,7 +334,7 @@ export default function TerminalPage() {
 
   const layers = [
     { id: 'geopolitical', label: 'GEOPOLITICAL ALERTS', color: '#ef4444' },
-    { id: 'weather', label: 'WEATHER ALERTS', color: '#DAA520' },
+    { id: 'weather', label: 'WEATHER ALERTS', color: '#ef4444' },
     { id: 'seismic-activity', label: 'SEISMIC ACTIVITY', color: '#ef4444' },
     { id: 'active-wells', label: 'ACTIVE OIL & GAS WELLS', color: '#DAA520' },
     { id: 'drilling-rigs', label: 'ACTIVE DRILLING RIGS', color: '#4ade80' },
@@ -507,6 +530,17 @@ export default function TerminalPage() {
           <div className="flex items-center">
             {/* Control Buttons Group */}
             <div className="flex items-center gap-1">
+              {/* Homepage Button */}
+              <button 
+                onClick={() => setShowHomepagePopup(true)}
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded"
+                title="Make Terminal your homepage"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+              </button>
+
               {/* View Hidden Widgets Button */}
               <button 
                 onClick={() => setShowHidden(!showHidden)}
@@ -663,8 +697,7 @@ export default function TerminalPage() {
                     ) : layer.id === 'weather' ? (
                       <div className="w-3 h-3 flex items-center justify-center">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill={layer.color}>
-                          <path d="M12 2l-1 4-4 1 4 1 1 4 1-4 4-1-4-1-1-4z"/>
-                          <path d="M12 6c-3 0-6 2-6 8 0 2 1 4 3 5l3-8 3 8c2-1 3-3 3-5 0-6-3-8-6-8z"/>
+                          <path d="M12 16l-6-8h12l-6 8z"/>
                         </svg>
                       </div>
                     ) : layer.id === 'refineries' ? (
@@ -742,6 +775,40 @@ export default function TerminalPage() {
           </DndContext>
         </div>
       </div>
+
+      {/* Homepage Popup */}
+      {showHomepagePopup && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="text-center">
+              <div className="mb-4">
+                <svg className="w-12 h-12 text-[#DAA520] mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <h3 className="text-xl text-white font-semibold">Make Terminal Your Homepage?</h3>
+                <p className="text-gray-400 text-sm mt-2">
+                  Set Wildcatter Energy Terminal as your browser homepage for instant access to energy markets and data.
+                </p>
+              </div>
+              
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={handleSetHomepage}
+                  className="bg-[#DAA520] text-black px-6 py-2 rounded font-semibold hover:bg-yellow-500 transition-colors"
+                >
+                  YES
+                </button>
+                <button
+                  onClick={() => setShowHomepagePopup(false)}
+                  className="bg-gray-700 text-white px-6 py-2 rounded font-semibold hover:bg-gray-600 transition-colors"
+                >
+                  NO
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
