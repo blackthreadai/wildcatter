@@ -389,6 +389,8 @@ export default function TerminalPage() {
                 widgetContent = <AsianStockWidget />;
               } else if (position === 10) {
                 widgetContent = <WorldClockWidget />;
+              } else if (position === 11) {
+                widgetContent = <NewsWidget region="SOUTH AMERICAN" />;
               } else {
                 widgetContent = <NewsWidget region="US" />;
               }
