@@ -34,58 +34,6 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       position: 'bottomright'
     }).addTo(map);
 
-    // Add test marker immediately after map setup
-    map.whenReady(() => {
-      // Test if ANY overlays work - start with simple marker
-      const testMarker = L.marker([29.0, 42.0]).addTo(map);
-      testMarker.bindPopup('🔥 TEST MARKER - If you see this, overlays work!');
-      
-      // Try circle overlay
-      const testCircle = L.circle([26.0, 56.0], {
-        color: 'red',
-        fillColor: '#f03',
-        fillOpacity: 0.5,
-        radius: 100000
-      }).addTo(map);
-      testCircle.bindPopup('🔴 TEST CIRCLE');
-      
-      // Try polygon instead of polyline (different approach)
-      try {
-        const testPolygon = L.polygon([
-          [29.0, 42.0],
-          [26.0, 56.0],
-          [30.0, 45.0],
-          [29.0, 42.0]
-        ], {
-          color: 'yellow',
-          weight: 8,
-          fillOpacity: 0.3
-        }).addTo(map);
-        testPolygon.bindPopup('🟡 TEST POLYGON');
-      } catch (e) {
-        console.error('Polygon failed:', e);
-      }
-
-      // Try different polyline syntax
-      try {
-        const coords = L.latLng(29.0, 42.0);
-        const coords2 = L.latLng(26.0, 56.0);
-        
-        const testLine = L.polyline([coords, coords2], {
-          color: '#00ff00',
-          weight: 15,
-          opacity: 1.0,
-          dashArray: null
-        });
-        
-        map.addLayer(testLine);
-        testLine.bindPopup('🟢 TEST POLYLINE V2');
-        
-      } catch (e) {
-        console.error('Polyline V2 failed:', e);
-      }
-    });
-
     mapInstanceRef.current = map;
 
     // Cleanup function
@@ -103,10 +51,61 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
 
     // Clear existing overlays but keep base layers
     mapInstanceRef.current.eachLayer((layer) => {
-      if (layer instanceof L.Marker || layer instanceof L.Polyline) {
-        mapInstanceRef.current!.removeLayer(layer);
+      if (layer instanceof L.Marker || layer instanceof L.Circle) {
+        // Only remove non-tile layers
+        if (!(layer as any)._url) {
+          mapInstanceRef.current!.removeLayer(layer);
+        }
       }
     });
+
+    // Add shipping lanes using circles (since polylines don't work)
+    if (activeLayers.includes('shipping-lanes')) {
+      // Strait of Hormuz shipping route using circles
+      const hormanRoute = [
+        [26.5, 56.2], [26.6, 56.4], [26.7, 56.6], [26.8, 56.8]
+      ];
+      
+      hormanRoute.forEach((coords, index) => {
+        L.circle(coords as [number, number], {
+          color: '#a855f7',
+          fillColor: '#a855f7', 
+          fillOpacity: 0.8,
+          radius: 15000,
+          weight: 2
+        }).addTo(mapInstanceRef.current!).bindPopup('Strait of Hormuz Shipping Lane');
+      });
+
+      // Suez Canal Route using circles  
+      const suezRoute = [
+        [30.0, 32.3], [29.5, 32.7], [29.0, 33.2], [28.0, 34.0], [26.0, 35.5]
+      ];
+      
+      suezRoute.forEach((coords, index) => {
+        L.circle(coords as [number, number], {
+          color: '#a855f7',
+          fillColor: '#a855f7',
+          fillOpacity: 0.8, 
+          radius: 20000,
+          weight: 2
+        }).addTo(mapInstanceRef.current!).bindPopup('Suez Canal Shipping Route');
+      });
+
+      // Red Sea Route
+      const redSeaRoute = [
+        [25.0, 35.0], [22.0, 37.0], [18.0, 40.0], [15.0, 42.0], [12.6, 43.3]
+      ];
+      
+      redSeaRoute.forEach((coords, index) => {
+        L.circle(coords as [number, number], {
+          color: '#a855f7', 
+          fillColor: '#a855f7',
+          fillOpacity: 0.8,
+          radius: 25000,
+          weight: 2
+        }).addTo(mapInstanceRef.current!).bindPopup('Red Sea Shipping Lane');
+      });
+    }
 
     // Add geopolitical alerts if active
     if (activeLayers.includes('geopolitical')) {
