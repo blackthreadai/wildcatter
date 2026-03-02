@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import NewsWidget from '@/components/NewsWidget';
 import YouTubeWidget from '@/components/YouTubeWidget';
+import LiveNewsWidget from '@/components/LiveNewsWidget';
 import GreedFearWidget from '@/components/GreedFearWidget';
 import StockWidget from '@/components/StockWidget';
 import AsianStockWidget from '@/components/AsianStockWidget';
@@ -52,14 +53,14 @@ const WorldMap = dynamic(() => import('@/components/WorldMap'), {
 // Widget configuration - defines all widgets in the grid
 type Widget = {
   id: string;
-  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction';
+  type: 'news' | 'youtube' | 'live-news' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction';
   title: string;
   span?: { col: number; row: number };
   region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN';
 };
 
 const defaultWidgets: Widget[] = [
-  { id: 'youtube', type: 'youtube', title: 'ENERGY NEWS TICKER', span: { col: 2, row: 2 } },
+  { id: 'live-news', type: 'live-news', title: 'LIVE NEWS CHANNELS', span: { col: 2, row: 2 } },
   { id: 'greed-fear', type: 'greed-fear', title: 'FEAR & GREED INDEX' },
   { id: 'us-news', type: 'news', title: 'US ENERGY', region: 'US' },
   { id: 'us-markets', type: 'stock', title: 'US ENERGY MARKETS' },
@@ -105,6 +106,8 @@ function DraggableWidget({
         return <NewsWidget region={widget.region} />;
       case 'youtube':
         return <YouTubeWidget />;
+      case 'live-news':
+        return <LiveNewsWidget />;
       case 'greed-fear':
         return <GreedFearWidget />;
       case 'stock':
