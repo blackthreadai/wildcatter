@@ -301,6 +301,7 @@ export default function TerminalPage() {
 
   const regions = [
     { value: 'global', label: 'GLOBAL' },
+    { value: 'middle-east', label: 'MIDDLE EAST' },
     { value: 'americas', label: 'AMERICAS' },
     { value: 'europe', label: 'EUROPE' },
     { value: 'asia', label: 'ASIA' },
@@ -481,9 +482,9 @@ export default function TerminalPage() {
               ))}
             </select>
 
-            {/* LIVE Button */}
-            <div className="flex items-center gap-1 bg-[#4ade80] text-black px-3 py-1 rounded text-xs font-bold tracking-wider animate-pulse">
-              <div className="w-2 h-2 bg-green-200 rounded-full"></div>
+            {/* LIVE Indicator */}
+            <div className="flex items-center gap-1 text-[#4ade80] text-xs font-bold tracking-wider animate-pulse">
+              <div className="w-2 h-2 bg-[#4ade80] rounded-full shadow-[0_0_8px_#4ade80]"></div>
               LIVE
             </div>
 
@@ -492,9 +493,9 @@ export default function TerminalPage() {
               <span className="text-gray-400 tracking-wider">MARKET SNAPSHOT</span>
               {marketData.map((item, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <span className="text-gray-300 text-xs">{item.label.replace(' Crude', '').replace('Henry Hub ', '')}</span>
+                  <span className="text-[#DAA520] text-xs">{item.label.replace(' Crude', '').replace('Henry Hub ', '')}</span>
                   <span className="text-white font-mono">{item.value}</span>
-                  <span className="text-xs text-[#DAA520]">
+                  <span className={`text-xs ${item.change >= 0 ? 'text-[#4ade80]' : 'text-red-400'}`}>
                     {item.change >= 0 ? '+' : ''}{item.change.toFixed(2)}%
                   </span>
                 </div>
