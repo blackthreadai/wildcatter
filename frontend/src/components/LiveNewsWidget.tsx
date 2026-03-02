@@ -17,7 +17,8 @@ const channels = [
 export default function LiveNewsWidget() {
   const [activeChannel, setActiveChannel] = useState('bloomberg');
 
-  return (
+  try {
+    return (
     <div className="h-full w-full flex flex-col bg-black">
       {/* Header */}
       <div className="bg-gray-800 p-2 flex-shrink-0 flex items-center justify-between">
@@ -64,5 +65,16 @@ export default function LiveNewsWidget() {
         </div>
       </div>
     </div>
-  );
+    );
+  } catch (error) {
+    console.error('LiveNewsWidget error:', error);
+    return (
+      <div className="h-full w-full flex items-center justify-center bg-black">
+        <div className="text-center text-red-400">
+          <p className="text-xs">Error loading Live News</p>
+          <p className="text-xs text-gray-500">Check console for details</p>
+        </div>
+      </div>
+    );
+  }
 }
