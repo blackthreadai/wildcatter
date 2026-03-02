@@ -10,7 +10,7 @@ interface NewsArticle {
 }
 
 interface NewsWidgetProps {
-  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS';
+  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS';
 }
 
 export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
@@ -170,6 +170,48 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
               url: "#",
               publishedAt: "2026-02-21T12:00:00Z",
               source: "Mining Weekly"
+            }
+          ],
+          'ECONOMIC INDICATORS': [
+            {
+              title: "Federal Reserve Signals Interest Rate Changes Impact Energy",
+              url: "#",
+              publishedAt: "2026-02-21T15:45:00Z",
+              source: "Federal Reserve Economic Data"
+            },
+            {
+              title: "Inflation Data Shows Energy Price Pressures Persist",
+              url: "#",
+              publishedAt: "2026-02-21T13:20:00Z",
+              source: "Bureau of Labor Statistics"
+            }
+          ],
+          'CRYPTOCURRENCY': [
+            {
+              title: "Bitcoin Mining Energy Consumption Hits New Records",
+              url: "#",
+              publishedAt: "2026-02-21T14:30:00Z",
+              source: "CoinDesk"
+            },
+            {
+              title: "Crypto Markets React to Energy Cost Fluctuations",
+              url: "#",
+              publishedAt: "2026-02-21T11:15:00Z",
+              source: "CryptoNews"
+            }
+          ],
+          'EUROPEAN ENERGY MARKETS': [
+            {
+              title: "European Gas Prices Rise on Supply Chain Concerns",
+              url: "#",
+              publishedAt: "2026-02-21T16:45:00Z",
+              source: "S&P Global Platts"
+            },
+            {
+              title: "EU Carbon Credits Hit Multi-Year Highs",
+              url: "#",
+              publishedAt: "2026-02-21T12:30:00Z",
+              source: "ICE Futures Europe"
             }
           ]
         };

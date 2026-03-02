@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import NewsWidget from '@/components/NewsWidget';
 import YouTubeWidget from '@/components/YouTubeWidget';
+import IntelFeedWidget from '@/components/IntelFeedWidget';
 import GreedFearWidget from '@/components/GreedFearWidget';
 import StockWidget from '@/components/StockWidget';
 import AsianStockWidget from '@/components/AsianStockWidget';
@@ -52,25 +53,25 @@ const WorldMap = dynamic(() => import('@/components/WorldMap'), {
 // Widget configuration - defines all widgets in the grid
 type Widget = {
   id: string;
-  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction';
+  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed';
   title: string;
   span?: { col: number; row: number };
-  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS';
+  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS';
 };
 
 const defaultWidgets: Widget[] = [
   { id: 'youtube', type: 'youtube', title: 'LIVE NEWS CHANNELS', span: { col: 2, row: 2 } },
+  { id: 'intel-feed', type: 'intel-feed', title: 'INTEL FEED', span: { col: 3, row: 1 } },
   { id: 'greed-fear', type: 'greed-fear', title: 'FEAR & GREED INDEX' },
   { id: 'us-news', type: 'news', title: 'US ENERGY', region: 'US' },
-  { id: 'us-markets', type: 'stock', title: 'US ENERGY MARKETS' },
+  { id: 'economic-indicators', type: 'news', title: 'ECONOMIC INDICATORS', region: 'ECONOMIC INDICATORS' },
+  { id: 'cryptocurrency', type: 'news', title: 'CRYPTOCURRENCY', region: 'CRYPTOCURRENCY' },
+  { id: 'european-energy-markets', type: 'news', title: 'EUROPEAN ENERGY MARKETS', region: 'EUROPEAN ENERGY MARKETS' },
   { id: 'climate-extremes', type: 'news', title: 'CLIMATE EXTREMES', region: 'CLIMATE EXTREMES' },
-  { id: 'european-energy', type: 'news', title: 'EUROPEAN ENERGY', region: 'EUROPEAN ENERGY' },
   { id: 'middle-east-energy', type: 'news', title: 'MIDDLE EAST ENERGY', region: 'MIDDLE EAST ENERGY' },
   { id: 'precious-metals', type: 'news', title: 'PRECIOUS METALS', region: 'PRECIOUS METALS' },
   { id: 'world-clock', type: 'world-clock', title: 'WORLD CLOCK' },
-  { id: 'asian-markets', type: 'asian-stock', title: 'ASIAN ENERGY MARKETS' },
   { id: 'predictions', type: 'prediction', title: 'PREDICTION MARKETS' },
-  { id: 'travel', type: 'travel', title: 'TRAVEL ADVISORIES' },
 ];
 
 // Draggable Widget Component
@@ -105,6 +106,8 @@ function DraggableWidget({
         return <NewsWidget region={widget.region} />;
       case 'youtube':
         return <YouTubeWidget />;
+      case 'intel-feed':
+        return <IntelFeedWidget />;
       case 'greed-fear':
         return <GreedFearWidget />;
       case 'stock':
@@ -126,7 +129,8 @@ function DraggableWidget({
   const getSpanClasses = () => {
     if (!widget.span) return '';
     
-    const colSpan = widget.span.col === 2 ? 'col-span-2' : '';
+    const colSpan = widget.span.col === 2 ? 'col-span-2' : 
+                   widget.span.col === 3 ? 'col-span-3' : '';
     const rowSpan = widget.span.row === 2 ? 'row-span-2' : '';
     
     return `${colSpan} ${rowSpan}`.trim();
@@ -227,7 +231,7 @@ export default function TerminalPage() {
   // Remove the localStorage clearing to prevent interference
 
   // Tailwind safelist for dynamic classes (ensures they're not purged)
-  // col-span-2 row-span-2
+  // col-span-2 row-span-2 col-span-3
 
   // Drag and drop sensors
   const sensors = useSensors(
