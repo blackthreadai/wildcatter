@@ -55,7 +55,7 @@ type Widget = {
   type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction';
   title: string;
   span?: { col: number; row: number };
-  region?: string;
+  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN';
 };
 
 const defaultWidgets: Widget[] = [
@@ -94,7 +94,7 @@ function DraggableWidget({ widget }: { widget: Widget }) {
   const renderWidget = () => {
     switch (widget.type) {
       case 'news':
-        return <NewsWidget region={widget.region || 'US'} />;
+        return <NewsWidget region={widget.region} />;
       case 'youtube':
         return <YouTubeWidget />;
       case 'greed-fear':
