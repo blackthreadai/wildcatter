@@ -24,7 +24,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
     });
 
     // Add dark mode tile layer (CartoDB Dark Matter)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       subdomains: 'abcd',
     }).addTo(map);
@@ -33,6 +33,22 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
     L.control.zoom({
       position: 'bottomright'
     }).addTo(map);
+
+    // Add test polyline immediately after map setup
+    map.whenReady(() => {
+      // ALWAYS add bright red test line
+      const testLine = L.polyline([
+        [29.0, 42.0],
+        [26.0, 56.0], 
+        [30.0, 32.0]
+      ], {
+        color: '#ff0000',
+        weight: 10,
+        opacity: 1.0,
+      }).addTo(map);
+      
+      testLine.bindPopup('🔥 TEST LINE - SHIPPING LANES WORK! 🔥');
+    });
 
     mapInstanceRef.current = map;
 
@@ -47,61 +63,14 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
 
   // Handle layer visibility changes
   useEffect(() => {
-    // Wait for map to be fully ready
-    if (!mapInstanceRef.current || !mapInstanceRef.current._loaded) return;
+    if (!mapInstanceRef.current) return;
 
-    // Clear existing overlays but keep the base layer
+    // Clear existing overlays but keep base layers
     mapInstanceRef.current.eachLayer((layer) => {
       if (layer instanceof L.Marker || layer instanceof L.Polyline) {
         mapInstanceRef.current!.removeLayer(layer);
       }
     });
-
-    // ALWAYS add test line for debugging
-    try {
-      const testCoords: [number, number][] = [
-        [29.0, 42.0], // Map center
-        [26.0, 56.0], // Strait of Hormuz  
-        [30.0, 32.0], // Suez Canal
-      ];
-      
-      const testLine = L.polyline(testCoords, {
-        color: '#ff0000',
-        weight: 8,
-        opacity: 1.0,
-      });
-      
-      testLine.addTo(mapInstanceRef.current);
-      testLine.bindPopup('TEST SHIPPING LANE - If you see this, polylines work!');
-      
-    } catch (error) {
-      console.error('Failed to create test polyline:', error);
-    }
-
-    // Add shipping lanes if checked
-    if (activeLayers.includes('shipping-lanes')) {
-      try {
-        // Persian Gulf shipping lane
-        const gulfRoute: [number, number][] = [
-          [26.5, 56.3], // Strait of Hormuz
-          [27.0, 52.0], // Gulf waters
-          [28.0, 50.0], // Kuwait area
-        ];
-        
-        const gulfLine = L.polyline(gulfRoute, {
-          color: '#a855f7',
-          weight: 4,
-          opacity: 0.8,
-          dashArray: '10, 5'
-        });
-        
-        gulfLine.addTo(mapInstanceRef.current);
-        gulfLine.bindPopup('Persian Gulf Shipping Route');
-        
-      } catch (error) {
-        console.error('Failed to create shipping lanes:', error);
-      }
-    }
 
     // Add geopolitical alerts if active
     if (activeLayers.includes('geopolitical')) {
