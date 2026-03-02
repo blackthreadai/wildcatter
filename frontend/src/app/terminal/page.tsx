@@ -511,7 +511,7 @@ export default function TerminalPage() {
             <select 
               value={selectedRegion}
               onChange={(e) => setSelectedRegion(e.target.value)}
-              className="bg-gray-900 text-white border border-gray-700 pl-3 pr-4 py-1 text-sm focus:border-[#DAA520] focus:outline-none cursor-pointer"
+              className="bg-gray-900 text-white border border-[#DAA520] pl-3 pr-4 py-1 text-sm focus:border-[#DAA520] focus:outline-none cursor-pointer"
               style={{ 
                 appearance: 'none',
                 WebkitAppearance: 'none',
@@ -568,8 +568,8 @@ export default function TerminalPage() {
                   showHidden 
                     ? 'bg-[#DAA520] text-black' 
                     : hiddenWidgets.length > 0
-                      ? 'bg-gray-700 text-[#DAA520] border border-[#DAA520]'
-                      : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                      ? 'bg-black text-[#DAA520]'
+                      : 'bg-black text-gray-400 cursor-not-allowed'
                 }`}
                 disabled={hiddenWidgets.length === 0}
                 title={showHidden ? 'Hide hidden widgets' : `Show ${hiddenWidgets.length} hidden widgets`}
