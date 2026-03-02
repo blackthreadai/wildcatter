@@ -114,14 +114,20 @@ function DraggableWidget({ widget }: { widget: Widget }) {
     }
   };
 
-  const spanClasses = widget.span 
-    ? `col-span-${widget.span.col} row-span-${widget.span.row}`
-    : '';
+  // Generate span classes properly for Tailwind
+  const getSpanClasses = () => {
+    if (!widget.span) return '';
+    
+    const colSpan = widget.span.col === 2 ? 'col-span-2' : '';
+    const rowSpan = widget.span.row === 2 ? 'row-span-2' : '';
+    
+    return `${colSpan} ${rowSpan}`.trim();
+  };
 
   return (
     <div 
       ref={setNodeRef}
-      className={`bg-black border overflow-hidden relative group ${spanClasses}`}
+      className={`bg-black border overflow-hidden relative group ${getSpanClasses()}`}
       style={{
         ...style,
         margin: '5px',
@@ -144,14 +150,7 @@ function DraggableWidget({ widget }: { widget: Widget }) {
         ⋮⋮
       </div>
       
-      {/* Drag hint overlay */}
-      {!isDragging && (
-        <div className="absolute inset-0 bg-[#DAA520]/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 flex items-center justify-center">
-          <div className="bg-black/80 text-[#DAA520] px-2 py-1 rounded text-xs font-semibold">
-            Click and drag to move
-          </div>
-        </div>
-      )}
+      {/* Removed drag hint overlay per user request */}
       
       {/* Dragging overlay */}
       {isDragging && (
@@ -176,6 +175,9 @@ export default function TerminalPage() {
   const [activeLayers, setActiveLayers] = useState<string[]>(['geopolitical']); // Default active
   const [marketData, setMarketData] = useState<{label: string; value: string; change: number}[]>([]);
   const [widgets, setWidgets] = useState<Widget[]>(defaultWidgets);
+
+  // Tailwind safelist for dynamic classes (ensures they're not purged)
+  // col-span-2 row-span-2
 
   // Drag and drop sensors
   const sensors = useSensors(
