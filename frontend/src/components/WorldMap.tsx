@@ -285,6 +285,142 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       });
     }
 
+    // Add oil wells if active
+    if (activeLayers.includes('oil-wells')) {
+      const oilWells = [
+        { lat: 26.0, lng: 50.0, name: "Kuwait Oil Field", production: "45,000 bbl/day" },
+        { lat: 25.0, lng: 51.0, name: "Qatar North Field", production: "62,000 bbl/day" },
+        { lat: 24.5, lng: 54.5, name: "UAE Offshore", production: "38,000 bbl/day" },
+        { lat: 29.0, lng: 48.0, name: "Iraqi Rumaila", production: "95,000 bbl/day" },
+        { lat: 27.5, lng: 49.5, name: "Saudi Ghawar", production: "125,000 bbl/day" }
+      ];
+
+      oilWells.forEach((well) => {
+        const oilIcon = L.divIcon({
+          html: `<div style="
+            width: 16px; 
+            height: 16px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+          ">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#10b981">
+              <path d="M12 2l2 8-2 8-2-8 2-8z"/>
+              <rect x="10" y="10" width="4" height="10" rx="2"/>
+              <circle cx="12" cy="4" r="2"/>
+            </svg>
+          </div>`,
+          className: '',
+          iconSize: [16, 16],
+          iconAnchor: [8, 8]
+        });
+
+        const marker = L.marker([well.lat, well.lng], { icon: oilIcon }).addTo(mapInstanceRef.current!);
+        marker.bindPopup(`
+          <div style="min-width: 150px;">
+            <h4 style="margin: 0 0 8px 0; color: #10b981; font-size: 14px; font-weight: bold;">
+              ${well.name}
+            </h4>
+            <p style="margin: 0; font-size: 12px; color: #DAA520;">
+              Production: ${well.production}
+            </p>
+          </div>
+        `);
+      });
+    }
+
+    // Add gas wells if active  
+    if (activeLayers.includes('gas-wells')) {
+      const gasWells = [
+        { lat: 25.5, lng: 51.2, name: "North Field Gas", production: "2.8 BCF/day" },
+        { lat: 26.8, lng: 50.2, name: "South Pars", production: "3.2 BCF/day" },
+        { lat: 24.0, lng: 54.0, name: "Khuff Formation", production: "1.9 BCF/day" },
+        { lat: 28.0, lng: 49.0, name: "Kangan Field", production: "2.1 BCF/day" }
+      ];
+
+      gasWells.forEach((well) => {
+        const gasIcon = L.divIcon({
+          html: `<div style="
+            width: 16px; 
+            height: 16px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+          ">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#3b82f6">
+              <path d="M12 2l2 8-2 8-2-8 2-8z"/>
+              <rect x="10" y="10" width="4" height="10" rx="2"/>
+              <circle cx="12" cy="4" r="2"/>
+              <path d="M8 8l8 0M8 12l8 0" stroke="#3b82f6" stroke-width="1"/>
+            </svg>
+          </div>`,
+          className: '',
+          iconSize: [16, 16],
+          iconAnchor: [8, 8]
+        });
+
+        const marker = L.marker([well.lat, well.lng], { icon: gasIcon }).addTo(mapInstanceRef.current!);
+        marker.bindPopup(`
+          <div style="min-width: 150px;">
+            <h4 style="margin: 0 0 8px 0; color: #3b82f6; font-size: 14px; font-weight: bold;">
+              ${well.name}
+            </h4>
+            <p style="margin: 0; font-size: 12px; color: #DAA520;">
+              Production: ${well.production}
+            </p>
+          </div>
+        `);
+      });
+    }
+
+    // Add drilling rigs if active
+    if (activeLayers.includes('drilling-rigs')) {
+      const drillingRigs = [
+        { lat: 27.0, lng: 50.5, name: "Rig-47", status: "Active drilling", depth: "8,500 ft" },
+        { lat: 25.8, lng: 52.0, name: "Offshore Platform-12", status: "Active drilling", depth: "12,200 ft" },
+        { lat: 26.3, lng: 49.8, name: "Desert Rig-203", status: "Active drilling", depth: "6,800 ft" },
+        { lat: 28.5, lng: 48.5, name: "Mobile Rig-89", status: "Moving to location", depth: "N/A" }
+      ];
+
+      drillingRigs.forEach((rig) => {
+        const rigIcon = L.divIcon({
+          html: `<div style="
+            width: 16px; 
+            height: 16px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+          ">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#f97316">
+              <path d="M12 2v20"/>
+              <path d="M8 6l8 0l-2 4l-4 0l-2-4z"/>
+              <path d="M6 22l12 0"/>
+              <path d="M10 14v8M14 14v8"/>
+              <rect x="11" y="3" width="2" height="3"/>
+            </svg>
+          </div>`,
+          className: '',
+          iconSize: [16, 16],
+          iconAnchor: [8, 8]
+        });
+
+        const marker = L.marker([rig.lat, rig.lng], { icon: rigIcon }).addTo(mapInstanceRef.current!);
+        marker.bindPopup(`
+          <div style="min-width: 150px;">
+            <h4 style="margin: 0 0 8px 0; color: #f97316; font-size: 14px; font-weight: bold;">
+              ${rig.name}
+            </h4>
+            <p style="margin: 0 0 4px 0; font-size: 12px; color: #DAA520;">
+              Status: ${rig.status}
+            </p>
+            <p style="margin: 0; font-size: 12px; color: #666;">
+              Depth: ${rig.depth}
+            </p>
+          </div>
+        `);
+      });
+    }
+
     console.log('Active layers changed:', activeLayers);
   }, [activeLayers]);
 
