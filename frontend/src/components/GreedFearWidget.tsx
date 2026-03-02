@@ -65,7 +65,7 @@ export default function GreedFearWidget() {
     return (
       <div className="h-full w-full flex flex-col bg-black">
         <div className="bg-gray-800 p-2 flex-shrink-0">
-          <h3 className="text-white text-xs font-semibold tracking-wider">FEAR & GREED</h3>
+          <h3 className="text-white text-xs font-semibold tracking-wider">FEAR & GREED INDEX</h3>
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
           <div className="text-gray-500 text-xs">Loading...</div>
@@ -78,7 +78,7 @@ export default function GreedFearWidget() {
     return (
       <div className="h-full w-full flex flex-col bg-black">
         <div className="bg-gray-800 p-2 flex-shrink-0">
-          <h3 className="text-white text-xs font-semibold tracking-wider">FEAR & GREED</h3>
+          <h3 className="text-white text-xs font-semibold tracking-wider">FEAR & GREED INDEX</h3>
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
           <div className="text-gray-500 text-xs">No data available</div>
@@ -90,7 +90,7 @@ export default function GreedFearWidget() {
   return (
     <div className="h-full w-full flex flex-col bg-black">
       <div className="bg-gray-800 p-2 flex-shrink-0">
-        <h3 className="text-white text-xs font-semibold tracking-wider">FEAR & GREED</h3>
+        <h3 className="text-white text-xs font-semibold tracking-wider">FEAR & GREED INDEX</h3>
       </div>
       
       <div className="flex-1 px-3 py-2 flex flex-col justify-center bg-black min-h-0">

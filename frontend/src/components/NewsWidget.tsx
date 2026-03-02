@@ -10,7 +10,7 @@ interface NewsArticle {
 }
 
 interface NewsWidgetProps {
-  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN';
+  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN';
 }
 
 export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
@@ -89,6 +89,26 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
               publishedAt: "2026-02-21T15:30:00Z",
               source: "African Power"
             }
+          ],
+          'ASIAN': [
+            {
+              title: "Japan Increases Nuclear Power Capacity",
+              url: "#",
+              publishedAt: "2026-02-21T16:00:00Z",
+              source: "Nikkei Energy"
+            },
+            {
+              title: "India Approves New Solar Farm Projects", 
+              url: "#",
+              publishedAt: "2026-02-21T11:45:00Z",
+              source: "Energy India"
+            },
+            {
+              title: "Indonesia Coal Exports Hit Record High",
+              url: "#",
+              publishedAt: "2026-02-21T14:20:00Z",
+              source: "Asian Coal Report"
+            }
           ]
         };
         setArticles(fallbackData[region]);
@@ -114,7 +134,7 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
     return (
       <div className="h-full w-full flex flex-col bg-black">
         <div className="bg-gray-800 p-2 flex-shrink-0">
-          <h3 className="text-white text-xs font-semibold tracking-wider">{region} NEWS</h3>
+          <h3 className="text-white text-xs font-semibold tracking-wider">{region} ENERGY</h3>
         </div>
         <div className="flex-1 p-2 flex items-center justify-center bg-black min-h-0">
           <div className="text-gray-500 text-xs">Loading...</div>
@@ -126,7 +146,7 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
   return (
     <div className="h-full w-full flex flex-col bg-black">
       <div className="bg-gray-800 p-2 flex-shrink-0">
-        <h3 className="text-white text-xs font-semibold tracking-wider">{region} NEWS</h3>
+        <h3 className="text-white text-xs font-semibold tracking-wider">{region} ENERGY</h3>
       </div>
       <div className="flex-1 p-2 overflow-y-auto bg-black min-h-0">
         <div className="space-y-2">

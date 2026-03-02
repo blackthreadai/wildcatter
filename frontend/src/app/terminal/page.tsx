@@ -9,6 +9,7 @@ import StockWidget from '@/components/StockWidget';
 import AsianStockWidget from '@/components/AsianStockWidget';
 import WorldClockWidget from '@/components/WorldClockWidget';
 import TravelAdvisoryWidget from '@/components/TravelAdvisoryWidget';
+import PredictionMarketsWidget from '@/components/PredictionMarketsWidget';
 
 // Dynamically import the map to avoid SSR issues
 const WorldMap = dynamic(() => import('@/components/WorldMap'), {
@@ -393,6 +394,10 @@ export default function TerminalPage() {
                 widgetContent = <NewsWidget region="AFRICAN" />;
               } else if (position === 12) {
                 widgetContent = <TravelAdvisoryWidget />;
+              } else if (position === 13) {
+                widgetContent = <NewsWidget region="ASIAN" />;
+              } else if (position === 14) {
+                widgetContent = <PredictionMarketsWidget />;
               } else {
                 widgetContent = <NewsWidget region="US" />;
               }

@@ -47,7 +47,7 @@ export default function AsianStockWidget() {
     return (
       <div className="h-full w-full flex flex-col bg-black">
         <div className="bg-gray-800 p-2 flex-shrink-0">
-          <h3 className="text-white text-xs font-semibold tracking-wider">ASIAN MARKETS</h3>
+          <h3 className="text-white text-xs font-semibold tracking-wider">ASIAN ENERGY MARKETS</h3>
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
           <div className="text-gray-500 text-xs">Loading...</div>
@@ -59,7 +59,7 @@ export default function AsianStockWidget() {
   return (
     <div className="h-full w-full flex flex-col bg-black">
       <div className="bg-gray-800 p-2 flex-shrink-0">
-        <h3 className="text-white text-xs font-semibold tracking-wider">ASIAN MARKETS</h3>
+        <h3 className="text-white text-xs font-semibold tracking-wider">ASIAN ENERGY MARKETS</h3>
       </div>
       
       <div className="flex-1 bg-black px-3 py-1">
