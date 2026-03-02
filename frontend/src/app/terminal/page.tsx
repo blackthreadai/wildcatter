@@ -29,7 +29,7 @@ export default function TerminalPage() {
   const [selectedRegion, setSelectedRegion] = useState('global');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [activeLayers, setActiveLayers] = useState<string[]>([]);
+  const [activeLayers, setActiveLayers] = useState<string[]>(['geopolitical-alerts']); // Default active
   const [marketData, setMarketData] = useState<{label: string; value: string; change: number}[]>([]);
 
   const regions = [
@@ -150,6 +150,21 @@ export default function TerminalPage() {
         }
         .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb:hover {
           background: #6b7280;
+        }
+        /* Geopolitical alert pulse animation */
+        @keyframes pulse {
+          0% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          50% {
+            transform: scale(1.2);
+            opacity: 0.7;
+          }
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
         }
         .scrollbar-thin::-webkit-scrollbar {
           width: 4px;
@@ -301,11 +316,14 @@ export default function TerminalPage() {
                     />
                     <div className={`w-4 h-4 border-2 rounded flex items-center justify-center transition-all ${
                       activeLayers.includes(layer.id) 
-                        ? 'border-white bg-white' 
+                        ? 'border-yellow-500 bg-yellow-500' 
                         : 'border-gray-500'
-                    }`}>
+                    }`} style={{
+                      borderColor: activeLayers.includes(layer.id) ? '#DAA520' : undefined,
+                      backgroundColor: activeLayers.includes(layer.id) ? '#DAA520' : undefined
+                    }}>
                       {activeLayers.includes(layer.id) && (
-                        <svg className="w-2.5 h-2.5 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       )}

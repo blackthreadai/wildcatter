@@ -49,11 +49,97 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
   useEffect(() => {
     if (!mapInstanceRef.current) return;
 
-    // TODO: Add/remove layers based on activeLayers
+    // Clear existing markers first
+    mapInstanceRef.current.eachLayer((layer) => {
+      if (layer instanceof L.Marker) {
+        mapInstanceRef.current!.removeLayer(layer);
+      }
+    });
+
+    // Add geopolitical alerts if active
+    if (activeLayers.includes('geopolitical-alerts')) {
+      // Mock Middle East geopolitical alerts
+      const geopoliticalAlerts = [
+        {
+          lat: 33.3128,
+          lng: 44.3615,
+          title: "Pipeline Security Incident",
+          description: "Reports of infrastructure disruption in Iraq",
+          severity: "high",
+          date: "2026-02-21T14:00:00Z"
+        },
+        {
+          lat: 20.0,
+          lng: 38.0,
+          title: "Red Sea Shipping Alert", 
+          description: "Commercial vessel security concerns reported",
+          severity: "moderate",
+          date: "2026-02-21T10:30:00Z"
+        },
+        {
+          lat: 26.5667,
+          lng: 56.25,
+          title: "Strait of Hormuz Tensions",
+          description: "Naval activity monitoring increased",
+          severity: "critical",
+          date: "2026-02-21T16:15:00Z"
+        },
+        {
+          lat: 24.2134,
+          lng: 55.8713,
+          title: "Energy Infrastructure Alert",
+          description: "UAE facilities on heightened security status",
+          severity: "moderate", 
+          date: "2026-02-21T12:45:00Z"
+        }
+      ];
+
+      // Add markers for each alert
+      geopoliticalAlerts.forEach((alert) => {
+        const color = alert.severity === 'critical' ? '#dc2626' : 
+                     alert.severity === 'high' ? '#ea580c' : '#eab308';
+        
+        // Create custom icon
+        const alertIcon = L.divIcon({
+          html: `<div style="
+            width: 12px; 
+            height: 12px; 
+            background-color: ${color}; 
+            border: 2px solid white; 
+            border-radius: 50%; 
+            box-shadow: 0 0 6px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite;
+          "></div>`,
+          className: 'geopolitical-alert',
+          iconSize: [12, 12],
+          iconAnchor: [6, 6]
+        });
+
+        const marker = L.marker([alert.lat, alert.lng], { 
+          icon: alertIcon 
+        }).addTo(mapInstanceRef.current!);
+
+        // Add popup with alert details
+        const popupContent = `
+          <div style="min-width: 200px;">
+            <h4 style="margin: 0 0 8px 0; color: ${color}; font-size: 14px; font-weight: bold;">
+              ${alert.title}
+            </h4>
+            <p style="margin: 0 0 6px 0; font-size: 12px; color: #333;">
+              ${alert.description}
+            </p>
+            <div style="font-size: 11px; color: #666;">
+              <strong>Severity:</strong> ${alert.severity.toUpperCase()}<br>
+              <strong>Time:</strong> ${new Date(alert.date).toLocaleString()}
+            </div>
+          </div>
+        `;
+        
+        marker.bindPopup(popupContent);
+      });
+    }
+
     console.log('Active layers changed:', activeLayers);
-    
-    // Example: Add markers or overlays based on active layers
-    // This is where you'd integrate your oil wells, pipelines, etc.
   }, [activeLayers]);
 
   return (
