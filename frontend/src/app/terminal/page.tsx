@@ -668,16 +668,8 @@ export default function TerminalPage() {
                         </svg>
                       </div>
                     ) : layer.id === 'tanker-ships' ? (
-                      <div className="w-3 h-3 flex items-center justify-center">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill={layer.color}>
-                          <path d="M2 16c0 2 1 3 3 3h14c2 0 3-1 3-3l-1-6H3l-1 6z"/>
-                          <path d="M3 10h18v1H3z"/>
-                          <rect x="6" y="6" width="2" height="4"/>
-                          <rect x="8" y="5" width="8" height="5"/>
-                          <rect x="16" y="7" width="2" height="3"/>
-                          <rect x="8" y="3" width="1" height="3"/>
-                          <rect x="10" y="2" width="1" height="4"/>
-                        </svg>
+                      <div className="w-3 h-3 flex items-center justify-center text-xs">
+                        ⚓
                       </div>
                     ) : layer.id === 'shipping-lanes' ? (
                       <div className="w-3 h-3 flex items-center justify-center">
