@@ -59,6 +59,9 @@ type Widget = {
   region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS';
 };
 
+// Widget version to force updates when we add new widgets
+const WIDGET_VERSION = '2.0';
+
 const defaultWidgets: Widget[] = [
   { id: 'youtube', type: 'youtube', title: 'LIVE NEWS CHANNELS', span: { col: 2, row: 2 } },
   { id: 'intel-feed', type: 'intel-feed', title: 'INTEL FEED', span: { col: 3, row: 1 } },
@@ -288,6 +291,20 @@ export default function TerminalPage() {
 
   // Load saved widget order and hidden widgets from localStorage
   useEffect(() => {
+    // Check version to force updates when we add new widgets
+    const savedVersion = localStorage.getItem('terminal-widget-version');
+    const shouldReset = savedVersion !== WIDGET_VERSION;
+    
+    if (shouldReset) {
+      // Clear old data and use new defaults
+      localStorage.removeItem('terminal-widget-order');
+      localStorage.removeItem('terminal-hidden-widgets');
+      localStorage.setItem('terminal-widget-version', WIDGET_VERSION);
+      setWidgets(defaultWidgets);
+      setHiddenWidgets([]);
+      return;
+    }
+
     const saved = localStorage.getItem('terminal-widget-order');
     if (saved) {
       try {
@@ -295,6 +312,7 @@ export default function TerminalPage() {
         setWidgets(savedWidgets);
       } catch (error) {
         console.error('Failed to load saved widget order:', error);
+        setWidgets(defaultWidgets);
       }
     }
 
@@ -305,6 +323,7 @@ export default function TerminalPage() {
         setHiddenWidgets(hiddenIds);
       } catch (error) {
         console.error('Failed to load hidden widgets:', error);
+        setHiddenWidgets([]);
       }
     }
   }, []);
@@ -598,6 +617,7 @@ export default function TerminalPage() {
                   setShowHidden(false);
                   localStorage.removeItem('terminal-widget-order');
                   localStorage.removeItem('terminal-hidden-widgets');
+                  localStorage.setItem('terminal-widget-version', WIDGET_VERSION);
                 }}
                 className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 border border-[#DAA520]"
                 title="Reset widget layout and show all widgets"
