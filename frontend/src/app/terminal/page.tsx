@@ -496,7 +496,7 @@ export default function TerminalPage() {
             <select 
               value={selectedRegion}
               onChange={(e) => setSelectedRegion(e.target.value)}
-              className="bg-gray-900 text-white border border-gray-700 rounded pl-3 pr-10 py-1 text-sm focus:border-[#DAA520] focus:outline-none"
+              className="bg-gray-900 text-white border border-gray-700 rounded pl-3 pr-12 py-1 text-sm focus:border-[#DAA520] focus:outline-none"
             >
               {regions.map(region => (
                 <option key={region.value} value={region.value}>
@@ -696,7 +696,7 @@ export default function TerminalPage() {
                       </div>
                     ) : layer.id === 'weather' ? (
                       <div className="w-3 h-3 flex items-center justify-center">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill={layer.color}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill={layer.color}>
                           <path d="M12 16l-6-8h12l-6 8z"/>
                         </svg>
                       </div>
@@ -778,7 +778,7 @@ export default function TerminalPage() {
 
       {/* Homepage Popup */}
       {showHomepagePopup && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
           <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 max-w-md w-full mx-4">
             <div className="text-center">
               <div className="mb-4">
