@@ -35,10 +35,10 @@ export default function YouTubeWidget() {
             <button
               key={channel.id}
               onClick={() => setActiveChannel(channel.id)}
-              className={`px-3 py-1 text-xs font-semibold transition-all whitespace-nowrap ${
+              className={`px-3 py-1 text-xs font-semibold whitespace-nowrap border ${
                 activeChannel === channel.id
-                  ? 'bg-yellow-500 text-black'
-                  : 'bg-gray-900 text-gray-300 hover:bg-gray-700'
+                  ? 'bg-yellow-500 text-black border-yellow-500'
+                  : 'bg-gray-900 text-gray-300 border-gray-700'
               }`}
             >
               {channel.name}
