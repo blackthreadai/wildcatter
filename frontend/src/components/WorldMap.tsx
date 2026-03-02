@@ -47,52 +47,59 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
 
   // Handle layer visibility changes
   useEffect(() => {
-    if (!mapInstanceRef.current) return;
+    // Wait for map to be fully ready
+    if (!mapInstanceRef.current || !mapInstanceRef.current._loaded) return;
 
-    // Clear existing markers and polylines first
+    // Clear existing overlays but keep the base layer
     mapInstanceRef.current.eachLayer((layer) => {
       if (layer instanceof L.Marker || layer instanceof L.Polyline) {
         mapInstanceRef.current!.removeLayer(layer);
       }
     });
 
-    // Add shipping lanes if active - ALWAYS show test line for debugging
-    if (activeLayers.includes('shipping-lanes') || true) {
-      // Simple test line that should definitely be visible
-      const testLine = L.polyline([
+    // ALWAYS add test line for debugging
+    try {
+      const testCoords: [number, number][] = [
         [29.0, 42.0], // Map center
-        [26.0, 56.0], // Strait of Hormuz
+        [26.0, 56.0], // Strait of Hormuz  
         [30.0, 32.0], // Suez Canal
-      ], {
-        color: '#ff0000', // Bright red for visibility
+      ];
+      
+      const testLine = L.polyline(testCoords, {
+        color: '#ff0000',
         weight: 8,
         opacity: 1.0,
-      }).addTo(mapInstanceRef.current!);
+      });
+      
+      testLine.addTo(mapInstanceRef.current);
+      testLine.bindPopup('TEST SHIPPING LANE - If you see this, polylines work!');
+      
+    } catch (error) {
+      console.error('Failed to create test polyline:', error);
+    }
 
-      testLine.bindPopup('TEST SHIPPING LANE - If you see this, shipping lanes work!');
-
-      // Only add complex routes if layer is actually checked
-      if (activeLayers.includes('shipping-lanes')) {
-        // Major shipping routes
-        const routes = [
-          {
-            name: "Persian Gulf Route",
-            coordinates: [[26.0, 56.0], [27.0, 52.0], [28.0, 50.0]]
-          },
-          {
-            name: "Red Sea Route", 
-            coordinates: [[29.0, 32.5], [25.0, 35.0], [15.0, 42.0]]
-          }
+    // Add shipping lanes if checked
+    if (activeLayers.includes('shipping-lanes')) {
+      try {
+        // Persian Gulf shipping lane
+        const gulfRoute: [number, number][] = [
+          [26.5, 56.3], // Strait of Hormuz
+          [27.0, 52.0], // Gulf waters
+          [28.0, 50.0], // Kuwait area
         ];
-
-        routes.forEach((route) => {
-          L.polyline(route.coordinates, {
-            color: '#a855f7',
-            weight: 6,
-            opacity: 0.8,
-            dashArray: '10, 5'
-          }).addTo(mapInstanceRef.current!).bindPopup(route.name);
+        
+        const gulfLine = L.polyline(gulfRoute, {
+          color: '#a855f7',
+          weight: 4,
+          opacity: 0.8,
+          dashArray: '10, 5'
         });
+        
+        gulfLine.addTo(mapInstanceRef.current);
+        gulfLine.bindPopup('Persian Gulf Shipping Route');
+        
+      } catch (error) {
+        console.error('Failed to create shipping lanes:', error);
       }
     }
 
