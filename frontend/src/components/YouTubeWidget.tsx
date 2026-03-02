@@ -3,16 +3,16 @@
 import { useState } from 'react';
 
 export default function YouTubeWidget() {
-  const [activeChannel, setActiveChannel] = useState('bloomberg');
+  const [activeChannel, setActiveChannel] = useState('aljazeera');
   
   const channels = [
+    { id: 'aljazeera', name: 'ALJAZEERA', url: 'https://youtu.be/gCNeDWCI0vo' },
     { id: 'bloomberg', name: 'BLOOMBERG', url: 'https://youtu.be/iEpJwprxDdk' },
+    { id: 'cnbc', name: 'CNBC', url: 'https://youtu.be/9NyxcX3rhQs' },
     { id: 'skynews', name: 'SKYNEWS', url: '#' },
     { id: 'euronews', name: 'EURONEWS', url: '#' },
     { id: 'dw', name: 'DW', url: '#' },
-    { id: 'cnbc', name: 'CNBC', url: 'https://youtu.be/9NyxcX3rhQs' },
     { id: 'france24', name: 'FRANCE24', url: '#' },
-    { id: 'aljazeera', name: 'ALJAZEERA', url: 'https://youtu.be/gCNeDWCI0vo' },
   ];
 
   return (
