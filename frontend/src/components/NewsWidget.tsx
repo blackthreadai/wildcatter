@@ -10,7 +10,7 @@ interface NewsArticle {
 }
 
 interface NewsWidgetProps {
-  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN';
+  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS';
 }
 
 export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
@@ -115,9 +115,65 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
               publishedAt: "2026-02-21T14:20:00Z",
               source: "Asian Coal Report"
             }
+          ],
+          'CLIMATE EXTREMES': [
+            {
+              title: "Record Heat Wave Impacts Global Energy Demand",
+              url: "#",
+              publishedAt: "2026-02-21T14:00:00Z",
+              source: "Climate Central"
+            },
+            {
+              title: "Extreme Weather Forces Pipeline Shutdowns",
+              url: "#",
+              publishedAt: "2026-02-21T12:15:00Z",
+              source: "Environmental News"
+            }
+          ],
+          'EUROPEAN ENERGY': [
+            {
+              title: "EU Approves New Renewable Energy Targets",
+              url: "#",
+              publishedAt: "2026-02-21T13:30:00Z",
+              source: "EurActiv"
+            },
+            {
+              title: "Norway Increases Gas Exports to Europe",
+              url: "#",
+              publishedAt: "2026-02-21T11:45:00Z",
+              source: "Energy Monitor"
+            }
+          ],
+          'MIDDLE EAST ENERGY': [
+            {
+              title: "Saudi Aramco Reports Record Quarterly Profits",
+              url: "#",
+              publishedAt: "2026-02-21T15:20:00Z",
+              source: "Middle East Economic Survey"
+            },
+            {
+              title: "UAE Launches Major Solar Energy Project",
+              url: "#",
+              publishedAt: "2026-02-21T10:30:00Z",
+              source: "Gulf Business"
+            }
+          ],
+          'PRECIOUS METALS': [
+            {
+              title: "Gold Prices Surge Amid Energy Market Volatility",
+              url: "#",
+              publishedAt: "2026-02-21T16:10:00Z",
+              source: "Metals Focus"
+            },
+            {
+              title: "Platinum Demand Rises in Green Energy Sector",
+              url: "#",
+              publishedAt: "2026-02-21T12:00:00Z",
+              source: "Mining Weekly"
+            }
           ]
         };
-        const fallbackArticles = fallbackData[region];
+        const fallbackArticles = fallbackData[region] || [];
         setArticles(region === 'US' ? fallbackArticles : fallbackArticles.slice(0, 2));
         setLoading(false);
       }

@@ -55,7 +55,7 @@ type Widget = {
   type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction';
   title: string;
   span?: { col: number; row: number };
-  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN';
+  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS';
 };
 
 const defaultWidgets: Widget[] = [
@@ -63,14 +63,14 @@ const defaultWidgets: Widget[] = [
   { id: 'greed-fear', type: 'greed-fear', title: 'FEAR & GREED INDEX' },
   { id: 'us-news', type: 'news', title: 'US ENERGY', region: 'US' },
   { id: 'us-markets', type: 'stock', title: 'US ENERGY MARKETS' },
-  { id: 'asian-news', type: 'news', title: 'ASIAN ENERGY', region: 'ASIAN' },
+  { id: 'climate-extremes', type: 'news', title: 'CLIMATE EXTREMES', region: 'CLIMATE EXTREMES' },
+  { id: 'european-energy', type: 'news', title: 'EUROPEAN ENERGY', region: 'EUROPEAN ENERGY' },
+  { id: 'middle-east-energy', type: 'news', title: 'MIDDLE EAST ENERGY', region: 'MIDDLE EAST ENERGY' },
+  { id: 'precious-metals', type: 'news', title: 'PRECIOUS METALS', region: 'PRECIOUS METALS' },
+  { id: 'world-clock', type: 'world-clock', title: 'WORLD CLOCK' },
   { id: 'asian-markets', type: 'asian-stock', title: 'ASIAN ENERGY MARKETS' },
   { id: 'predictions', type: 'prediction', title: 'PREDICTION MARKETS' },
-  { id: 'world-clock', type: 'world-clock', title: 'WORLD CLOCK' },
-  { id: 'african-news', type: 'news', title: 'AFRICAN ENERGY', region: 'AFRICAN' },
   { id: 'travel', type: 'travel', title: 'TRAVEL ADVISORIES' },
-  { id: 'sa-news', type: 'news', title: 'SOUTH AMERICAN ENERGY', region: 'SOUTH AMERICAN' },
-  { id: 'russian-news', type: 'news', title: 'RUSSIAN ENERGY', region: 'RUSSIAN' },
 ];
 
 // Draggable Widget Component
