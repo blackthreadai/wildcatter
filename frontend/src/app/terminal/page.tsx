@@ -564,7 +564,7 @@ export default function TerminalPage() {
               {/* View Hidden Widgets Button */}
               <button 
                 onClick={() => setShowHidden(!showHidden)}
-                className={`p-2 transition-colors flex items-center gap-2 border border-[#DAA520] ${
+                className={`p-2 transition-colors border border-[#DAA520] ${
                   showHidden 
                     ? 'bg-[#DAA520] text-black' 
                     : hiddenWidgets.length > 0
@@ -575,19 +575,14 @@ export default function TerminalPage() {
                 title={showHidden ? 'Hide hidden widgets' : `Show ${hiddenWidgets.length} hidden widgets`}
               >
                 {showHidden ? (
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                     <path d="M3 3l18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                   </svg>
                 ) : (
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                   </svg>
-                )}
-                {hiddenWidgets.length > 0 && (
-                  <span className="text-xs font-semibold">
-                    {hiddenWidgets.length}
-                  </span>
                 )}
               </button>
 
