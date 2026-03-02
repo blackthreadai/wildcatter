@@ -75,7 +75,7 @@ export default function WorldClockWidget() {
       
       <div className="flex-1 bg-black p-1">
         {cityTimes.map((cityTime, i) => (
-          <div key={cityTime.city} className="flex items-center justify-between py-1">
+          <div key={cityTime.city} className="flex items-center justify-between py-1 border-b border-gray-700 last:border-b-0">
             <div className="min-w-0 flex-1">
               <div className="text-[#DAA520] text-xs font-semibold">{cityTime.city}</div>
               <div className="text-gray-400 text-xs">{cityTime.date}</div>
