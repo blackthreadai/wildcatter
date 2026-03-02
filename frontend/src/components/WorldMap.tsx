@@ -49,20 +49,40 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       }).addTo(map);
       testCircle.bindPopup('🔴 TEST CIRCLE');
       
-      // Try simple polyline with very basic coordinates
+      // Try polygon instead of polyline (different approach)
       try {
-        const testLine = L.polyline([
+        const testPolygon = L.polygon([
           [29.0, 42.0],
-          [26.0, 56.0]
+          [26.0, 56.0],
+          [30.0, 45.0],
+          [29.0, 42.0]
         ], {
-          color: 'red',
-          weight: 10
+          color: 'yellow',
+          weight: 8,
+          fillOpacity: 0.3
         }).addTo(map);
-        testLine.bindPopup('🔥 TEST POLYLINE');
+        testPolygon.bindPopup('🟡 TEST POLYGON');
       } catch (e) {
-        console.error('Polyline failed:', e);
-        // Add marker instead
-        L.marker([30.0, 50.0]).addTo(map).bindPopup('Polyline failed, but marker works');
+        console.error('Polygon failed:', e);
+      }
+
+      // Try different polyline syntax
+      try {
+        const coords = L.latLng(29.0, 42.0);
+        const coords2 = L.latLng(26.0, 56.0);
+        
+        const testLine = L.polyline([coords, coords2], {
+          color: '#00ff00',
+          weight: 15,
+          opacity: 1.0,
+          dashArray: null
+        });
+        
+        map.addLayer(testLine);
+        testLine.bindPopup('🟢 TEST POLYLINE V2');
+        
+      } catch (e) {
+        console.error('Polyline V2 failed:', e);
       }
     });
 
