@@ -59,52 +59,59 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       }
     });
 
-    // Add shipping lanes using circles (since polylines don't work)
+    // Add shipping lanes using small, closely-spaced circles
     if (activeLayers.includes('shipping-lanes')) {
-      // Strait of Hormuz shipping route using circles
-      const hormanRoute = [
-        [26.5, 56.2], [26.6, 56.4], [26.7, 56.6], [26.8, 56.8]
-      ];
       
-      hormanRoute.forEach((coords, index) => {
-        L.circle(coords as [number, number], {
-          color: '#a855f7',
-          fillColor: '#a855f7', 
-          fillOpacity: 0.8,
-          radius: 15000,
-          weight: 2
-        }).addTo(mapInstanceRef.current!).bindPopup('Strait of Hormuz Shipping Lane');
-      });
+      // Function to create dotted shipping route
+      const createShippingRoute = (start: [number, number], end: [number, number], routeName: string, numDots: number = 20) => {
+        const latStep = (end[0] - start[0]) / numDots;
+        const lngStep = (end[1] - start[1]) / numDots;
+        
+        for (let i = 0; i <= numDots; i++) {
+          const lat = start[0] + (latStep * i);
+          const lng = start[1] + (lngStep * i);
+          
+          L.circle([lat, lng], {
+            color: '#a855f7',
+            fillColor: '#a855f7',
+            fillOpacity: 0.9,
+            radius: 8000, // Small 8km circles
+            weight: 0 // No border for cleaner look
+          }).addTo(mapInstanceRef.current!).bindPopup(routeName);
+        }
+      };
 
-      // Suez Canal Route using circles  
-      const suezRoute = [
-        [30.0, 32.3], [29.5, 32.7], [29.0, 33.2], [28.0, 34.0], [26.0, 35.5]
-      ];
+      // Major Global Shipping Routes
       
-      suezRoute.forEach((coords, index) => {
-        L.circle(coords as [number, number], {
-          color: '#a855f7',
-          fillColor: '#a855f7',
-          fillOpacity: 0.8, 
-          radius: 20000,
-          weight: 2
-        }).addTo(mapInstanceRef.current!).bindPopup('Suez Canal Shipping Route');
-      });
-
-      // Red Sea Route
-      const redSeaRoute = [
-        [25.0, 35.0], [22.0, 37.0], [18.0, 40.0], [15.0, 42.0], [12.6, 43.3]
-      ];
+      // 1. Suez Canal to Persian Gulf
+      createShippingRoute([30.7, 32.3], [26.5, 56.2], 'Suez-Persian Gulf Route', 25);
       
-      redSeaRoute.forEach((coords, index) => {
-        L.circle(coords as [number, number], {
-          color: '#a855f7', 
-          fillColor: '#a855f7',
-          fillOpacity: 0.8,
-          radius: 25000,
-          weight: 2
-        }).addTo(mapInstanceRef.current!).bindPopup('Red Sea Shipping Lane');
-      });
+      // 2. Strait of Hormuz
+      createShippingRoute([26.5, 56.1], [26.6, 56.9], 'Strait of Hormuz', 15);
+      
+      // 3. Red Sea Route  
+      createShippingRoute([30.0, 32.5], [12.6, 43.3], 'Red Sea Shipping Lane', 30);
+      
+      // 4. Mediterranean Route
+      createShippingRoute([36.0, -5.5], [36.0, 28.0], 'Mediterranean Shipping Route', 35);
+      
+      // 5. North Atlantic Route
+      createShippingRoute([50.0, -30.0], [50.0, 0.0], 'North Atlantic Route', 25);
+      
+      // 6. Panama Canal Approach  
+      createShippingRoute([9.1, -79.7], [25.0, -90.0], 'Panama Canal Route', 20);
+      
+      // 7. Singapore Strait to China
+      createShippingRoute([1.3, 103.8], [22.0, 114.0], 'Asia Pacific Route', 30);
+      
+      // 8. English Channel
+      createShippingRoute([50.0, -1.0], [51.5, 2.0], 'English Channel', 15);
+      
+      // 9. Cape of Good Hope (Africa route)
+      createShippingRoute([-34.4, 18.4], [-20.0, 40.0], 'Cape Route', 25);
+      
+      // 10. Baltic Sea Route
+      createShippingRoute([60.0, 10.0], [60.0, 28.0], 'Baltic Sea Route', 20);
     }
 
     // Add geopolitical alerts if active
