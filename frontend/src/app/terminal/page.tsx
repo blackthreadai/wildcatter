@@ -374,30 +374,30 @@ export default function TerminalPage() {
               const positions = [2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14]; // Skip 0,1,5,6
               const position = positions[i];
               
-              // Determine widget type based on position
+              // Determine widget type based on position (new order)
               let widgetContent;
               if (position === 2) {
-                widgetContent = <NewsWidget region="US" />;
+                widgetContent = <GreedFearWidget />; // FEAR & GREED INDEX
               } else if (position === 3) {
-                widgetContent = <NewsWidget region="RUSSIAN" />;
+                widgetContent = <NewsWidget region="US" />; // US ENERGY
               } else if (position === 4) {
-                widgetContent = <NewsWidget region="SOUTH AMERICAN" />;
+                widgetContent = <StockWidget />; // US ENERGY MARKETS
               } else if (position === 7) {
-                widgetContent = <GreedFearWidget />;
+                widgetContent = <NewsWidget region="ASIAN" />; // ASIAN ENERGY
               } else if (position === 8) {
-                widgetContent = <StockWidget />;
+                widgetContent = <AsianStockWidget />; // ASIAN ENERGY MARKETS
               } else if (position === 9) {
-                widgetContent = <AsianStockWidget />;
+                widgetContent = <PredictionMarketsWidget />; // PREDICTION MARKETS
               } else if (position === 10) {
-                widgetContent = <WorldClockWidget />;
+                widgetContent = <WorldClockWidget />; // WORLD CLOCK
               } else if (position === 11) {
-                widgetContent = <NewsWidget region="AFRICAN" />;
+                widgetContent = <NewsWidget region="AFRICAN" />; // AFRICAN ENERGY
               } else if (position === 12) {
-                widgetContent = <TravelAdvisoryWidget />;
+                widgetContent = <TravelAdvisoryWidget />; // TRAVEL ADVISORIES
               } else if (position === 13) {
-                widgetContent = <NewsWidget region="ASIAN" />;
+                widgetContent = <NewsWidget region="SOUTH AMERICAN" />; // SOUTH AMERICAN ENERGY
               } else if (position === 14) {
-                widgetContent = <PredictionMarketsWidget />;
+                widgetContent = <NewsWidget region="RUSSIAN" />; // RUSSIAN ENERGY
               } else {
                 widgetContent = <NewsWidget region="US" />;
               }
