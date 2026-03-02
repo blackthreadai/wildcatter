@@ -56,6 +56,93 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       }
     });
 
+    // Add shipping lanes if active
+    if (activeLayers.includes('shipping-lanes')) {
+      // Major global shipping routes (simplified)
+      const shippingRoutes = [
+        {
+          name: "Suez Canal Route",
+          coordinates: [
+            [29.9773, 32.5498], // Suez Canal
+            [25.0, 35.0], // Red Sea
+            [12.0, 43.0], // Bab el-Mandeb
+            [8.0, 54.0], // Arabian Sea
+            [20.0, 65.0], // Persian Gulf approach
+          ]
+        },
+        {
+          name: "Strait of Hormuz",
+          coordinates: [
+            [26.5667, 56.25], // Strait of Hormuz west
+            [26.5, 56.5], // Strait of Hormuz center  
+            [26.4, 56.8], // Strait of Hormuz east
+          ]
+        },
+        {
+          name: "Panama Canal Route", 
+          coordinates: [
+            [9.08, -79.68], // Panama Canal
+            [15.0, -85.0], // Caribbean approach
+            [25.0, -90.0], // Gulf of Mexico
+            [29.0, -94.0], // Texas ports
+          ]
+        },
+        {
+          name: "North Sea Route",
+          coordinates: [
+            [60.0, 5.0], // North Sea
+            [58.0, 3.0], // UK waters
+            [51.5, 2.0], // English Channel
+            [49.0, -2.0], // Atlantic approach
+          ]
+        },
+        {
+          name: "Singapore Strait",
+          coordinates: [
+            [1.25, 103.8], // Singapore Strait
+            [3.0, 105.0], // South China Sea
+            [10.0, 107.0], // Vietnam coast
+            [18.0, 109.0], // China approach
+          ]
+        },
+        {
+          name: "Mediterranean Route",
+          coordinates: [
+            [36.0, -5.5], // Gibraltar
+            [37.0, 0.0], // Spanish coast
+            [40.0, 8.0], // Italian coast  
+            [35.0, 18.0], // Greek waters
+            [36.0, 28.0], // Turkey approach
+          ]
+        }
+      ];
+
+      // Draw shipping lanes
+      shippingRoutes.forEach((route) => {
+        const polyline = L.polyline(route.coordinates, {
+          color: '#a855f7', // Purple color matching layer
+          weight: 2,
+          opacity: 0.8,
+          dashArray: '5, 5' // Dashed line for shipping routes
+        }).addTo(mapInstanceRef.current!);
+
+        // Add popup with route info
+        polyline.bindPopup(`
+          <div style="min-width: 150px;">
+            <h4 style="margin: 0 0 8px 0; color: #a855f7; font-size: 14px; font-weight: bold;">
+              ${route.name}
+            </h4>
+            <p style="margin: 0; font-size: 12px; color: #DAA520;">
+              Major shipping route for energy transport
+            </p>
+            <div style="font-size: 11px; color: #666; margin-top: 6px;">
+              <strong>Type:</strong> Commercial Shipping Lane
+            </div>
+          </div>
+        `);
+      });
+    }
+
     // Add geopolitical alerts if active
     if (activeLayers.includes('geopolitical')) {
       // Mock Middle East geopolitical alerts
