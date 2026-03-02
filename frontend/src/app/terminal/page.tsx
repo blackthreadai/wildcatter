@@ -312,7 +312,7 @@ export default function TerminalPage() {
   const layers = [
     { id: 'geopolitical', label: 'GEOPOLITICAL ALERTS', color: '#ef4444' },
     { id: 'weather', label: 'WEATHER ALERTS', color: '#DAA520' },
-    { id: 'seismic-activity', label: 'SEISMIC ACTIVITY', color: '#4ade80' },
+    { id: 'seismic-activity', label: 'SEISMIC ACTIVITY', color: '#ef4444' },
     { id: 'active-wells', label: 'ACTIVE OIL & GAS WELLS', color: '#DAA520' },
     { id: 'drilling-rigs', label: 'ACTIVE DRILLING RIGS', color: '#4ade80' },
     { id: 'pipelines', label: 'PIPELINE ROUTES', color: '#ef4444' },
@@ -473,7 +473,7 @@ export default function TerminalPage() {
             <select 
               value={selectedRegion}
               onChange={(e) => setSelectedRegion(e.target.value)}
-              className="bg-gray-900 text-white border border-gray-700 rounded px-3 py-1 text-sm focus:border-[#DAA520] focus:outline-none"
+              className="bg-gray-900 text-white border border-gray-700 rounded px-3 py-1 pr-8 text-sm focus:border-[#DAA520] focus:outline-none"
             >
               {regions.map(region => (
                 <option key={region.value} value={region.value}>
@@ -648,6 +648,23 @@ export default function TerminalPage() {
                           <path d="M7 21l10 0"/>
                           <rect x="11" y="4" width="2" height="3" fill={layer.color}/>
                           <circle cx="12" cy="15" r="1" fill={layer.color}/>
+                        </svg>
+                      </div>
+                    ) : layer.id === 'seismic-activity' ? (
+                      <div className="w-3 h-3 flex items-center justify-center">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                          <path d="M2 12l2-4 2 8 2-6 2 4 2-3 2 2 2-1 2-2 2 1 2 3" 
+                                stroke={layer.color} 
+                                strokeWidth="1.5" 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                    ) : layer.id === 'weather' ? (
+                      <div className="w-3 h-3 flex items-center justify-center">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill={layer.color}>
+                          <path d="M12 2l-1 4-4 1 4 1 1 4 1-4 4-1-4-1-1-4z"/>
+                          <path d="M12 6c-3 0-6 2-6 8 0 2 1 4 3 5l3-8 3 8c2-1 3-3 3-5 0-6-3-8-6-8z"/>
                         </svg>
                       </div>
                     ) : layer.id === 'refineries' ? (
