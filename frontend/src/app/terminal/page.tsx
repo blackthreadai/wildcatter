@@ -508,7 +508,7 @@ export default function TerminalPage() {
             </select>
 
             {/* DEFCON 3 Indicator */}
-            <div className="flex items-center gap-1 text-[#DAA520] text-xs font-bold tracking-wider animate-pulse">
+            <div className="flex items-center gap-1 text-[#DAA520] text-xs font-bold tracking-[0.2em] animate-pulse" style={{ fontStretch: 'condensed' }}>
               <div className="w-2 h-2 bg-[#DAA520] rounded-full shadow-[0_0_8px_#DAA520]"></div>
               DEFCON 3
             </div>
@@ -519,7 +519,7 @@ export default function TerminalPage() {
               {marketData.map((item, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <span className="text-[#DAA520] text-xs">{item.label.replace(' Crude', '').replace('Henry Hub ', '')}</span>
-                  <span className="text-white font-mono">{item.value}</span>
+                  <span className="text-white font-medium tracking-[0.1em]" style={{ fontStretch: 'condensed' }}>{item.value}</span>
                   <span className={`text-xs ${item.change >= 0 ? 'text-[#4ade80]' : 'text-red-400'}`}>
                     {item.change >= 0 ? '+' : ''}{item.change.toFixed(2)}%
                   </span>
@@ -607,7 +607,7 @@ export default function TerminalPage() {
         {/* Map Header with Date/Time */}
         <div className="bg-gray-800 border-b border-gray-700 py-2 px-6 pb-3">
           <div className="text-center">
-            <span className="text-white text-sm font-mono">
+            <span className="text-white text-sm font-medium tracking-[0.1em]" style={{ fontStretch: 'condensed' }}>
               {formatDateTime(currentTime)}
             </span>
           </div>
