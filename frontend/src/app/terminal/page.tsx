@@ -286,7 +286,7 @@ export default function TerminalPage() {
           className="h-[50vh] bg-gray-800 relative border"
           style={{
             borderColor: '#333333',
-            boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)'
+            boxShadow: '0 0 10px rgba(218, 165, 32, 0.2), 0 0 20px rgba(218, 165, 32, 0.1)'
           }}
         >
           <WorldMap activeLayers={activeLayers} />
@@ -358,7 +358,7 @@ export default function TerminalPage() {
               style={{ 
                 margin: '5px',
                 borderColor: '#333333',
-                boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)',
+                boxShadow: '0 0 10px rgba(218, 165, 32, 0.2), 0 0 20px rgba(218, 165, 32, 0.1)',
                 maxHeight: '100%'
               }}
             >
@@ -404,7 +404,7 @@ export default function TerminalPage() {
                   style={{ 
                     margin: '5px',
                     borderColor: '#333333',
-                    boxShadow: '0 0 10px rgba(218, 165, 32, 0.4), 0 0 20px rgba(218, 165, 32, 0.2)',
+                    boxShadow: '0 0 10px rgba(218, 165, 32, 0.2), 0 0 20px rgba(218, 165, 32, 0.1)',
                     maxHeight: '100%'
                   }}
                 >

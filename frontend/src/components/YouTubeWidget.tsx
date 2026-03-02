@@ -35,11 +35,11 @@ export default function YouTubeWidget() {
         {/* Embedded Live YouTube Stream */}
         <div className="h-full w-full rounded overflow-hidden">
           <iframe
-            src="https://www.youtube.com/embed/C2jdSFlKJ4g?autoplay=1&mute=1&controls=1&modestbranding=1&rel=0"
+            src="https://www.youtube.com/embed/C2jdSFlKJ4g?mute=1&controls=1&modestbranding=1&rel=0"
             title="Live News Stream"
             className="w-full h-full"
             frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allow="clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             style={{
               border: 'none',
