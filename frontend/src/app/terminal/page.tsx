@@ -310,7 +310,8 @@ export default function TerminalPage() {
 
   const layers = [
     { id: 'geopolitical', label: 'GEOPOLITICAL ALERTS', color: '#ef4444' },
-    { id: 'weather', label: 'WEATHER ALERTS', color: '#f59e0b' },
+    { id: 'weather', label: 'WEATHER ALERTS', color: '#DAA520' },
+    { id: 'seismic-activity', label: 'SEISMIC ACTIVITY', color: '#4ade80' },
     { id: 'oil-wells', label: 'ACTIVE OIL WELLS', color: '#10b981' },
     { id: 'gas-wells', label: 'ACTIVE GAS WELLS', color: '#3b82f6' },
     { id: 'drilling-rigs', label: 'ACTIVE DRILLING RIGS', color: '#f97316' },
@@ -318,7 +319,6 @@ export default function TerminalPage() {
     { id: 'refineries', label: 'REFINERIES', color: '#06b6d4' },
     { id: 'tanker-ships', label: 'TANKER SHIPS', color: '#84cc16' },
     { id: 'shipping-lanes', label: 'SHIPPING LANES', color: '#a855f7' },
-    { id: 'seismic-activity', label: 'SEISMIC ACTIVITY', color: '#dc2626' },
   ];
 
   useEffect(() => {
@@ -503,7 +503,7 @@ export default function TerminalPage() {
             </div>
           </div>
 
-          {/* Right Side - Search + Settings */}
+          {/* Right Side - Search + Buttons */}
           <div className="flex items-center gap-4">
             {/* Search Bar */}
             <div className="relative">
@@ -524,60 +524,63 @@ export default function TerminalPage() {
               </svg>
             </div>
 
-            {/* View Hidden Widgets Button */}
-            <button 
-              onClick={() => setShowHidden(!showHidden)}
-              className={`p-2 rounded transition-colors flex items-center gap-2 ${
-                showHidden 
-                  ? 'bg-[#DAA520] text-black' 
-                  : hiddenWidgets.length > 0
-                    ? 'bg-gray-700 text-[#DAA520] border border-[#DAA520]'
-                    : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-              }`}
-              disabled={hiddenWidgets.length === 0}
-              title={showHidden ? 'Hide hidden widgets' : `Show ${hiddenWidgets.length} hidden widgets`}
-            >
-              {showHidden ? (
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                  <path d="M3 3l18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              ) : (
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                </svg>
-              )}
-              {hiddenWidgets.length > 0 && (
-                <span className="text-xs font-semibold">
-                  {hiddenWidgets.length}
-                </span>
-              )}
-            </button>
+            {/* Control Buttons Group - Closer Together */}
+            <div className="flex items-center gap-1">
+              {/* View Hidden Widgets Button */}
+              <button 
+                onClick={() => setShowHidden(!showHidden)}
+                className={`p-2 rounded transition-colors flex items-center gap-2 ${
+                  showHidden 
+                    ? 'bg-[#DAA520] text-black' 
+                    : hiddenWidgets.length > 0
+                      ? 'bg-gray-700 text-[#DAA520] border border-[#DAA520]'
+                      : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                }`}
+                disabled={hiddenWidgets.length === 0}
+                title={showHidden ? 'Hide hidden widgets' : `Show ${hiddenWidgets.length} hidden widgets`}
+              >
+                {showHidden ? (
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    <path d="M3 3l18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                  </svg>
+                )}
+                {hiddenWidgets.length > 0 && (
+                  <span className="text-xs font-semibold">
+                    {hiddenWidgets.length}
+                  </span>
+                )}
+              </button>
 
-            {/* Reset Widgets Button */}
-            <button 
-              onClick={() => {
-                setWidgets(defaultWidgets);
-                setHiddenWidgets([]);
-                setShowHidden(false);
-                localStorage.removeItem('terminal-widget-order');
-                localStorage.removeItem('terminal-hidden-widgets');
-              }}
-              className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded"
-              title="Reset widget layout and show all widgets"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            </button>
+              {/* Reset Widgets Button */}
+              <button 
+                onClick={() => {
+                  setWidgets(defaultWidgets);
+                  setHiddenWidgets([]);
+                  setShowHidden(false);
+                  localStorage.removeItem('terminal-widget-order');
+                  localStorage.removeItem('terminal-hidden-widgets');
+                }}
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded"
+                title="Reset widget layout and show all widgets"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
 
-            {/* Settings Gear */}
-            <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </button>
+              {/* Settings Gear */}
+              <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </header>
