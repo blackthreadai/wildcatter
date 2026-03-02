@@ -649,6 +649,16 @@ export default function TerminalPage() {
                           <circle cx="12" cy="15" r="1" fill={layer.color}/>
                         </svg>
                       </div>
+                    ) : layer.id === 'refineries' ? (
+                      <div className="w-3 h-3 flex items-center justify-center text-xs">
+                        🏭
+                      </div>
+                    ) : layer.id === 'pipelines' ? (
+                      <div className="w-3 h-3 flex items-center justify-center">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                          <path d="M2 12l20 0" stroke={layer.color} strokeWidth="3" strokeLinecap="round"/>
+                        </svg>
+                      </div>
                     ) : (
                       <div 
                         className="w-3 h-3 rounded-full"

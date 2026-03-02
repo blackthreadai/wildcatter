@@ -414,6 +414,109 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       });
     }
 
+    // Add refineries if active
+    if (activeLayers.includes('refineries')) {
+      const refineries = [
+        { lat: 29.3, lng: 47.8, name: "Ras Tanura Refinery", capacity: "550,000 bbl/day", country: "Saudi Arabia" },
+        { lat: 29.1, lng: 48.1, name: "Abadan Refinery", capacity: "400,000 bbl/day", country: "Iran" },
+        { lat: 26.2, lng: 50.1, name: "Mina Al-Ahmadi", capacity: "466,000 bbl/day", country: "Kuwait" },
+        { lat: 25.0, lng: 55.2, name: "Jebel Ali Refinery", capacity: "140,000 bbl/day", country: "UAE" },
+        { lat: 24.5, lng: 46.7, name: "Riyadh Refinery", capacity: "120,000 bbl/day", country: "Saudi Arabia" }
+      ];
+
+      refineries.forEach((refinery) => {
+        const refineryIcon = L.divIcon({
+          html: `<div style="
+            width: 18px; 
+            height: 18px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 14px;
+          ">🏭</div>`,
+          className: '',
+          iconSize: [18, 18],
+          iconAnchor: [9, 9]
+        });
+
+        const marker = L.marker([refinery.lat, refinery.lng], { icon: refineryIcon }).addTo(mapInstanceRef.current!);
+        marker.bindPopup(`
+          <div style="min-width: 160px;">
+            <h4 style="margin: 0 0 8px 0; color: #06b6d4; font-size: 14px; font-weight: bold;">
+              ${refinery.name}
+            </h4>
+            <p style="margin: 0 0 4px 0; font-size: 12px; color: #DAA520;">
+              Capacity: ${refinery.capacity}
+            </p>
+            <p style="margin: 0; font-size: 12px; color: #666;">
+              Location: ${refinery.country}
+            </p>
+          </div>
+        `);
+      });
+    }
+
+    // Add pipeline routes if active
+    if (activeLayers.includes('pipelines')) {
+      const pipelines = [
+        {
+          name: "Trans-Arabian Pipeline",
+          coordinates: [[26.0, 50.0], [31.0, 35.0]], // Kuwait to Mediterranean
+          capacity: "1.2 million bbl/day"
+        },
+        {
+          name: "Iraq-Turkey Pipeline", 
+          coordinates: [[33.3, 44.4], [37.0, 41.0]], // Iraq to Turkey
+          capacity: "1.6 million bbl/day"
+        },
+        {
+          name: "Petroline",
+          coordinates: [[24.5, 46.7], [26.7, 49.6]], // Saudi internal pipeline
+          capacity: "4.8 million bbl/day"
+        },
+        {
+          name: "Iran-Pakistan Pipeline",
+          coordinates: [[29.0, 60.0], [25.0, 67.0]], // Iran to Pakistan
+          capacity: "760,000 bbl/day"
+        }
+      ];
+
+      pipelines.forEach((pipeline) => {
+        const pipelineColor = '#8b5cf6';
+        
+        // Create pipeline as series of small circles
+        const startLat = pipeline.coordinates[0][0];
+        const startLng = pipeline.coordinates[0][1];
+        const endLat = pipeline.coordinates[1][0];
+        const endLng = pipeline.coordinates[1][1];
+        
+        // Create points along the pipeline route
+        const numPoints = 15;
+        for (let i = 0; i <= numPoints; i++) {
+          const ratio = i / numPoints;
+          const lat = startLat + (endLat - startLat) * ratio;
+          const lng = startLng + (endLng - startLng) * ratio;
+          
+          L.circle([lat, lng], {
+            color: pipelineColor,
+            fillColor: pipelineColor,
+            fillOpacity: 0.8,
+            radius: 5000, // 5km circles
+            weight: 1
+          }).addTo(mapInstanceRef.current!).bindPopup(`
+            <div style="min-width: 150px;">
+              <h4 style="margin: 0 0 8px 0; color: ${pipelineColor}; font-size: 14px; font-weight: bold;">
+                ${pipeline.name}
+              </h4>
+              <p style="margin: 0; font-size: 12px; color: #DAA520;">
+                Capacity: ${pipeline.capacity}
+              </p>
+            </div>
+          `);
+        }
+      });
+    }
+
     console.log('Active layers changed:', activeLayers);
   }, [activeLayers]);
 
