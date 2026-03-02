@@ -34,20 +34,36 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       position: 'bottomright'
     }).addTo(map);
 
-    // Add test polyline immediately after map setup
+    // Add test marker immediately after map setup
     map.whenReady(() => {
-      // ALWAYS add bright red test line
-      const testLine = L.polyline([
-        [29.0, 42.0],
-        [26.0, 56.0], 
-        [30.0, 32.0]
-      ], {
-        color: '#ff0000',
-        weight: 10,
-        opacity: 1.0,
-      }).addTo(map);
+      // Test if ANY overlays work - start with simple marker
+      const testMarker = L.marker([29.0, 42.0]).addTo(map);
+      testMarker.bindPopup('🔥 TEST MARKER - If you see this, overlays work!');
       
-      testLine.bindPopup('🔥 TEST LINE - SHIPPING LANES WORK! 🔥');
+      // Try circle overlay
+      const testCircle = L.circle([26.0, 56.0], {
+        color: 'red',
+        fillColor: '#f03',
+        fillOpacity: 0.5,
+        radius: 100000
+      }).addTo(map);
+      testCircle.bindPopup('🔴 TEST CIRCLE');
+      
+      // Try simple polyline with very basic coordinates
+      try {
+        const testLine = L.polyline([
+          [29.0, 42.0],
+          [26.0, 56.0]
+        ], {
+          color: 'red',
+          weight: 10
+        }).addTo(map);
+        testLine.bindPopup('🔥 TEST POLYLINE');
+      } catch (e) {
+        console.error('Polyline failed:', e);
+        // Add marker instead
+        L.marker([30.0, 50.0]).addTo(map).bindPopup('Polyline failed, but marker works');
+      }
     });
 
     mapInstanceRef.current = map;
