@@ -74,7 +74,15 @@ const defaultWidgets: Widget[] = [
 ];
 
 // Draggable Widget Component
-function DraggableWidget({ widget }: { widget: Widget }) {
+function DraggableWidget({ 
+  widget, 
+  isHidden, 
+  onToggleVisibility 
+}: { 
+  widget: Widget;
+  isHidden: boolean;
+  onToggleVisibility: (widgetId: string) => void;
+}) {
   const {
     attributes,
     listeners,
@@ -131,23 +139,42 @@ function DraggableWidget({ widget }: { widget: Widget }) {
       style={{
         ...style,
         margin: '5px',
-        borderColor: isDragging ? '#DAA520' : '#333333',
+        borderColor: isDragging ? '#DAA520' : (isHidden ? '#666666' : '#333333'),
         borderWidth: isDragging ? '2px' : '1px',
         boxShadow: isDragging 
           ? '0 0 20px rgba(218, 165, 32, 0.5), 0 0 40px rgba(218, 165, 32, 0.3)'
-          : '0 0 10px rgba(218, 165, 32, 0.2), 0 0 20px rgba(218, 165, 32, 0.1)',
+          : isHidden 
+            ? '0 0 10px rgba(102, 102, 102, 0.2)'
+            : '0 0 10px rgba(218, 165, 32, 0.2), 0 0 20px rgba(218, 165, 32, 0.1)',
         maxHeight: '100%',
-        cursor: isDragging ? 'grabbing' : 'grab'
+        cursor: isDragging ? 'grabbing' : 'grab',
+        opacity: isHidden ? 0.5 : 1
       }}
       {...attributes}
       {...listeners}
     >
-      {/* Always visible drag handle */}
-      <div 
-        className="absolute top-1 right-1 text-[#DAA520] z-50 bg-black/80 rounded px-1 opacity-60 group-hover:opacity-100 transition-opacity pointer-events-none"
-        style={{ fontSize: '10px' }}
-      >
-        ⋮⋮
+      {/* Controls: Drag handle and Eye icon */}
+      <div className="absolute top-1 right-1 z-50 flex items-center gap-1 bg-black/80 rounded px-1 opacity-60 group-hover:opacity-100 transition-opacity">
+        {/* Eye icon for hide/show */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleVisibility(widget.id);
+          }}
+          className="text-[#DAA520] hover:text-yellow-300 transition-colors pointer-events-auto"
+          style={{ fontSize: '12px' }}
+          title={isHidden ? 'Show widget' : 'Hide widget'}
+        >
+          {isHidden ? '👁️‍🗨️' : '👁️'}
+        </button>
+        
+        {/* Drag handle dots */}
+        <div 
+          className="text-[#DAA520] pointer-events-none"
+          style={{ fontSize: '10px' }}
+        >
+          ⋮⋮
+        </div>
       </div>
       
       {/* Removed drag hint overlay per user request */}
@@ -175,6 +202,8 @@ export default function TerminalPage() {
   const [activeLayers, setActiveLayers] = useState<string[]>(['geopolitical']); // Default active
   const [marketData, setMarketData] = useState<{label: string; value: string; change: number}[]>([]);
   const [widgets, setWidgets] = useState<Widget[]>(defaultWidgets);
+  const [hiddenWidgets, setHiddenWidgets] = useState<string[]>([]);
+  const [showHidden, setShowHidden] = useState(false);
 
   // Tailwind safelist for dynamic classes (ensures they're not purged)
   // col-span-2 row-span-2
@@ -210,7 +239,7 @@ export default function TerminalPage() {
     }
   }
 
-  // Load saved widget order from localStorage
+  // Load saved widget order and hidden widgets from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('terminal-widget-order');
     if (saved) {
@@ -221,7 +250,36 @@ export default function TerminalPage() {
         console.error('Failed to load saved widget order:', error);
       }
     }
+
+    const savedHidden = localStorage.getItem('terminal-hidden-widgets');
+    if (savedHidden) {
+      try {
+        const hiddenIds = JSON.parse(savedHidden) as string[];
+        setHiddenWidgets(hiddenIds);
+      } catch (error) {
+        console.error('Failed to load hidden widgets:', error);
+      }
+    }
   }, []);
+
+  // Toggle widget visibility
+  const toggleWidgetVisibility = (widgetId: string) => {
+    setHiddenWidgets(prev => {
+      const newHidden = prev.includes(widgetId)
+        ? prev.filter(id => id !== widgetId)
+        : [...prev, widgetId];
+      
+      // Save to localStorage
+      localStorage.setItem('terminal-hidden-widgets', JSON.stringify(newHidden));
+      
+      return newHidden;
+    });
+  };
+
+  // Get visible widgets (filter out hidden unless showHidden is true)
+  const visibleWidgets = widgets.filter(widget => 
+    showHidden || !hiddenWidgets.includes(widget.id)
+  );
 
   const regions = [
     { value: 'global', label: 'GLOBAL' },
@@ -448,14 +506,33 @@ export default function TerminalPage() {
               </svg>
             </div>
 
+            {/* View Hidden Widgets Button */}
+            <button 
+              onClick={() => setShowHidden(!showHidden)}
+              className={`px-3 py-1 text-xs font-semibold rounded transition-colors ${
+                showHidden 
+                  ? 'bg-[#DAA520] text-black' 
+                  : hiddenWidgets.length > 0
+                    ? 'bg-gray-700 text-[#DAA520] border border-[#DAA520]'
+                    : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+              }`}
+              disabled={hiddenWidgets.length === 0}
+              title={showHidden ? 'Hide hidden widgets' : `Show ${hiddenWidgets.length} hidden widgets`}
+            >
+              {showHidden ? 'HIDE HIDDEN' : `VIEW HIDDEN (${hiddenWidgets.length})`}
+            </button>
+
             {/* Reset Widgets Button */}
             <button 
               onClick={() => {
                 setWidgets(defaultWidgets);
+                setHiddenWidgets([]);
+                setShowHidden(false);
                 localStorage.removeItem('terminal-widget-order');
+                localStorage.removeItem('terminal-hidden-widgets');
               }}
               className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded"
-              title="Reset widget layout"
+              title="Reset widget layout and show all widgets"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -554,7 +631,7 @@ export default function TerminalPage() {
             onDragEnd={handleDragEnd}
           >
             <SortableContext 
-              items={widgets.map(w => w.id)}
+              items={visibleWidgets.map(w => w.id)}
               strategy={rectSortingStrategy}
             >
               <div 
@@ -564,8 +641,13 @@ export default function TerminalPage() {
                   maxHeight: '100%'
                 }}
               >
-                {widgets.map((widget) => (
-                  <DraggableWidget key={widget.id} widget={widget} />
+                {visibleWidgets.map((widget) => (
+                  <DraggableWidget 
+                    key={widget.id} 
+                    widget={widget}
+                    isHidden={hiddenWidgets.includes(widget.id)}
+                    onToggleVisibility={toggleWidgetVisibility}
+                  />
                 ))}
               </div>
             </SortableContext>
