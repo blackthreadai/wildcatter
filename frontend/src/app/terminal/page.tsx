@@ -507,12 +507,6 @@ export default function TerminalPage() {
               ))}
             </select>
 
-            {/* DEFCON 3 Indicator */}
-            <div className="flex items-center gap-1 text-[#DAA520] text-xs font-bold tracking-[0.2em] animate-pulse" style={{ fontStretch: 'condensed' }}>
-              <div className="w-2 h-2 bg-[#DAA520] rounded-full shadow-[0_0_8px_#DAA520]"></div>
-              DEFCON 3
-            </div>
-
             {/* Market Snapshot */}
             <div className="flex items-center gap-4 text-sm">
               <span className="text-gray-400 tracking-wider">MARKET SNAPSHOT</span>
@@ -525,6 +519,12 @@ export default function TerminalPage() {
                   </span>
                 </div>
               ))}
+            </div>
+
+            {/* DEFCON 3 Indicator */}
+            <div className="flex items-center gap-1 text-[#DAA520] text-xs font-bold tracking-[0.2em] animate-pulse" style={{ fontStretch: 'condensed' }}>
+              <div className="w-2 h-2 bg-[#DAA520] rounded-full shadow-[0_0_8px_#DAA520]"></div>
+              DEFCON 3
             </div>
           </div>
 

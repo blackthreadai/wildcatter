@@ -6,15 +6,15 @@ export default function YouTubeWidget() {
   const [activeChannel, setActiveChannel] = useState('bloomberg');
   
   const channels = [
-    { id: 'bloomberg', name: 'BLOOMBERG' },
-    { id: 'skynews', name: 'SKYNEWS' },
-    { id: 'euronews', name: 'EURONEWS' },
-    { id: 'dw', name: 'DW' },
-    { id: 'cnbc', name: 'CNBC' },
-    { id: 'cnn', name: 'CNN' },
-    { id: 'france24', name: 'FRANCE24' },
-    { id: 'aljarabiya', name: 'ALJARABIYA' },
-    { id: 'aljazeera', name: 'ALJAZEERA' },
+    { id: 'bloomberg', name: 'BLOOMBERG', url: 'https://youtu.be/iEpJwprxDdk' },
+    { id: 'skynews', name: 'SKYNEWS', url: '#' },
+    { id: 'euronews', name: 'EURONEWS', url: '#' },
+    { id: 'dw', name: 'DW', url: '#' },
+    { id: 'cnbc', name: 'CNBC', url: 'https://youtu.be/9NyxcX3rhQs' },
+    { id: 'cnn', name: 'CNN', url: '#' },
+    { id: 'france24', name: 'FRANCE24', url: '#' },
+    { id: 'aljarabiya', name: 'ALJARABIYA', url: '#' },
+    { id: 'aljazeera', name: 'ALJAZEERA', url: 'https://youtu.be/gCNeDWCI0vo' },
   ];
 
   return (
@@ -48,15 +48,46 @@ export default function YouTubeWidget() {
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 p-3 bg-black min-h-0 flex items-center justify-center">
-        <div className="text-center text-gray-400">
-          <p className="text-xs text-gray-500 mb-1">
-            {channels.find(c => c.id === activeChannel)?.name} Live Stream
-          </p>
-          <p className="text-xs text-gray-600">
-            Ready for live stream URLs
-          </p>
-        </div>
+      <div className="flex-1 p-2 bg-black min-h-0">
+        {(() => {
+          const channel = channels.find(c => c.id === activeChannel);
+          const url = channel?.url;
+          
+          if (url && url !== '#') {
+            // Convert YouTube URL to embed format
+            const embedUrl = url.replace('youtu.be/', 'www.youtube.com/embed/').replace('watch?v=', 'embed/');
+            
+            return (
+              <div className="h-full w-full">
+                <iframe
+                  src={`${embedUrl}?autoplay=0&mute=0&controls=1&modestbranding=1&rel=0`}
+                  title={`${channel.name} Live Stream`}
+                  className="w-full h-full"
+                  frameBorder="0"
+                  allow="clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{
+                    border: 'none',
+                    borderRadius: '4px'
+                  }}
+                />
+              </div>
+            );
+          } else {
+            return (
+              <div className="flex items-center justify-center h-full text-center text-gray-400">
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">
+                    {channel?.name} Live Stream
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    Coming Soon
+                  </p>
+                </div>
+              </div>
+            );
+          }
+        })()}
       </div>
     </div>
   );
