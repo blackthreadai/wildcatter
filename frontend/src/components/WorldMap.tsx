@@ -285,18 +285,25 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       });
     }
 
-    // Add oil wells if active
-    if (activeLayers.includes('oil-wells')) {
-      const oilWells = [
-        { lat: 26.0, lng: 50.0, name: "Kuwait Oil Field", production: "45,000 bbl/day" },
-        { lat: 25.0, lng: 51.0, name: "Qatar North Field", production: "62,000 bbl/day" },
-        { lat: 24.5, lng: 54.5, name: "UAE Offshore", production: "38,000 bbl/day" },
-        { lat: 29.0, lng: 48.0, name: "Iraqi Rumaila", production: "95,000 bbl/day" },
-        { lat: 27.5, lng: 49.5, name: "Saudi Ghawar", production: "125,000 bbl/day" }
+    // Add active wells (oil & gas combined) if active
+    if (activeLayers.includes('active-wells')) {
+      const activeWells = [
+        // Oil wells
+        { lat: 26.0, lng: 50.0, name: "Kuwait Oil Field", type: "Oil", production: "45,000 bbl/day", color: "#10b981" },
+        { lat: 25.0, lng: 51.0, name: "Qatar Oil Platform", type: "Oil", production: "62,000 bbl/day", color: "#10b981" },
+        { lat: 24.5, lng: 54.5, name: "UAE Offshore", type: "Oil", production: "38,000 bbl/day", color: "#10b981" },
+        { lat: 29.0, lng: 48.0, name: "Iraqi Rumaila", type: "Oil", production: "95,000 bbl/day", color: "#10b981" },
+        { lat: 27.5, lng: 49.5, name: "Saudi Ghawar", type: "Oil", production: "125,000 bbl/day", color: "#10b981" },
+        // Gas wells
+        { lat: 25.5, lng: 51.2, name: "North Field Gas", type: "Gas", production: "2.8 BCF/day", color: "#3b82f6" },
+        { lat: 26.8, lng: 50.2, name: "South Pars", type: "Gas", production: "3.2 BCF/day", color: "#3b82f6" },
+        { lat: 24.0, lng: 54.0, name: "Khuff Formation", type: "Gas", production: "1.9 BCF/day", color: "#3b82f6" },
+        { lat: 28.0, lng: 49.0, name: "Kangan Field", type: "Gas", production: "2.1 BCF/day", color: "#3b82f6" },
+        { lat: 23.5, lng: 53.5, name: "Abu Dhabi Gas", type: "Gas", production: "1.6 BCF/day", color: "#3b82f6" }
       ];
 
-      oilWells.forEach((well) => {
-        const oilIcon = L.divIcon({
+      activeWells.forEach((well) => {
+        const wellIcon = L.divIcon({
           html: `<div style="
             width: 16px; 
             height: 16px; 
@@ -304,10 +311,14 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
             align-items: center; 
             justify-content: center;
           ">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#10b981">
-              <path d="M12 2l2 8-2 8-2-8 2-8z"/>
-              <rect x="10" y="10" width="4" height="10" rx="2"/>
-              <circle cx="12" cy="4" r="2"/>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="${well.color}">
+              <path d="M12 2v20"/>
+              <path d="M8 6l8 0l-2 4l-4 0l-2-4z"/>
+              <path d="M6 22l12 0"/>
+              <path d="M10 14v8M14 14v8"/>
+              <rect x="11" y="3" width="2" height="3"/>
+              <circle cx="12" cy="8" r="1.5" fill="white"/>
+              ${well.type === 'Gas' ? '<path d="M8 10l8 0M8 12l8 0" stroke="white" stroke-width="0.5"/>' : ''}
             </svg>
           </div>`,
           className: '',
@@ -315,56 +326,15 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
           iconAnchor: [8, 8]
         });
 
-        const marker = L.marker([well.lat, well.lng], { icon: oilIcon }).addTo(mapInstanceRef.current!);
+        const marker = L.marker([well.lat, well.lng], { icon: wellIcon }).addTo(mapInstanceRef.current!);
         marker.bindPopup(`
           <div style="min-width: 150px;">
-            <h4 style="margin: 0 0 8px 0; color: #10b981; font-size: 14px; font-weight: bold;">
+            <h4 style="margin: 0 0 8px 0; color: ${well.color}; font-size: 14px; font-weight: bold;">
               ${well.name}
             </h4>
-            <p style="margin: 0; font-size: 12px; color: #DAA520;">
-              Production: ${well.production}
+            <p style="margin: 0 0 4px 0; font-size: 12px; color: #DAA520;">
+              Type: ${well.type} Well
             </p>
-          </div>
-        `);
-      });
-    }
-
-    // Add gas wells if active  
-    if (activeLayers.includes('gas-wells')) {
-      const gasWells = [
-        { lat: 25.5, lng: 51.2, name: "North Field Gas", production: "2.8 BCF/day" },
-        { lat: 26.8, lng: 50.2, name: "South Pars", production: "3.2 BCF/day" },
-        { lat: 24.0, lng: 54.0, name: "Khuff Formation", production: "1.9 BCF/day" },
-        { lat: 28.0, lng: 49.0, name: "Kangan Field", production: "2.1 BCF/day" }
-      ];
-
-      gasWells.forEach((well) => {
-        const gasIcon = L.divIcon({
-          html: `<div style="
-            width: 16px; 
-            height: 16px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-          ">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#3b82f6">
-              <path d="M12 2l2 8-2 8-2-8 2-8z"/>
-              <rect x="10" y="10" width="4" height="10" rx="2"/>
-              <circle cx="12" cy="4" r="2"/>
-              <path d="M8 8l8 0M8 12l8 0" stroke="#3b82f6" stroke-width="1"/>
-            </svg>
-          </div>`,
-          className: '',
-          iconSize: [16, 16],
-          iconAnchor: [8, 8]
-        });
-
-        const marker = L.marker([well.lat, well.lng], { icon: gasIcon }).addTo(mapInstanceRef.current!);
-        marker.bindPopup(`
-          <div style="min-width: 150px;">
-            <h4 style="margin: 0 0 8px 0; color: #3b82f6; font-size: 14px; font-weight: bold;">
-              ${well.name}
-            </h4>
             <p style="margin: 0; font-size: 12px; color: #DAA520;">
               Production: ${well.production}
             </p>
