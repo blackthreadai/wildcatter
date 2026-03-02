@@ -498,7 +498,7 @@ export default function TerminalPage() {
             <select 
               value={selectedRegion}
               onChange={(e) => setSelectedRegion(e.target.value)}
-              className="bg-gray-900 text-white border border-gray-700 pl-3 pr-4 py-1 text-sm focus:border-[#DAA520] focus:outline-none hover:text-[#DAA520] cursor-pointer"
+              className="bg-gray-900 text-white border border-gray-700 pl-3 pr-4 py-1 text-sm focus:border-[#DAA520] focus:outline-none cursor-pointer"
               style={{ 
                 appearance: 'none',
                 WebkitAppearance: 'none',
