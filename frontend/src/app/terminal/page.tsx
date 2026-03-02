@@ -507,10 +507,10 @@ export default function TerminalPage() {
               ))}
             </select>
 
-            {/* LIVE Indicator */}
-            <div className="flex items-center gap-1 text-[#4ade80] text-xs font-bold tracking-wider animate-pulse">
-              <div className="w-2 h-2 bg-[#4ade80] rounded-full shadow-[0_0_8px_#4ade80]"></div>
-              LIVE
+            {/* DEFCON 3 Indicator */}
+            <div className="flex items-center gap-1 text-[#DAA520] text-xs font-bold tracking-wider animate-pulse">
+              <div className="w-2 h-2 bg-[#DAA520] rounded-full shadow-[0_0_8px_#DAA520]"></div>
+              DEFCON 3
             </div>
 
             {/* Market Snapshot */}

@@ -24,7 +24,7 @@ export default function YouTubeWidget() {
         <h3 className="text-white text-xs font-semibold tracking-wider absolute left-2">LIVE NEWS</h3>
         <div className="flex items-center gap-1">
           <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-          <span className="text-red-500 text-xs font-bold">DEFCON 3</span>
+          <span className="text-red-500 text-xs font-bold">LIVE</span>
         </div>
       </div>
 
