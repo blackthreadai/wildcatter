@@ -121,26 +121,48 @@ function DraggableWidget({ widget }: { widget: Widget }) {
   return (
     <div 
       ref={setNodeRef}
-      className={`bg-black border overflow-hidden cursor-move ${spanClasses}`}
-      {...attributes}
-      {...listeners}
+      className={`bg-black border overflow-hidden relative group ${spanClasses}`}
       style={{
         ...style,
         margin: '5px',
-        borderColor: '#333333',
+        borderColor: isDragging ? '#DAA520' : '#333333',
+        borderWidth: isDragging ? '2px' : '1px',
         boxShadow: isDragging 
           ? '0 0 20px rgba(218, 165, 32, 0.5), 0 0 40px rgba(218, 165, 32, 0.3)'
           : '0 0 10px rgba(218, 165, 32, 0.2), 0 0 20px rgba(218, 165, 32, 0.1)',
-        maxHeight: '100%'
+        maxHeight: '100%',
+        cursor: isDragging ? 'grabbing' : 'grab'
       }}
+      {...attributes}
+      {...listeners}
     >
-      {/* Drag handle indicator */}
-      <div className="absolute top-2 right-2 text-gray-600 hover:text-[#DAA520] z-10 opacity-0 hover:opacity-100 transition-opacity">
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
-        </svg>
+      {/* Always visible drag handle */}
+      <div 
+        className="absolute top-1 right-1 text-[#DAA520] z-50 bg-black/80 rounded px-1 opacity-60 group-hover:opacity-100 transition-opacity pointer-events-none"
+        style={{ fontSize: '10px' }}
+      >
+        ⋮⋮
       </div>
-      <div className="h-full w-full overflow-hidden">
+      
+      {/* Drag hint overlay */}
+      {!isDragging && (
+        <div className="absolute inset-0 bg-[#DAA520]/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 flex items-center justify-center">
+          <div className="bg-black/80 text-[#DAA520] px-2 py-1 rounded text-xs font-semibold">
+            Click and drag to move
+          </div>
+        </div>
+      )}
+      
+      {/* Dragging overlay */}
+      {isDragging && (
+        <div className="absolute inset-0 bg-[#DAA520]/20 pointer-events-none z-10 flex items-center justify-center">
+          <div className="bg-[#DAA520] text-black px-3 py-2 rounded font-bold text-sm animate-pulse">
+            MOVING...
+          </div>
+        </div>
+      )}
+      
+      <div className="h-full w-full overflow-hidden relative">
         {renderWidget()}
       </div>
     </div>
@@ -157,7 +179,11 @@ export default function TerminalPage() {
 
   // Drag and drop sensors
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px movement before drag starts
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
