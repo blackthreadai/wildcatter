@@ -20,8 +20,8 @@ export default function YouTubeWidget() {
   return (
     <div className="h-full w-full flex flex-col bg-black">
       {/* Header */}
-      <div className="bg-gray-800 p-2 flex-shrink-0 flex items-center justify-between">
-        <h3 className="text-white text-xs font-semibold tracking-wider">LIVE NEWS</h3>
+      <div className="bg-gray-800 p-2 flex-shrink-0 flex items-center justify-center relative">
+        <h3 className="text-white text-xs font-semibold tracking-wider absolute left-2">LIVE NEWS</h3>
         <div className="flex items-center gap-1">
           <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
           <span className="text-red-500 text-xs font-bold">LIVE</span>
@@ -35,10 +35,10 @@ export default function YouTubeWidget() {
             <button
               key={channel.id}
               onClick={() => setActiveChannel(channel.id)}
-              className={`px-3 py-1 text-xs font-semibold rounded transition-all whitespace-nowrap ${
+              className={`px-3 py-1 text-xs font-semibold transition-all whitespace-nowrap ${
                 activeChannel === channel.id
                   ? 'bg-yellow-500 text-black'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  : 'bg-gray-900 text-gray-300 hover:bg-gray-700'
               }`}
             >
               {channel.name}
