@@ -11,6 +11,27 @@ import WorldClockWidget from '@/components/WorldClockWidget';
 import TravelAdvisoryWidget from '@/components/TravelAdvisoryWidget';
 import PredictionMarketsWidget from '@/components/PredictionMarketsWidget';
 
+// Drag and drop imports
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
 // Dynamically import the map to avoid SSR issues
 const WorldMap = dynamic(() => import('@/components/WorldMap'), {
   ssr: false,
@@ -28,12 +49,151 @@ const WorldMap = dynamic(() => import('@/components/WorldMap'), {
   )
 });
 
+// Widget configuration - defines all widgets in the grid
+type Widget = {
+  id: string;
+  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction';
+  title: string;
+  span?: { col: number; row: number };
+  region?: string;
+};
+
+const defaultWidgets: Widget[] = [
+  { id: 'youtube', type: 'youtube', title: 'ENERGY NEWS TICKER', span: { col: 2, row: 2 } },
+  { id: 'greed-fear', type: 'greed-fear', title: 'FEAR & GREED INDEX' },
+  { id: 'us-news', type: 'news', title: 'US ENERGY', region: 'US' },
+  { id: 'us-markets', type: 'stock', title: 'US ENERGY MARKETS' },
+  { id: 'asian-news', type: 'news', title: 'ASIAN ENERGY', region: 'ASIAN' },
+  { id: 'asian-markets', type: 'asian-stock', title: 'ASIAN ENERGY MARKETS' },
+  { id: 'predictions', type: 'prediction', title: 'PREDICTION MARKETS' },
+  { id: 'world-clock', type: 'world-clock', title: 'WORLD CLOCK' },
+  { id: 'african-news', type: 'news', title: 'AFRICAN ENERGY', region: 'AFRICAN' },
+  { id: 'travel', type: 'travel', title: 'TRAVEL ADVISORIES' },
+  { id: 'sa-news', type: 'news', title: 'SOUTH AMERICAN ENERGY', region: 'SOUTH AMERICAN' },
+  { id: 'russian-news', type: 'news', title: 'RUSSIAN ENERGY', region: 'RUSSIAN' },
+];
+
+// Draggable Widget Component
+function DraggableWidget({ widget }: { widget: Widget }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: widget.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  // Render the appropriate widget component
+  const renderWidget = () => {
+    switch (widget.type) {
+      case 'news':
+        return <NewsWidget region={widget.region || 'US'} />;
+      case 'youtube':
+        return <YouTubeWidget />;
+      case 'greed-fear':
+        return <GreedFearWidget />;
+      case 'stock':
+        return <StockWidget />;
+      case 'asian-stock':
+        return <AsianStockWidget />;
+      case 'world-clock':
+        return <WorldClockWidget />;
+      case 'travel':
+        return <TravelAdvisoryWidget />;
+      case 'prediction':
+        return <PredictionMarketsWidget />;
+      default:
+        return <NewsWidget region="US" />;
+    }
+  };
+
+  const spanClasses = widget.span 
+    ? `col-span-${widget.span.col} row-span-${widget.span.row}`
+    : '';
+
+  return (
+    <div 
+      ref={setNodeRef}
+      className={`bg-black border overflow-hidden cursor-move ${spanClasses}`}
+      {...attributes}
+      {...listeners}
+      style={{
+        ...style,
+        margin: '5px',
+        borderColor: '#333333',
+        boxShadow: isDragging 
+          ? '0 0 20px rgba(218, 165, 32, 0.5), 0 0 40px rgba(218, 165, 32, 0.3)'
+          : '0 0 10px rgba(218, 165, 32, 0.2), 0 0 20px rgba(218, 165, 32, 0.1)',
+        maxHeight: '100%'
+      }}
+    >
+      {/* Drag handle indicator */}
+      <div className="absolute top-2 right-2 text-gray-600 hover:text-[#DAA520] z-10 opacity-0 hover:opacity-100 transition-opacity">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+        </svg>
+      </div>
+      <div className="h-full w-full overflow-hidden">
+        {renderWidget()}
+      </div>
+    </div>
+  );
+}
+
 export default function TerminalPage() {
   const [selectedRegion, setSelectedRegion] = useState('global');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeLayers, setActiveLayers] = useState<string[]>(['geopolitical']); // Default active
   const [marketData, setMarketData] = useState<{label: string; value: string; change: number}[]>([]);
+  const [widgets, setWidgets] = useState<Widget[]>(defaultWidgets);
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Handle drag end
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      setWidgets((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over?.id);
+
+        const newOrder = arrayMove(items, oldIndex, newIndex);
+        
+        // Save to localStorage
+        localStorage.setItem('terminal-widget-order', JSON.stringify(newOrder));
+        
+        return newOrder;
+      });
+    }
+  }
+
+  // Load saved widget order from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('terminal-widget-order');
+    if (saved) {
+      try {
+        const savedWidgets = JSON.parse(saved) as Widget[];
+        setWidgets(savedWidgets);
+      } catch (error) {
+        console.error('Failed to load saved widget order:', error);
+      }
+    }
+  }, []);
 
   const regions = [
     { value: 'global', label: 'GLOBAL' },
@@ -260,6 +420,20 @@ export default function TerminalPage() {
               </svg>
             </div>
 
+            {/* Reset Widgets Button */}
+            <button 
+              onClick={() => {
+                setWidgets(defaultWidgets);
+                localStorage.removeItem('terminal-widget-order');
+              }}
+              className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded"
+              title="Reset widget layout"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+
             {/* Settings Gear */}
             <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -344,82 +518,30 @@ export default function TerminalPage() {
           </div>
         </div>
 
-        {/* Bottom Area - Grid */}
+        {/* Bottom Area - Draggable Widget Grid */}
         <div className="flex-1 bg-black p-2 min-h-0">
-          <div 
-            className="grid grid-cols-5 gap-2 h-full"
-            style={{ 
-              gridTemplateRows: '1fr 1fr 1fr',
-              maxHeight: '100%'
-            }}
+          <DndContext 
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            {/* Large YouTube Widget - spans 2x2 */}
-            <div 
-              className="bg-black border col-span-2 row-span-2 overflow-hidden"
-              style={{ 
-                margin: '5px',
-                borderColor: '#333333',
-                boxShadow: '0 0 10px rgba(218, 165, 32, 0.2), 0 0 20px rgba(218, 165, 32, 0.1)',
-                maxHeight: '100%'
-              }}
+            <SortableContext 
+              items={widgets.map(w => w.id)}
+              strategy={rectSortingStrategy}
             >
-              <div className="h-full w-full overflow-hidden">
-                <YouTubeWidget />
+              <div 
+                className="grid grid-cols-5 gap-2 h-full"
+                style={{ 
+                  gridTemplateRows: '1fr 1fr 1fr',
+                  maxHeight: '100%'
+                }}
+              >
+                {widgets.map((widget) => (
+                  <DraggableWidget key={widget.id} widget={widget} />
+                ))}
               </div>
-            </div>
-
-            {/* Remaining widgets */}
-            {Array.from({ length: 11 }, (_, i) => {
-              // Skip positions that would be occupied by the large widget
-              const positions = [2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14]; // Skip 0,1,5,6
-              const position = positions[i];
-              
-              // Determine widget type based on position (new order)
-              let widgetContent;
-              if (position === 2) {
-                widgetContent = <GreedFearWidget />; // FEAR & GREED INDEX
-              } else if (position === 3) {
-                widgetContent = <NewsWidget region="US" />; // US ENERGY
-              } else if (position === 4) {
-                widgetContent = <StockWidget />; // US ENERGY MARKETS
-              } else if (position === 7) {
-                widgetContent = <NewsWidget region="ASIAN" />; // ASIAN ENERGY
-              } else if (position === 8) {
-                widgetContent = <AsianStockWidget />; // ASIAN ENERGY MARKETS
-              } else if (position === 9) {
-                widgetContent = <PredictionMarketsWidget />; // PREDICTION MARKETS
-              } else if (position === 10) {
-                widgetContent = <WorldClockWidget />; // WORLD CLOCK
-              } else if (position === 11) {
-                widgetContent = <NewsWidget region="AFRICAN" />; // AFRICAN ENERGY
-              } else if (position === 12) {
-                widgetContent = <TravelAdvisoryWidget />; // TRAVEL ADVISORIES
-              } else if (position === 13) {
-                widgetContent = <NewsWidget region="SOUTH AMERICAN" />; // SOUTH AMERICAN ENERGY
-              } else if (position === 14) {
-                widgetContent = <NewsWidget region="RUSSIAN" />; // RUSSIAN ENERGY
-              } else {
-                widgetContent = <NewsWidget region="US" />;
-              }
-              
-              return (
-                <div 
-                  key={position} 
-                  className="bg-black border overflow-hidden"
-                  style={{ 
-                    margin: '5px',
-                    borderColor: '#333333',
-                    boxShadow: '0 0 10px rgba(218, 165, 32, 0.2), 0 0 20px rgba(218, 165, 32, 0.1)',
-                    maxHeight: '100%'
-                  }}
-                >
-                  <div className="h-full w-full overflow-hidden">
-                    {widgetContent}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+            </SortableContext>
+          </DndContext>
         </div>
       </div>
     </div>
