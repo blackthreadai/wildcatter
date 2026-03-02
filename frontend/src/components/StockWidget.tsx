@@ -49,7 +49,7 @@ export default function StockWidget() {
         <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-semibold tracking-wider">US MARKETS</h3>
         </div>
-        <div className="flex-1 p-2 flex items-center justify-center bg-black min-h-0">
+        <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
           <div className="text-gray-500 text-xs">Loading...</div>
         </div>
       </div>
@@ -62,7 +62,7 @@ export default function StockWidget() {
         <h3 className="text-white text-xs font-semibold tracking-wider">US MARKETS</h3>
       </div>
       
-      <div className="flex-1 bg-black p-1">
+      <div className="flex-1 bg-black px-3 py-1">
         {stocks.map((stock, i) => (
           <div key={stock.symbol} className="flex items-center justify-between py-1 border-b border-gray-700 last:border-b-0">
             <div className="min-w-0 flex-1">
