@@ -473,7 +473,7 @@ export default function TerminalPage() {
             <select 
               value={selectedRegion}
               onChange={(e) => setSelectedRegion(e.target.value)}
-              className="bg-gray-900 text-white border border-gray-700 rounded px-3 py-1 pr-8 text-sm focus:border-[#DAA520] focus:outline-none"
+              className="bg-gray-900 text-white border border-gray-700 rounded pl-3 pr-10 py-1 text-sm focus:border-[#DAA520] focus:outline-none"
             >
               {regions.map(region => (
                 <option key={region.value} value={region.value}>
@@ -653,9 +653,9 @@ export default function TerminalPage() {
                     ) : layer.id === 'seismic-activity' ? (
                       <div className="w-3 h-3 flex items-center justify-center">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                          <path d="M2 12l2-4 2 8 2-6 2 4 2-3 2 2 2-1 2-2 2 1 2 3" 
+                          <path d="M2 12l4 0 4-6 4 12 4-6 4 0" 
                                 stroke={layer.color} 
-                                strokeWidth="1.5" 
+                                strokeWidth="2" 
                                 strokeLinecap="round" 
                                 strokeLinejoin="round"/>
                         </svg>
