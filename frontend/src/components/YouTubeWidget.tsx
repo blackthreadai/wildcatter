@@ -11,9 +11,7 @@ export default function YouTubeWidget() {
     { id: 'euronews', name: 'EURONEWS', url: '#' },
     { id: 'dw', name: 'DW', url: '#' },
     { id: 'cnbc', name: 'CNBC', url: 'https://youtu.be/9NyxcX3rhQs' },
-    { id: 'cnn', name: 'CNN', url: '#' },
     { id: 'france24', name: 'FRANCE24', url: '#' },
-    { id: 'aljarabiya', name: 'ALJARABIYA', url: '#' },
     { id: 'aljazeera', name: 'ALJAZEERA', url: 'https://youtu.be/gCNeDWCI0vo' },
   ];
 
