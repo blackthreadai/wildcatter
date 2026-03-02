@@ -546,18 +546,18 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
             justify-content: center;
           ">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#DAA520">
-              <!-- Ship hull -->
-              <path d="M2 18h20v2H2z"/>
-              <path d="M3 16h18l-2-8H5l-2 8z"/>
-              <!-- Cargo containers -->
-              <rect x="6" y="10" width="3" height="4" fill="#B8860B"/>
-              <rect x="9" y="9" width="6" height="5" fill="#B8860B"/>
-              <rect x="15" y="10" width="3" height="4" fill="#B8860B"/>
-              <!-- Bridge/superstructure -->
-              <rect x="10" y="6" width="4" height="3" fill="#DAA520"/>
-              <rect x="11" y="4" width="2" height="2" fill="#DAA520"/>
-              <!-- Mast -->
-              <path d="M12 4v-2" stroke="#DAA520" strokeWidth="1"/>
+              <!-- Ship hull profile -->
+              <path d="M2 16c0 2 1 3 3 3h14c2 0 3-1 3-3l-1-6H3l-1 6z"/>
+              <!-- Deck line -->
+              <path d="M3 10h18v1H3z"/>
+              <!-- Superstructure blocks -->
+              <rect x="5" y="6" width="3" height="4" fill="#DAA520"/>
+              <rect x="8" y="5" width="8" height="5" fill="#DAA520"/>
+              <rect x="16" y="7" width="3" height="3" fill="#DAA520"/>
+              <!-- Smokestacks -->
+              <rect x="7" y="3" width="1" height="3" fill="#B8860B"/>
+              <rect x="9" y="2" width="1" height="4" fill="#B8860B"/>
+              <rect x="11" y="3" width="1" height="3" fill="#B8860B"/>
             </svg>
           </div>`,
           className: '',
