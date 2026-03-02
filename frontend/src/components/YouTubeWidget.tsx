@@ -35,7 +35,7 @@ export default function YouTubeWidget() {
         {/* Embedded Live YouTube Stream */}
         <div className="h-full w-full rounded overflow-hidden">
           <iframe
-            src="https://www.youtube.com/embed/C2jdSFlKJ4g?mute=1&controls=1&modestbranding=1&rel=0"
+            src="https://www.youtube.com/embed/pykz0DEP2rE?mute=1&controls=1&modestbranding=1&rel=0"
             title="Live News Stream"
             className="w-full h-full"
             frameBorder="0"
@@ -55,10 +55,10 @@ export default function YouTubeWidget() {
               <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
               <span className="text-red-500 text-xs font-semibold">LIVE</span>
             </div>
-            <span className="text-gray-400 text-xs">Al Jazeera English</span>
+            <span className="text-gray-400 text-xs">DW News</span>
           </div>
           <div className="text-gray-500 text-xs">
-            24/7 News
+            Deutsche Welle Live
           </div>
         </div>
       </div>

@@ -17,8 +17,8 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
 
     // Initialize map
     const map = L.map(mapRef.current, {
-      center: [26.0, 51.0], // Center on Persian Gulf region
-      zoom: 6,
+      center: [29.0, 42.0], // Center on entire Middle East region
+      zoom: 4,
       zoomControl: false, // Hide default zoom controls
       attributionControl: false, // Hide attribution for cleaner look
     });
@@ -127,7 +127,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
             <h4 style="margin: 0 0 8px 0; color: ${color}; font-size: 14px; font-weight: bold;">
               ${alert.title}
             </h4>
-            <p style="margin: 0 0 6px 0; font-size: 12px; color: #333;">
+            <p style="margin: 0 0 6px 0; font-size: 12px; color: #DAA520;">
               ${alert.description}
             </p>
             <div style="font-size: 11px; color: #666;">
