@@ -22,7 +22,7 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
       try {
         const response = await fetch(`/api/news?region=${region}`);
         const data = await response.json();
-        setArticles(data.slice(0, 2)); // Only show 2 articles
+        setArticles(data.slice(0, region === 'US' ? 3 : 2)); // Show 3 articles for US, 2 for others
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch news:', error);
@@ -40,6 +40,12 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
               url: "#",
               publishedAt: "2026-02-21T11:30:00Z", 
               source: "Bloomberg"
+            },
+            {
+              title: "Shale Production Reaches Record Highs",
+              url: "#",
+              publishedAt: "2026-02-21T10:45:00Z",
+              source: "Energy Intelligence"
             }
           ],
           'RUSSIAN': [
@@ -111,7 +117,8 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
             }
           ]
         };
-        setArticles(fallbackData[region]);
+        const fallbackArticles = fallbackData[region];
+        setArticles(region === 'US' ? fallbackArticles : fallbackArticles.slice(0, 2));
         setLoading(false);
       }
     };

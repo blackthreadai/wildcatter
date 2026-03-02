@@ -527,7 +527,7 @@ export default function TerminalPage() {
             </div>
 
             {/* DEFCON 3 Indicator */}
-            <div className="flex items-center gap-1 text-[#DAA520] text-xs font-bold tracking-[0.2em] animate-pulse" style={{ fontStretch: 'condensed' }}>
+            <div className="flex items-center gap-1 text-[#DAA520] text-xs font-bold tracking-[0.2em] border border-[#DAA520] px-2 py-1" style={{ fontStretch: 'condensed', animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}>
               <div className="w-2 h-2 bg-[#DAA520] rounded-full shadow-[0_0_8px_#DAA520]"></div>
               DEFCON 3
             </div>
