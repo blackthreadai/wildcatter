@@ -153,32 +153,36 @@ function DraggableWidget({
       {...attributes}
       {...listeners}
     >
-      {/* Eye icon button - top-left */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onToggleVisibility(widget.id);
-        }}
-        className="absolute top-1 left-1 z-50 text-[#DAA520] hover:text-yellow-300 transition-colors bg-black/80 rounded p-1 opacity-60 group-hover:opacity-100 pointer-events-auto"
-        style={{ fontSize: '12px' }}
-        title={isHidden ? 'Show widget' : 'Hide widget'}
-      >
-        {isHidden ? '👁️‍🗨️' : '👁️'}
-      </button>
-
-      {/* Drag handle - top-right */}
-      <div 
-        className="absolute top-1 right-1 z-50 bg-black/80 rounded p-1 opacity-60 group-hover:opacity-100 transition-opacity pointer-events-none cursor-move"
-        title="Drag to move widget"
-      >
-        <svg 
-          className="w-3 h-3 text-[#DAA520]" 
-          fill="currentColor" 
-          viewBox="0 0 24 24"
+      {/* Control buttons in top-right */}
+      <div className="absolute top-1 right-1 z-50 flex items-center gap-1 bg-black/80 rounded px-1 opacity-60 group-hover:opacity-100 transition-opacity">
+        {/* Eye icon button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleVisibility(widget.id);
+          }}
+          className="text-[#DAA520] hover:text-yellow-300 transition-colors pointer-events-auto p-1"
+          style={{ fontSize: '11px' }}
+          title={isHidden ? 'Show widget' : 'Hide widget'}
         >
-          {/* 4-way arrow icon */}
-          <path d="M12 2l3 3h-2v4h4v-2l3 3-3 3v-2h-4v4h2l-3 3-3-3h2v-4h-4v2l-3-3 3-3v2h4V5h-2l3-3z"/>
-        </svg>
+          {isHidden ? '👁️‍🗨️' : '👁️'}
+        </button>
+
+        {/* Drag handle - up/down arrows */}
+        <div 
+          className="pointer-events-none cursor-move p-1"
+          title="Drag to move widget"
+        >
+          <svg 
+            className="w-3 h-3 text-[#DAA520]" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            {/* Up and down arrows */}
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+          </svg>
+        </div>
       </div>
       
       {/* Removed drag hint overlay per user request */}
@@ -513,7 +517,7 @@ export default function TerminalPage() {
             {/* View Hidden Widgets Button */}
             <button 
               onClick={() => setShowHidden(!showHidden)}
-              className={`px-3 py-1 text-xs font-semibold rounded transition-colors ${
+              className={`p-2 rounded transition-colors flex items-center gap-1 ${
                 showHidden 
                   ? 'bg-[#DAA520] text-black' 
                   : hiddenWidgets.length > 0
@@ -523,7 +527,14 @@ export default function TerminalPage() {
               disabled={hiddenWidgets.length === 0}
               title={showHidden ? 'Hide hidden widgets' : `Show ${hiddenWidgets.length} hidden widgets`}
             >
-              {showHidden ? 'HIDE HIDDEN' : `VIEW HIDDEN (${hiddenWidgets.length})`}
+              <span style={{ fontSize: '14px' }}>
+                {showHidden ? '👁️‍🗨️' : '👁️'}
+              </span>
+              {hiddenWidgets.length > 0 && (
+                <span className="text-xs font-semibold ml-1">
+                  {hiddenWidgets.length}
+                </span>
+              )}
             </button>
 
             {/* Reset Widgets Button */}
