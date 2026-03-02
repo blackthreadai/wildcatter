@@ -8,6 +8,7 @@ import GreedFearWidget from '@/components/GreedFearWidget';
 import StockWidget from '@/components/StockWidget';
 import AsianStockWidget from '@/components/AsianStockWidget';
 import WorldClockWidget from '@/components/WorldClockWidget';
+import TravelAdvisoryWidget from '@/components/TravelAdvisoryWidget';
 
 // Dynamically import the map to avoid SSR issues
 const WorldMap = dynamic(() => import('@/components/WorldMap'), {
@@ -390,7 +391,9 @@ export default function TerminalPage() {
               } else if (position === 10) {
                 widgetContent = <WorldClockWidget />;
               } else if (position === 11) {
-                widgetContent = <NewsWidget region="SOUTH AMERICAN" />;
+                widgetContent = <NewsWidget region="AFRICAN" />;
+              } else if (position === 12) {
+                widgetContent = <TravelAdvisoryWidget />;
               } else {
                 widgetContent = <NewsWidget region="US" />;
               }

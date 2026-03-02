@@ -10,7 +10,7 @@ interface NewsArticle {
 }
 
 interface NewsWidgetProps {
-  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN';
+  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN';
 }
 
 export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
@@ -68,6 +68,26 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
               url: "#",
               publishedAt: "2026-02-21T08:45:00Z",
               source: "Energy SA"
+            }
+          ],
+          'AFRICAN': [
+            {
+              title: "Nigeria's NNPC Announces New Gas Pipeline",
+              url: "#",
+              publishedAt: "2026-02-21T13:15:00Z",
+              source: "Africa Energy"
+            },
+            {
+              title: "Algeria Increases LNG Exports to Europe",
+              url: "#",
+              publishedAt: "2026-02-21T09:20:00Z",
+              source: "North Africa Oil"
+            },
+            {
+              title: "Angola Plans Offshore Wind Energy Projects",
+              url: "#",
+              publishedAt: "2026-02-21T15:30:00Z",
+              source: "African Power"
             }
           ]
         };
