@@ -34,7 +34,7 @@ export default function YouTubeWidget() {
         {/* Embedded Live Stream */}
         <div className="h-full w-full rounded overflow-hidden bg-gray-900 border border-gray-700">
           <iframe
-            src="https://www.youtube.com/embed/9Auq9mYxFEE?autoplay=0&mute=0&controls=1&modestbranding=1&rel=0"
+            src="https://www.youtube.com/embed/gCNeDWCI0vo?autoplay=0&mute=0&controls=1&modestbranding=1&rel=0"
             title="Live News Stream"
             className="w-full h-full"
             frameBorder="0"
