@@ -313,7 +313,7 @@ export default function TerminalPage() {
     { id: 'weather', label: 'WEATHER ALERTS', color: '#DAA520' },
     { id: 'seismic-activity', label: 'SEISMIC ACTIVITY', color: '#4ade80' },
     { id: 'active-wells', label: 'ACTIVE OIL & GAS WELLS', color: '#DAA520' },
-    { id: 'drilling-rigs', label: 'ACTIVE DRILLING RIGS', color: '#f97316' },
+    { id: 'drilling-rigs', label: 'ACTIVE DRILLING RIGS', color: '#4ade80' },
     { id: 'pipelines', label: 'PIPELINE ROUTES', color: '#8b5cf6' },
     { id: 'refineries', label: 'REFINERIES', color: '#06b6d4' },
     { id: 'tanker-ships', label: 'TANKER SHIPS', color: '#84cc16' },
@@ -634,6 +634,19 @@ export default function TerminalPage() {
                           <path d="M15 3l2 18"/>
                           <path d="M7 21l10 0"/>
                           <rect x="11" y="4" width="2" height="2" fill={layer.color}/>
+                        </svg>
+                      </div>
+                    ) : layer.id === 'drilling-rigs' ? (
+                      <div className="w-3 h-3 flex items-center justify-center">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={layer.color} strokeWidth="2">
+                          <path d="M12 3v18"/>
+                          <path d="M9 3l6 0"/>
+                          <path d="M10 8l4 0"/>
+                          <path d="M9 3l-2 18"/>
+                          <path d="M15 3l2 18"/>
+                          <path d="M7 21l10 0"/>
+                          <rect x="11" y="4" width="2" height="3" fill={layer.color}/>
+                          <circle cx="12" cy="15" r="1" fill={layer.color}/>
                         </svg>
                       </div>
                     ) : (

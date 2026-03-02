@@ -358,35 +358,49 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         { lat: 27.0, lng: 50.5, name: "Rig-47", status: "Active drilling", depth: "8,500 ft" },
         { lat: 25.8, lng: 52.0, name: "Offshore Platform-12", status: "Active drilling", depth: "12,200 ft" },
         { lat: 26.3, lng: 49.8, name: "Desert Rig-203", status: "Active drilling", depth: "6,800 ft" },
-        { lat: 28.5, lng: 48.5, name: "Mobile Rig-89", status: "Moving to location", depth: "N/A" }
+        { lat: 28.5, lng: 48.5, name: "Mobile Rig-89", status: "Moving to location", depth: "N/A" },
+        { lat: 29.5, lng: 47.5, name: "Exploration Rig-156", status: "Active drilling", depth: "11,800 ft" }
       ];
 
       drillingRigs.forEach((rig) => {
+        const rigColor = "#4ade80"; // Green color for active drilling rigs
+        
         const rigIcon = L.divIcon({
           html: `<div style="
-            width: 16px; 
-            height: 16px; 
+            width: 20px; 
+            height: 20px; 
             display: flex; 
             align-items: center; 
             justify-content: center;
           ">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#f97316">
-              <path d="M12 2v20"/>
-              <path d="M8 6l8 0l-2 4l-4 0l-2-4z"/>
-              <path d="M6 22l12 0"/>
-              <path d="M10 14v8M14 14v8"/>
-              <rect x="11" y="3" width="2" height="3"/>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${rigColor}" stroke-width="2">
+              <!-- Main derrick tower -->
+              <path d="M12 3v18"/>
+              <!-- Derrick top -->
+              <path d="M9 3l6 0"/>
+              <!-- Cross beams -->
+              <path d="M10 6l4 0"/>
+              <path d="M10 9l4 0"/>
+              <path d="M10 12l4 0"/>
+              <!-- Derrick legs -->
+              <path d="M9 3l-2 18"/>
+              <path d="M15 3l2 18"/>
+              <!-- Base platform -->
+              <path d="M7 21l10 0"/>
+              <!-- Active drilling indicator - rotating drill bit -->
+              <rect x="11" y="4" width="2" height="4" fill="${rigColor}"/>
+              <circle cx="12" cy="15" r="1.5" fill="${rigColor}"/>
             </svg>
           </div>`,
           className: '',
-          iconSize: [16, 16],
-          iconAnchor: [8, 8]
+          iconSize: [20, 20],
+          iconAnchor: [10, 10]
         });
 
         const marker = L.marker([rig.lat, rig.lng], { icon: rigIcon }).addTo(mapInstanceRef.current!);
         marker.bindPopup(`
           <div style="min-width: 150px;">
-            <h4 style="margin: 0 0 8px 0; color: #f97316; font-size: 14px; font-weight: bold;">
+            <h4 style="margin: 0 0 8px 0; color: ${rigColor}; font-size: 14px; font-weight: bold;">
               ${rig.name}
             </h4>
             <p style="margin: 0 0 4px 0; font-size: 12px; color: #DAA520;">
