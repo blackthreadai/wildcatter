@@ -153,28 +153,32 @@ function DraggableWidget({
       {...attributes}
       {...listeners}
     >
-      {/* Controls: Drag handle and Eye icon */}
-      <div className="absolute top-1 right-1 z-50 flex items-center gap-1 bg-black/80 rounded px-1 opacity-60 group-hover:opacity-100 transition-opacity">
-        {/* Eye icon for hide/show */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleVisibility(widget.id);
-          }}
-          className="text-[#DAA520] hover:text-yellow-300 transition-colors pointer-events-auto"
-          style={{ fontSize: '12px' }}
-          title={isHidden ? 'Show widget' : 'Hide widget'}
+      {/* Eye icon button - top-left */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleVisibility(widget.id);
+        }}
+        className="absolute top-1 left-1 z-50 text-[#DAA520] hover:text-yellow-300 transition-colors bg-black/80 rounded p-1 opacity-60 group-hover:opacity-100 pointer-events-auto"
+        style={{ fontSize: '12px' }}
+        title={isHidden ? 'Show widget' : 'Hide widget'}
+      >
+        {isHidden ? '👁️‍🗨️' : '👁️'}
+      </button>
+
+      {/* Drag handle - top-right */}
+      <div 
+        className="absolute top-1 right-1 z-50 bg-black/80 rounded p-1 opacity-60 group-hover:opacity-100 transition-opacity pointer-events-none cursor-move"
+        title="Drag to move widget"
+      >
+        <svg 
+          className="w-3 h-3 text-[#DAA520]" 
+          fill="currentColor" 
+          viewBox="0 0 24 24"
         >
-          {isHidden ? '👁️‍🗨️' : '👁️'}
-        </button>
-        
-        {/* Drag handle dots */}
-        <div 
-          className="text-[#DAA520] pointer-events-none"
-          style={{ fontSize: '10px' }}
-        >
-          ⋮⋮
-        </div>
+          {/* 4-way arrow icon */}
+          <path d="M12 2l3 3h-2v4h4v-2l3 3-3 3v-2h-4v4h2l-3 3-3-3h2v-4h-4v2l-3-3 3-3v2h4V5h-2l3-3z"/>
+        </svg>
       </div>
       
       {/* Removed drag hint overlay per user request */}
