@@ -11,9 +11,10 @@ interface NewsArticle {
 
 interface NewsWidgetProps {
   region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS';
+  title?: string;
 }
 
-export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
+export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -239,7 +240,7 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
     return (
       <div className="h-full w-full flex flex-col bg-black">
         <div className="bg-gray-800 p-2 flex-shrink-0">
-          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>{region} ENERGY</h3>
+          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>{title || `${region} ENERGY`}</h3>
         </div>
         <div className="flex-1 p-2 flex items-center justify-center bg-black min-h-0">
           <div className="text-gray-500 text-xs">Loading...</div>
@@ -251,7 +252,7 @@ export default function NewsWidget({ region = 'US' }: NewsWidgetProps) {
   return (
     <div className="h-full w-full flex flex-col bg-black">
       <div className="bg-gray-800 p-2 flex-shrink-0">
-        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>{region} ENERGY</h3>
+        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>{title || `${region} ENERGY`}</h3>
       </div>
       <div className="flex-1 p-2 overflow-y-auto bg-black min-h-0">
         <div className="space-y-2">

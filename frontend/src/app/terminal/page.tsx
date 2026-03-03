@@ -60,7 +60,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '5.0-FORCE-RESET';
+const WIDGET_VERSION = '6.0-TITLE-FIX';
 
 const defaultWidgets: Widget[] = [
   // Core widgets
@@ -121,7 +121,7 @@ function DraggableWidget({
   const renderWidget = () => {
     switch (widget.type) {
       case 'news':
-        return <NewsWidget region={widget.region} />;
+        return <NewsWidget region={widget.region} title={widget.title} />;
       case 'youtube':
         return <YouTubeWidget />;
       case 'intel-feed':
@@ -139,7 +139,7 @@ function DraggableWidget({
       case 'prediction':
         return <PredictionMarketsWidget />;
       default:
-        return <NewsWidget region="US" />;
+        return <NewsWidget region="US" title="US NEWS" />;
     }
   };
 
@@ -310,20 +310,13 @@ export default function TerminalPage() {
     const savedVersion = localStorage.getItem('terminal-widget-version');
     const shouldReset = savedVersion !== WIDGET_VERSION;
     
-    console.log('Widget version check:', { savedVersion, currentVersion: WIDGET_VERSION, shouldReset });
-    console.log('Default widgets:', defaultWidgets.map(w => ({ id: w.id, title: w.title })));
-    
-    if (shouldReset || true) { // Force reset every time for debugging
-      // Clear ALL terminal-related localStorage
-      Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('terminal-')) {
-          localStorage.removeItem(key);
-        }
-      });
+    if (shouldReset) {
+      // Clear old data and use new defaults
+      localStorage.removeItem('terminal-widget-order');
+      localStorage.removeItem('terminal-hidden-widgets');
       localStorage.setItem('terminal-widget-version', WIDGET_VERSION);
       setWidgets(defaultWidgets);
       setHiddenWidgets([]);
-      console.log('FORCED Reset widgets to new defaults');
       return;
     }
 
