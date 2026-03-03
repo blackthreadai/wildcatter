@@ -59,8 +59,8 @@ type Widget = {
   region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS';
 };
 
-// Widget version to force updates when we add new widgets
-const WIDGET_VERSION = '4.0';
+// Widget version to force updates when we add new widgets  
+const WIDGET_VERSION = '4.1';
 
 const defaultWidgets: Widget[] = [
   // Core widgets
