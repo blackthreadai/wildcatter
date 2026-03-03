@@ -56,16 +56,17 @@ type Widget = {
   type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed';
   title: string;
   span?: { col: number; row: number };
-  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS';
+  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS' | 'STRATEGIC RESERVE';
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '6.0-TITLE-FIX';
+const WIDGET_VERSION = '7.0-INTEL-2WIDE-STRATEGIC-RESERVE';
 
 const defaultWidgets: Widget[] = [
   // Core widgets
   { id: 'youtube', type: 'youtube', title: 'LIVE NEWS', span: { col: 2, row: 2 } },
-  { id: 'intel-feed', type: 'intel-feed', title: 'INTEL FEED', span: { col: 3, row: 1 } },
+  { id: 'intel-feed', type: 'intel-feed', title: 'INTEL FEED', span: { col: 2, row: 1 } },
+  { id: 'strategic-reserve', type: 'news', title: 'STRATEGIC RESERVE', region: 'STRATEGIC RESERVE' },
   { id: 'greed-fear', type: 'greed-fear', title: 'FEAR & GREED INDEX' },
   { id: 'us-news', type: 'news', title: 'US NEWS', region: 'US' },
   { id: 'us-markets', type: 'stock', title: 'US ENERGY MARKETS' },

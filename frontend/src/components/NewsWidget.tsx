@@ -10,7 +10,7 @@ interface NewsArticle {
 }
 
 interface NewsWidgetProps {
-  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS';
+  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS' | 'STRATEGIC RESERVE';
   title?: string;
 }
 
@@ -213,6 +213,20 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
               url: "#",
               publishedAt: "2026-02-21T12:30:00Z",
               source: "ICE Futures Europe"
+            }
+          ],
+          'STRATEGIC RESERVE': [
+            {
+              title: "US Strategic Petroleum Reserve Releases 50M Barrels",
+              url: "#",
+              publishedAt: "2026-02-21T17:30:00Z",
+              source: "Department of Energy"
+            },
+            {
+              title: "Emergency Oil Stockpiles Hit 15-Year Low Amid Geopolitical Tensions",
+              url: "#",
+              publishedAt: "2026-02-21T14:45:00Z",
+              source: "Energy Information Administration"
             }
           ]
         };
