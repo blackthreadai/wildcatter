@@ -60,28 +60,28 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets
-const WIDGET_VERSION = '3.0';
+const WIDGET_VERSION = '4.0';
 
 const defaultWidgets: Widget[] = [
   // Core widgets
-  { id: 'youtube', type: 'youtube', title: 'LIVE NEWS CHANNELS', span: { col: 2, row: 2 } },
+  { id: 'youtube', type: 'youtube', title: 'LIVE NEWS', span: { col: 2, row: 2 } },
   { id: 'intel-feed', type: 'intel-feed', title: 'INTEL FEED', span: { col: 3, row: 1 } },
   { id: 'greed-fear', type: 'greed-fear', title: 'FEAR & GREED INDEX' },
-  { id: 'us-news', type: 'news', title: 'US ENERGY', region: 'US' },
+  { id: 'us-news', type: 'news', title: 'US NEWS', region: 'US' },
   { id: 'us-markets', type: 'stock', title: 'US ENERGY MARKETS' },
   { id: 'world-clock', type: 'world-clock', title: 'WORLD CLOCK' },
   
   // Original regional news widgets
-  { id: 'asian-news', type: 'news', title: 'ASIAN ENERGY', region: 'ASIAN' },
+  { id: 'asian-news', type: 'news', title: 'ASIAN NEWS', region: 'ASIAN' },
   { id: 'asian-markets', type: 'asian-stock', title: 'ASIAN ENERGY MARKETS' },
-  { id: 'african-news', type: 'news', title: 'AFRICAN ENERGY', region: 'AFRICAN' },
-  { id: 'sa-news', type: 'news', title: 'SOUTH AMERICAN ENERGY', region: 'SOUTH AMERICAN' },
-  { id: 'russian-news', type: 'news', title: 'RUSSIAN ENERGY', region: 'RUSSIAN' },
+  { id: 'african-news', type: 'news', title: 'AFRICAN NEWS', region: 'AFRICAN' },
+  { id: 'sa-news', type: 'news', title: 'S. AMERICAN NEWS', region: 'SOUTH AMERICAN' },
+  { id: 'russian-news', type: 'news', title: 'RUSSIAN NEWS', region: 'RUSSIAN' },
   
   // Original specialty widgets  
   { id: 'climate-extremes', type: 'news', title: 'CLIMATE EXTREMES', region: 'CLIMATE EXTREMES' },
-  { id: 'european-energy', type: 'news', title: 'EUROPEAN ENERGY', region: 'EUROPEAN ENERGY' },
-  { id: 'middle-east-energy', type: 'news', title: 'MIDDLE EAST ENERGY', region: 'MIDDLE EAST ENERGY' },
+  { id: 'european-energy', type: 'news', title: 'EUROPEAN NEWS', region: 'EUROPEAN ENERGY' },
+  { id: 'middle-east-energy', type: 'news', title: 'MIDDLE EAST NEWS', region: 'MIDDLE EAST ENERGY' },
   { id: 'precious-metals', type: 'news', title: 'PRECIOUS METALS', region: 'PRECIOUS METALS' },
   { id: 'travel', type: 'travel', title: 'TRAVEL ADVISORIES' },
   { id: 'predictions', type: 'prediction', title: 'PREDICTION MARKETS' },
