@@ -60,7 +60,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '4.1';
+const WIDGET_VERSION = '5.0-FORCE-RESET';
 
 const defaultWidgets: Widget[] = [
   // Core widgets
@@ -310,13 +310,20 @@ export default function TerminalPage() {
     const savedVersion = localStorage.getItem('terminal-widget-version');
     const shouldReset = savedVersion !== WIDGET_VERSION;
     
-    if (shouldReset) {
-      // Clear old data and use new defaults
-      localStorage.removeItem('terminal-widget-order');
-      localStorage.removeItem('terminal-hidden-widgets');
+    console.log('Widget version check:', { savedVersion, currentVersion: WIDGET_VERSION, shouldReset });
+    console.log('Default widgets:', defaultWidgets.map(w => ({ id: w.id, title: w.title })));
+    
+    if (shouldReset || true) { // Force reset every time for debugging
+      // Clear ALL terminal-related localStorage
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('terminal-')) {
+          localStorage.removeItem(key);
+        }
+      });
       localStorage.setItem('terminal-widget-version', WIDGET_VERSION);
       setWidgets(defaultWidgets);
       setHiddenWidgets([]);
+      console.log('FORCED Reset widgets to new defaults');
       return;
     }
 
