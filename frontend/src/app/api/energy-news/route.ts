@@ -25,14 +25,14 @@ async function fetchReutersEnergyNews(): Promise<EnergyNewsArticle[]> {
     const xmlText = await response.text();
     
     // Simple XML parsing for RSS items (would use a proper XML parser in production)
-    const items = xmlText.match(/<item>(.*?)<\/item>/gs) || [];
+    const items = xmlText.match(/<item>(.*?)<\/item>/g) || [];
     const articles: EnergyNewsArticle[] = [];
     
     for (const item of items.slice(0, 10)) {
-      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/s);
-      const linkMatch = item.match(/<link>(.*?)<\/link>/s);
-      const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/s);
-      const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/s);
+      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/);
+      const linkMatch = item.match(/<link>(.*?)<\/link>/);
+      const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
+      const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
         const title = titleMatch[1].trim();
@@ -78,14 +78,14 @@ async function fetchAssociatedPressEnergyNews(): Promise<EnergyNewsArticle[]> {
     if (!response.ok) throw new Error('AP fetch failed');
     
     const xmlText = await response.text();
-    const items = xmlText.match(/<item>(.*?)<\/item>/gs) || [];
+    const items = xmlText.match(/<item>(.*?)<\/item>/g) || [];
     const articles: EnergyNewsArticle[] = [];
     
     for (const item of items.slice(0, 8)) {
-      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/s);
-      const linkMatch = item.match(/<link>(.*?)<\/link>/s);
-      const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/s);
-      const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/s);
+      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/);
+      const linkMatch = item.match(/<link>(.*?)<\/link>/);
+      const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
+      const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
         const title = titleMatch[1].trim();
