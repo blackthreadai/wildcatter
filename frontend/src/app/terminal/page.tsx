@@ -15,6 +15,7 @@ import PreciousMetalsWidget from '@/components/PreciousMetalsWidget';
 import CryptocurrencyWidget from '@/components/CryptocurrencyWidget';
 import EuropeanEnergyMarketsWidget from '@/components/EuropeanEnergyMarketsWidget';
 import EconomicIndicatorsWidget from '@/components/EconomicIndicatorsWidget';
+import ClimateExtremesWidget from '@/components/ClimateExtremesWidget';
 
 // Drag and drop imports
 import {
@@ -57,7 +58,7 @@ const WorldMap = dynamic(() => import('@/components/WorldMap'), {
 // Widget configuration - defines all widgets in the grid
 type Widget = {
   id: string;
-  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'economic-indicators';
+  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'economic-indicators' | 'climate-extremes';
   title: string;
   span?: { col: number; row: number };
   region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS' | 'STRATEGIC RESERVE';
@@ -86,7 +87,7 @@ const defaultWidgets: Widget[] = [
   { id: 'european-energy', type: 'news', title: 'EUROPEAN NEWS', region: 'EUROPEAN ENERGY' },
   { id: 'european-energy-markets', type: 'european-energy-markets', title: 'EURO ENERGY MARKETS' },
   { id: 'predictions', type: 'prediction', title: 'PREDICTION MARKETS' },
-  { id: 'climate-extremes', type: 'news', title: 'CLIMATE EXTREMES', region: 'CLIMATE EXTREMES' },
+  { id: 'climate-extremes', type: 'climate-extremes', title: 'CLIMATE EXTREMES' },
   { id: 'intel-feed', type: 'intel-feed', title: 'INTEL FEED', span: { col: 2, row: 1 } },
   { id: 'african-news', type: 'news', title: 'AFRICAN NEWS', region: 'AFRICAN' },
 ];
@@ -145,6 +146,8 @@ function DraggableWidget({
         return <EuropeanEnergyMarketsWidget />;
       case 'economic-indicators':
         return <EconomicIndicatorsWidget />;
+      case 'climate-extremes':
+        return <ClimateExtremesWidget />;
       default:
         return <NewsWidget region="US" title="US NEWS" />;
     }
