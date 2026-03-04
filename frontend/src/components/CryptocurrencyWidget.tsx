@@ -20,18 +20,24 @@ export default function CryptocurrencyWidget() {
       try {
         const response = await fetch('/api/cryptocurrency');
         const data = await response.json();
-        setCryptos(data);
+        
+        // Filter to only show the top 4: BTC, ETH, USDT, SOL
+        const targetCryptos = ['BTC', 'ETH', 'USDT', 'SOL'];
+        const filteredCryptos = targetCryptos.map(symbol => 
+          data.find((crypto: CryptoCurrency) => crypto.symbol === symbol)
+        ).filter(Boolean);
+        
+        setCryptos(filteredCryptos);
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch cryptocurrency data:', error);
         
-        // Fallback data
+        // Fallback data for the 4 main cryptos
         const fallbackData: CryptoCurrency[] = [
-          { symbol: 'BTC', name: 'Bitcoin', price: 43250.50, changePercent24h: 0.69, marketCap: 850000000000, rank: 1 },
-          { symbol: 'ETH', name: 'Ethereum', price: 2890.75, changePercent24h: 1.41, marketCap: 350000000000, rank: 2 },
-          { symbol: 'USDT', name: 'Tether', price: 1.00, changePercent24h: 0.0, marketCap: 95000000000, rank: 3 },
-          { symbol: 'BNB', name: 'BNB', price: 315.25, changePercent24h: 1.3, marketCap: 47000000000, rank: 4 },
-          { symbol: 'SOL', name: 'Solana', price: 98.45, changePercent24h: -2.5, marketCap: 45000000000, rank: 5 },
+          { symbol: 'BTC', name: 'Bitcoin', price: 68234.00, changePercent24h: 0.69, marketCap: 1350000000000, rank: 1 },
+          { symbol: 'ETH', name: 'Ethereum', price: 1975.06, changePercent24h: 1.41, marketCap: 240000000000, rank: 2 },
+          { symbol: 'USDT', name: 'Tether', price: 1.00, changePercent24h: 0.01, marketCap: 184000000000, rank: 3 },
+          { symbol: 'SOL', name: 'Solana', price: 87.11, changePercent24h: -2.5, marketCap: 50000000000, rank: 4 },
         ];
         
         setCryptos(fallbackData);
@@ -44,40 +50,13 @@ export default function CryptocurrencyWidget() {
     return () => clearInterval(interval);
   }, []);
 
-  const getTileColor = (change: number) => {
-    if (change > 0) {
-      return 'bg-green-500'; // Green for positive
-    } else if (change < 0) {
-      return 'bg-red-500'; // Red for negative  
+  const formatPrice = (price: number) => {
+    if (price < 1) {
+      return price.toFixed(6); // For coins under $1, show more decimals
+    } else if (price < 100) {
+      return price.toFixed(2); // For coins under $100
     } else {
-      return 'bg-gray-600'; // Neutral gray
-    }
-  };
-
-  const getTileSize = (rank: number) => {
-    // Define grid spans based on crypto rank/importance
-    switch (rank) {
-      case 1: // BTC - largest tile
-        return 'col-span-2 row-span-2';
-      case 2: // ETH - large tile  
-        return 'col-span-2 row-span-1';
-      case 3: // USDT - medium tile
-        return 'col-span-1 row-span-2';
-      case 4: // BNB - medium tile
-      case 5: // SOL - medium tile
-        return 'col-span-1 row-span-1';
-      default: // All others - small tiles
-        return 'col-span-1 row-span-1';
-    }
-  };
-
-  const getFontSize = (rank: number) => {
-    // Adjust font size based on tile size
-    switch (rank) {
-      case 1: return 'text-2xl'; // BTC largest
-      case 2: return 'text-lg';  // ETH large
-      case 3: return 'text-base'; // USDT medium
-      default: return 'text-sm'; // Others small
+      return price.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); // For larger amounts
     }
   };
 
@@ -100,45 +79,22 @@ export default function CryptocurrencyWidget() {
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>CRYPTOCURRENCY</h3>
       </div>
       
-      <div className="flex-1 bg-black p-2">
-        {/* Treemap-style grid layout */}
-        <div className="grid grid-cols-4 grid-rows-4 gap-1 h-full">
-          {cryptos.slice(0, 12).map((crypto, index) => (
-            <div
-              key={crypto.symbol}
-              className={`
-                ${getTileColor(crypto.changePercent24h)}
-                ${getTileSize(crypto.rank)}
-                rounded-sm
-                flex flex-col items-center justify-center
-                p-1
-                transition-all duration-300 hover:brightness-110
-              `}
-            >
-              {/* Crypto symbol */}
-              <div className={`text-white font-bold ${getFontSize(crypto.rank)} mb-1`}>
-                {crypto.symbol}
-              </div>
-              
-              {/* Percentage change */}
-              <div className={`text-white font-mono ${
-                crypto.rank === 1 ? 'text-base' : 
-                crypto.rank <= 3 ? 'text-sm' : 'text-xs'
-              }`}>
+      <div className="flex-1 bg-black px-3 py-1">
+        {/* Clean ticker-style layout for 4 cryptos */}
+        {cryptos.slice(0, 4).map((crypto, i) => (
+          <div key={crypto.symbol} className="flex items-center justify-between py-1 border-b border-gray-700 last:border-b-0">
+            <div className="min-w-0 flex-1">
+              <div className="text-[#DAA520] text-xs font-semibold">{crypto.symbol}</div>
+              <div className="text-gray-400 text-xs truncate">{crypto.name}</div>
+            </div>
+            <div className="text-right ml-1">
+              <div className="text-white text-xs font-mono">${formatPrice(crypto.price)}</div>
+              <div className={`text-xs ${crypto.changePercent24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                 {crypto.changePercent24h >= 0 ? '+' : ''}{crypto.changePercent24h.toFixed(2)}%
               </div>
-              
-              {/* Price for major cryptos */}
-              {crypto.rank <= 5 && (
-                <div className={`text-white font-mono text-xs opacity-75 ${
-                  crypto.rank === 1 ? 'block' : 'hidden sm:block'
-                }`}>
-                  ${crypto.price < 1 ? crypto.price.toFixed(4) : crypto.price.toLocaleString()}
-                </div>
-              )}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );

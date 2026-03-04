@@ -13,11 +13,9 @@ interface CryptoCurrency {
 let cache: { data: CryptoCurrency[]; ts: number } | null = null;
 const CACHE_MS = 5 * 60 * 1000;
 
-// Top 20 cryptocurrencies for the treemap display
+// Top 4 cryptocurrencies for the ticker display
 const TOP_CRYPTOS = [
-  'bitcoin', 'ethereum', 'tether', 'bnb', 'solana', 'xrp', 'dogecoin', 'cardano',
-  'avalanche-2', 'chainlink', 'polkadot', 'polygon', 'litecoin', 'near', 'uniswap',
-  'ethereum-classic', 'stellar', 'filecoin', 'cosmos', 'monero'
+  'bitcoin', 'ethereum', 'tether', 'solana'
 ];
 
 async function fetchCoinGeckoCrypto(): Promise<CryptoCurrency[]> {
@@ -38,32 +36,20 @@ async function fetchCoinGeckoCrypto(): Promise<CryptoCurrency[]> {
     const data = await response.json();
     const cryptos: CryptoCurrency[] = [];
     
-    // Map CoinGecko IDs to symbols
+    // Map CoinGecko IDs to symbols (top 4 only)
     const symbolMap: Record<string, string> = {
       'bitcoin': 'BTC',
       'ethereum': 'ETH', 
       'tether': 'USDT',
-      'bnb': 'BNB',
-      'solana': 'SOL',
-      'xrp': 'XRP',
-      'dogecoin': 'DOGE',
-      'cardano': 'ADA',
-      'avalanche-2': 'AVAX',
-      'chainlink': 'LINK',
-      'polkadot': 'DOT',
-      'polygon': 'MATIC',
-      'litecoin': 'LTC',
-      'near': 'NEAR',
-      'uniswap': 'UNI',
-      'ethereum-classic': 'ETC',
-      'stellar': 'XLM',
-      'filecoin': 'FIL',
-      'cosmos': 'ATOM',
-      'monero': 'XMR'
+      'solana': 'SOL'
     };
     
-    let rank = 1;
-    for (const [id, priceData] of Object.entries(data)) {
+    // Desired order for display
+    const displayOrder = ['bitcoin', 'ethereum', 'tether', 'solana'];
+    
+    // Process in the desired display order (BTC, ETH, USDT, SOL)
+    for (const id of displayOrder) {
+      const priceData = data[id];
       if (typeof priceData === 'object' && priceData !== null) {
         const price = (priceData as any).usd || 0;
         const change = (priceData as any).usd_24h_change || 0;
@@ -71,17 +57,14 @@ async function fetchCoinGeckoCrypto(): Promise<CryptoCurrency[]> {
         
         cryptos.push({
           symbol: symbolMap[id] || id.toUpperCase(),
-          name: id.replace('-', ' '),
+          name: id.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()),
           price: parseFloat(price.toFixed(price < 1 ? 6 : 2)),
           changePercent24h: parseFloat(change.toFixed(2)),
           marketCap,
-          rank: rank++
+          rank: cryptos.length + 1
         });
       }
     }
-    
-    // Sort by market cap (descending)
-    cryptos.sort((a, b) => b.marketCap - a.marketCap);
     
     return cryptos;
     
@@ -91,29 +74,17 @@ async function fetchCoinGeckoCrypto(): Promise<CryptoCurrency[]> {
   }
 }
 
-// Realistic mock data for major cryptocurrencies
+// Realistic mock data for top 4 cryptocurrencies
 function getMockCryptoData(): CryptoCurrency[] {
   return [
-    { symbol: 'BTC', name: 'Bitcoin', price: 43250.50, changePercent24h: 0.69, marketCap: 850000000000, rank: 1 },
-    { symbol: 'ETH', name: 'Ethereum', price: 2890.75, changePercent24h: 1.41, marketCap: 350000000000, rank: 2 },
-    { symbol: 'USDT', name: 'Tether', price: 1.00, changePercent24h: 0.0, marketCap: 95000000000, rank: 3 },
-    { symbol: 'BNB', name: 'BNB', price: 315.25, changePercent24h: 1.3, marketCap: 47000000000, rank: 4 },
-    { symbol: 'SOL', name: 'Solana', price: 98.45, changePercent24h: -2.5, marketCap: 45000000000, rank: 5 },
-    { symbol: 'XRP', name: 'XRP', price: 0.52, changePercent24h: -1.2, marketCap: 28000000000, rank: 6 },
-    { symbol: 'DOGE', name: 'Dogecoin', price: 0.085, changePercent24h: 3.4, marketCap: 12000000000, rank: 7 },
-    { symbol: 'ADA', name: 'Cardano', price: 0.48, changePercent24h: -0.8, marketCap: 17000000000, rank: 8 },
-    { symbol: 'AVAX', name: 'Avalanche', price: 36.75, changePercent24h: 2.1, marketCap: 15000000000, rank: 9 },
-    { symbol: 'LINK', name: 'Chainlink', price: 14.25, changePercent24h: -1.5, marketCap: 8500000000, rank: 10 },
-    { symbol: 'DOT', name: 'Polkadot', price: 6.85, changePercent24h: 0.7, marketCap: 9200000000, rank: 11 },
-    { symbol: 'MATIC', name: 'Polygon', price: 0.92, changePercent24h: -2.1, marketCap: 8800000000, rank: 12 },
-    { symbol: 'LTC', name: 'Litecoin', price: 72.50, changePercent24h: 1.8, marketCap: 5400000000, rank: 13 },
-    { symbol: 'NEAR', name: 'NEAR Protocol', price: 3.25, changePercent24h: -0.5, marketCap: 3600000000, rank: 14 },
-    { symbol: 'UNI', name: 'Uniswap', price: 7.45, changePercent24h: 0.9, marketCap: 5600000000, rank: 15 },
-    { symbol: 'ETC', name: 'Ethereum Classic', price: 28.50, changePercent24h: -3.2, marketCap: 4200000000, rank: 16 }
+    { symbol: 'BTC', name: 'Bitcoin', price: 68234.00, changePercent24h: 0.69, marketCap: 1350000000000, rank: 1 },
+    { symbol: 'ETH', name: 'Ethereum', price: 1975.06, changePercent24h: 1.41, marketCap: 240000000000, rank: 2 },
+    { symbol: 'USDT', name: 'Tether', price: 1.00, changePercent24h: 0.01, marketCap: 184000000000, rank: 3 },
+    { symbol: 'SOL', name: 'Solana', price: 87.11, changePercent24h: -2.5, marketCap: 50000000000, rank: 4 }
   ].map(crypto => ({
     ...crypto,
-    // Add some randomization for demo purposes
-    changePercent24h: crypto.changePercent24h + (Math.random() - 0.5) * 2
+    // Add slight randomization for realistic movement
+    changePercent24h: crypto.changePercent24h + (Math.random() - 0.5) * 1
   }));
 }
 
@@ -133,9 +104,8 @@ export async function GET() {
       cryptos = getMockCryptoData();
     }
     
-    // Ensure we have at least top 16 cryptos for the treemap
-    const minCryptos = Math.min(16, cryptos.length);
-    const displayCryptos = cryptos.slice(0, minCryptos);
+    // Ensure we have exactly 4 cryptos for the ticker
+    const displayCryptos = cryptos.slice(0, 4);
     
     // Cache the results
     cache = { data: displayCryptos, ts: Date.now() };
@@ -147,6 +117,6 @@ export async function GET() {
     
     // Ultimate fallback
     const fallbackData = getMockCryptoData();
-    return NextResponse.json(fallbackData.slice(0, 16));
+    return NextResponse.json(fallbackData);
   }
 }
