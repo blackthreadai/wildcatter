@@ -589,25 +589,7 @@ export default function TerminalPage() {
 
           {/* Right Side - DEFCON + Control Buttons */}
           <div className="flex items-center gap-4">
-            {/* DEFCON Status Indicator */}
-            <div 
-              className="flex items-center gap-1 text-xs font-bold tracking-[0.2em] border px-2 py-1" 
-              style={{ 
-                fontStretch: 'condensed', 
-                animation: defconStatus.level <= 3 ? 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite' : undefined,
-                color: defconStatus.color,
-                borderColor: defconStatus.color
-              }}
-            >
-              <div 
-                className="w-2 h-2 rounded-full"
-                style={{ 
-                  backgroundColor: defconStatus.color,
-                  boxShadow: `0 0 8px ${defconStatus.color}`
-                }}
-              ></div>
-              DEFCON {defconStatus.level}
-            </div>
+            {/* DEFCON Status moved to subheader */}
 
             {/* Control Buttons Group */}
             <div className="flex items-center gap-1">
@@ -679,12 +661,24 @@ export default function TerminalPage() {
 
       {/* Main Content */}
       <div className="h-[calc(100vh-73px)] relative">
-        {/* Map Header with Date/Time */}
+        {/* Map Header with Date/Time and DEFCON Status */}
         <div className="bg-gray-800 border-b border-gray-700 py-2 px-6 pb-3">
-          <div className="text-center">
+          <div className="flex items-center justify-center gap-4">
             <span className="text-white text-sm font-thin tracking-[0.1em] uppercase" style={{ fontStretch: 'condensed' }}>
               {formatDateTime(currentTime)}
             </span>
+            <span className="text-gray-400">|</span>
+            <div 
+              className="flex items-center gap-1 text-xs font-bold tracking-[0.2em] border px-2 py-1" 
+              style={{ 
+                fontStretch: 'condensed', 
+                animation: defconStatus.level <= 3 ? 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite' : undefined,
+                color: defconStatus.color,
+                borderColor: defconStatus.color
+              }}
+            >
+              <span>DEFCON {defconStatus.level}</span>
+            </div>
           </div>
         </div>
 
