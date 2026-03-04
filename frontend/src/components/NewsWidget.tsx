@@ -32,6 +32,9 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
         } else if (region === 'ASIAN') {
           apiEndpoint = '/api/asian-energy-news';
           articleCount = 3;
+        } else if (region === 'SOUTH AMERICAN') {
+          apiEndpoint = '/api/south-american-energy-news';
+          articleCount = 3;
         } else {
           apiEndpoint = `/api/news?region=${region}`;
           articleCount = 2;
@@ -254,8 +257,8 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
 
     fetchNews();
     
-    // Set up refresh interval - more frequent for US and Asian energy news
-    const refreshInterval = (region === 'US' || region === 'ASIAN') ? 20 * 60 * 1000 : 30 * 60 * 1000; // 20 min for energy regions, 30 min for others
+    // Set up refresh interval - more frequent for energy-focused regions
+    const refreshInterval = (region === 'US' || region === 'ASIAN' || region === 'SOUTH AMERICAN') ? 25 * 60 * 1000 : 30 * 60 * 1000; // 25 min for energy regions, 30 min for others
     const interval = setInterval(fetchNews, refreshInterval);
     
     return () => clearInterval(interval);

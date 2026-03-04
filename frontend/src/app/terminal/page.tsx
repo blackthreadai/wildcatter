@@ -12,6 +12,7 @@ import WorldClockWidget from '@/components/WorldClockWidget';
 import TravelAdvisoryWidget from '@/components/TravelAdvisoryWidget';
 import PredictionMarketsWidget from '@/components/PredictionMarketsWidget';
 import PreciousMetalsWidget from '@/components/PreciousMetalsWidget';
+import CryptocurrencyWidget from '@/components/CryptocurrencyWidget';
 
 // Drag and drop imports
 import {
@@ -54,7 +55,7 @@ const WorldMap = dynamic(() => import('@/components/WorldMap'), {
 // Widget configuration - defines all widgets in the grid
 type Widget = {
   id: string;
-  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals';
+  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency';
   title: string;
   span?: { col: number; row: number };
   region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS' | 'STRATEGIC RESERVE';
@@ -76,7 +77,7 @@ const defaultWidgets: Widget[] = [
   { id: 'asian-markets', type: 'asian-stock', title: 'ASIAN ENERGY MARKETS' },
   { id: 'precious-metals', type: 'precious-metals', title: 'PRECIOUS METALS' },
   { id: 'sa-news', type: 'news', title: 'S. AMERICAN NEWS', region: 'SOUTH AMERICAN' },
-  { id: 'cryptocurrency', type: 'news', title: 'CRYPTOCURRENCY', region: 'CRYPTOCURRENCY' },
+  { id: 'cryptocurrency', type: 'cryptocurrency', title: 'CRYPTOCURRENCY' },
   { id: 'russian-news', type: 'news', title: 'RUSSIAN NEWS', region: 'RUSSIAN' },
   { id: 'middle-east-energy', type: 'news', title: 'MIDDLE EAST NEWS', region: 'MIDDLE EAST ENERGY' },
   { id: 'economic-indicators', type: 'news', title: 'ECONOMIC INDICATORS', region: 'ECONOMIC INDICATORS' },
@@ -136,6 +137,8 @@ function DraggableWidget({
         return <PredictionMarketsWidget />;
       case 'precious-metals':
         return <PreciousMetalsWidget />;
+      case 'cryptocurrency':
+        return <CryptocurrencyWidget />;
       default:
         return <NewsWidget region="US" title="US NEWS" />;
     }
