@@ -13,9 +13,9 @@ interface CryptoCurrency {
 let cache: { data: CryptoCurrency[]; ts: number } | null = null;
 const CACHE_MS = 5 * 60 * 1000;
 
-// Top 4 cryptocurrencies for the ticker display
+// Top 2 cryptocurrencies for the ticker display
 const TOP_CRYPTOS = [
-  'bitcoin', 'ethereum', 'tether', 'solana'
+  'bitcoin', 'ethereum'
 ];
 
 async function fetchCoinGeckoCrypto(): Promise<CryptoCurrency[]> {
@@ -36,16 +36,14 @@ async function fetchCoinGeckoCrypto(): Promise<CryptoCurrency[]> {
     const data = await response.json();
     const cryptos: CryptoCurrency[] = [];
     
-    // Map CoinGecko IDs to symbols (top 4 only)
+    // Map CoinGecko IDs to symbols (top 2 only)
     const symbolMap: Record<string, string> = {
       'bitcoin': 'BTC',
-      'ethereum': 'ETH', 
-      'tether': 'USDT',
-      'solana': 'SOL'
+      'ethereum': 'ETH'
     };
     
     // Desired order for display
-    const displayOrder = ['bitcoin', 'ethereum', 'tether', 'solana'];
+    const displayOrder = ['bitcoin', 'ethereum'];
     
     // Process in the desired display order (BTC, ETH, USDT, SOL)
     for (const id of displayOrder) {
@@ -74,13 +72,11 @@ async function fetchCoinGeckoCrypto(): Promise<CryptoCurrency[]> {
   }
 }
 
-// Realistic mock data for top 4 cryptocurrencies
+// Realistic mock data for top 2 cryptocurrencies
 function getMockCryptoData(): CryptoCurrency[] {
   return [
     { symbol: 'BTC', name: 'Bitcoin', price: 68234.00, changePercent24h: 0.69, marketCap: 1350000000000, rank: 1 },
-    { symbol: 'ETH', name: 'Ethereum', price: 1975.06, changePercent24h: 1.41, marketCap: 240000000000, rank: 2 },
-    { symbol: 'USDT', name: 'Tether', price: 1.00, changePercent24h: 0.01, marketCap: 184000000000, rank: 3 },
-    { symbol: 'SOL', name: 'Solana', price: 87.11, changePercent24h: -2.5, marketCap: 50000000000, rank: 4 }
+    { symbol: 'ETH', name: 'Ethereum', price: 1975.06, changePercent24h: 1.41, marketCap: 240000000000, rank: 2 }
   ].map(crypto => ({
     ...crypto,
     // Add slight randomization for realistic movement
@@ -104,8 +100,8 @@ export async function GET() {
       cryptos = getMockCryptoData();
     }
     
-    // Ensure we have exactly 4 cryptos for the ticker
-    const displayCryptos = cryptos.slice(0, 4);
+    // Ensure we have exactly 2 cryptos for the ticker
+    const displayCryptos = cryptos.slice(0, 2);
     
     // Cache the results
     cache = { data: displayCryptos, ts: Date.now() };

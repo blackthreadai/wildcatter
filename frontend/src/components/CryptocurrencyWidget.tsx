@@ -22,8 +22,8 @@ export default function CryptocurrencyWidget() {
         const response = await fetch('/api/cryptocurrency');
         const data = await response.json();
         
-        // Filter to only show the top 4: BTC, ETH, USDT, SOL
-        const targetCryptos = ['BTC', 'ETH', 'USDT', 'SOL'];
+        // Filter to only show the top 2: BTC, ETH
+        const targetCryptos = ['BTC', 'ETH'];
         const filteredCryptos = targetCryptos.map(symbol => 
           data.find((crypto: CryptoCurrency) => crypto.symbol === symbol)
         ).filter(Boolean);
@@ -39,12 +39,10 @@ export default function CryptocurrencyWidget() {
       } catch (error) {
         console.error('Failed to fetch cryptocurrency data:', error);
         
-        // Fallback data for the 4 main cryptos with sparklines
+        // Fallback data for the 2 main cryptos with sparklines
         const fallbackData: CryptoCurrency[] = [
           { symbol: 'BTC', name: 'Bitcoin', price: 68234.00, changePercent24h: 0.69, marketCap: 1350000000000, rank: 1 },
-          { symbol: 'ETH', name: 'Ethereum', price: 1975.06, changePercent24h: 1.41, marketCap: 240000000000, rank: 2 },
-          { symbol: 'USDT', name: 'Tether', price: 1.00, changePercent24h: 0.01, marketCap: 184000000000, rank: 3 },
-          { symbol: 'SOL', name: 'Solana', price: 87.11, changePercent24h: -2.5, marketCap: 50000000000, rank: 4 },
+          { symbol: 'ETH', name: 'Ethereum', price: 1975.06, changePercent24h: 1.41, marketCap: 240000000000, rank: 2 }
         ].map(crypto => ({
           ...crypto,
           sparklineData: generateMockSparklineData(crypto.changePercent24h)
@@ -136,19 +134,19 @@ export default function CryptocurrencyWidget() {
       </div>
       
       <div className="flex-1 bg-black p-3">
-        {/* 2x2 Grid of crypto squares */}
-        <div className="grid grid-cols-2 gap-3 h-full">
-          {cryptos.slice(0, 4).map((crypto) => (
+        {/* 2x1 Grid of crypto squares - side by side */}
+        <div className="grid grid-cols-2 gap-4 h-full">
+          {cryptos.slice(0, 2).map((crypto) => (
             <div
               key={crypto.symbol}
-              className="bg-gray-900 rounded-lg p-3 flex flex-col justify-between border border-gray-700 hover:border-gray-600 transition-all duration-200"
+              className="bg-gray-900 rounded-lg p-4 flex flex-col justify-between border border-gray-700 hover:border-gray-600 transition-all duration-200"
               style={{
                 background: 'linear-gradient(135deg, rgba(31, 41, 55, 0.8) 0%, rgba(17, 24, 39, 0.9) 100%)'
               }}
             >
               {/* Top section: Symbol */}
               <div className="flex justify-between items-start mb-2">
-                <div className="text-white font-bold text-sm">
+                <div className="text-white font-bold text-base">
                   {crypto.symbol}
                 </div>
                 <div className={`text-xs font-medium ${
@@ -173,7 +171,7 @@ export default function CryptocurrencyWidget() {
               </div>
               
               {/* Bottom section: Price */}
-              <div className="text-white font-mono font-bold text-sm">
+              <div className="text-white font-mono font-bold text-base">
                 ${formatPrice(crypto.price)}
               </div>
             </div>
