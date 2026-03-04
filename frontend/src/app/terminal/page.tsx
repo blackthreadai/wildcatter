@@ -242,6 +242,11 @@ export default function TerminalPage() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeLayers, setActiveLayers] = useState<string[]>(['geopolitical']); // Default active
   const [marketData, setMarketData] = useState<{label: string; value: string; change: number}[]>([]);
+  const [defconStatus, setDefconStatus] = useState<{level: number; description: string; color: string}>({
+    level: 3,
+    description: 'INCREASE READINESS',
+    color: '#DAA520'
+  });
   const [widgets, setWidgets] = useState<Widget[]>(defaultWidgets);
   const [hiddenWidgets, setHiddenWidgets] = useState<string[]>([]);
   const [showHidden, setShowHidden] = useState(false);
@@ -410,9 +415,27 @@ export default function TerminalPage() {
       }
     };
 
+    // Fetch DEFCON status
+    const fetchDefconStatus = async () => {
+      try {
+        const response = await fetch('/api/defcon');
+        const data = await response.json();
+        setDefconStatus(data);
+      } catch (error) {
+        console.error('Failed to fetch DEFCON status:', error);
+      }
+    };
+
     fetchMarketData();
-    const interval = setInterval(fetchMarketData, 60000); // Update every minute
-    return () => clearInterval(interval);
+    fetchDefconStatus();
+    
+    const marketInterval = setInterval(fetchMarketData, 60000); // Update every minute
+    const defconInterval = setInterval(fetchDefconStatus, 30 * 60000); // Update every 30 minutes
+    
+    return () => {
+      clearInterval(marketInterval);
+      clearInterval(defconInterval);
+    };
   }, []);
 
   const toggleLayer = (layerId: string) => {
@@ -566,10 +589,24 @@ export default function TerminalPage() {
 
           {/* Right Side - DEFCON + Control Buttons */}
           <div className="flex items-center gap-4">
-            {/* DEFCON 3 Indicator */}
-            <div className="flex items-center gap-1 text-[#DAA520] text-xs font-bold tracking-[0.2em] border border-[#DAA520] px-2 py-1" style={{ fontStretch: 'condensed', animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}>
-              <div className="w-2 h-2 bg-[#DAA520] rounded-full shadow-[0_0_8px_#DAA520]"></div>
-              DEFCON 3
+            {/* DEFCON Status Indicator */}
+            <div 
+              className="flex items-center gap-1 text-xs font-bold tracking-[0.2em] border px-2 py-1" 
+              style={{ 
+                fontStretch: 'condensed', 
+                animation: defconStatus.level <= 3 ? 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite' : undefined,
+                color: defconStatus.color,
+                borderColor: defconStatus.color
+              }}
+            >
+              <div 
+                className="w-2 h-2 rounded-full"
+                style={{ 
+                  backgroundColor: defconStatus.color,
+                  boxShadow: `0 0 8px ${defconStatus.color}`
+                }}
+              ></div>
+              DEFCON {defconStatus.level}
             </div>
 
             {/* Control Buttons Group */}
