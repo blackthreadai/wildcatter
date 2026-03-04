@@ -2,52 +2,44 @@
 
 import { useState, useEffect } from 'react';
 
-interface CityTime {
-  city: string;
-  timezone: string;
+interface TimeZone {
+  name: string;
+  zone: string;
   time: string;
-  date: string;
 }
 
 export default function WorldClockWidget() {
-  const [cityTimes, setCityTimes] = useState<CityTime[]>([]);
+  const [times, setTimes] = useState<TimeZone[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const cities = [
-    { city: 'Chicago', timezone: 'America/Chicago' },
-    { city: 'London', timezone: 'Europe/London' },
-    { city: 'Moscow', timezone: 'Europe/Moscow' },
-    { city: 'Beijing', timezone: 'Asia/Shanghai' }
-  ];
-
-  const updateTimes = () => {
-    const times = cities.map(({ city, timezone }) => {
-      const now = new Date();
-      const timeOptions: Intl.DateTimeFormatOptions = {
-        timeZone: timezone,
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      };
-      const dateOptions: Intl.DateTimeFormatOptions = {
-        timeZone: timezone,
-        month: 'short',
-        day: 'numeric'
-      };
-      
-      return {
-        city,
-        timezone,
-        time: now.toLocaleTimeString('en-US', timeOptions),
-        date: now.toLocaleDateString('en-US', dateOptions)
-      };
-    });
-    
-    setCityTimes(times);
-    setLoading(false);
-  };
-
   useEffect(() => {
+    const updateTimes = () => {
+      const now = new Date();
+      
+      // 6 time zones in the order shown in the LED clock image
+      const timeZones = [
+        { name: 'PACIFIC', zone: 'America/Los_Angeles' },
+        { name: 'LOCAL', zone: 'America/Chicago' }, // Assuming Central as local
+        { name: 'CENTRAL', zone: 'America/Chicago' },
+        { name: 'EASTERN', zone: 'America/New_York' },
+        { name: 'ATLANTIC', zone: 'America/Halifax' },
+        { name: 'GMT', zone: 'GMT' }
+      ];
+
+      const newTimes = timeZones.map(tz => ({
+        ...tz,
+        time: new Intl.DateTimeFormat('en-US', {
+          timeZone: tz.zone,
+          hour12: false,
+          hour: '2-digit',
+          minute: '2-digit'
+        }).format(now)
+      }));
+
+      setTimes(newTimes);
+      setLoading(false);
+    };
+
     updateTimes();
     const interval = setInterval(updateTimes, 1000); // Update every second
     return () => clearInterval(interval);
@@ -69,21 +61,38 @@ export default function WorldClockWidget() {
   return (
     <div className="h-full w-full flex flex-col bg-black">
       <div className="bg-gray-800 p-2 flex-shrink-0">
-        <h3 className="text-white text-xs font-semibold tracking-wider">WORLD CLOCK</h3>
+        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>WORLD CLOCK</h3>
       </div>
       
-      <div className="flex-1 bg-black px-3 py-1">
-        {cityTimes.map((cityTime, i) => (
-          <div key={cityTime.city} className="flex items-center justify-between py-1 border-b border-gray-700 last:border-b-0">
-            <div className="min-w-0 flex-1">
-              <div className="text-[#DAA520] text-xs font-semibold">{cityTime.city}</div>
-              <div className="text-gray-400 text-xs">{cityTime.date}</div>
+      <div className="flex-1 bg-black p-2">
+        {/* 2x3 Grid Layout like the LED clock image */}
+        <div className="grid grid-cols-3 grid-rows-2 gap-1 h-full">
+          {times.map((timeData, i) => (
+            <div key={timeData.name} className="flex flex-col items-center justify-center">
+              {/* LED-style time display */}
+              <div 
+                className="text-red-500 font-mono font-bold text-sm mb-1 tracking-wider"
+                style={{ 
+                  fontFamily: 'monospace',
+                  textShadow: '0 0 8px #ef4444',
+                  fontSize: '0.8rem'
+                }}
+              >
+                {timeData.time}
+              </div>
+              {/* Zone label */}
+              <div 
+                className="text-white text-xs font-bold tracking-wider"
+                style={{ 
+                  fontStretch: 'condensed',
+                  fontSize: '0.65rem'
+                }}
+              >
+                {timeData.name}
+              </div>
             </div>
-            <div className="text-right ml-1">
-              <div className="text-white text-xs font-mono">{cityTime.time}</div>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
