@@ -6,9 +6,9 @@ interface DefconStatus {
   color: string;
 }
 
-// Cache for 30 minutes (DEFCON changes rarely)
+// Cache for 12 hours (DEFCON changes rarely)
 let cache: { data: DefconStatus; ts: number } | null = null;
-const CACHE_MS = 30 * 60 * 1000; // 30 minutes
+const CACHE_MS = 12 * 60 * 60 * 1000; // 12 hours
 
 async function fetchDefconStatus(): Promise<DefconStatus | null> {
   // Return cached data if fresh
@@ -17,20 +17,41 @@ async function fetchDefconStatus(): Promise<DefconStatus | null> {
   }
 
   try {
-    // Try DEFCON Warning System first
-    const resp = await fetch('https://defconwarningsystem.com/', {
+    // Primary source: defconlevel.com
+    const resp = await fetch('https://www.defconlevel.com/current-level', {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
       },
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(15000),
     });
     const html = await resp.text();
 
-    // Look for DEFCON level in HTML
+    // Look for DEFCON level in the page - multiple patterns
+    let level: number | null = null;
+    
+    // Pattern 1: "DEFCON 2" in HTML
     const defconMatch = html.match(/DEFCON\s*(\d)/i);
     if (defconMatch) {
-      const level = parseInt(defconMatch[1]);
-      
+      level = parseInt(defconMatch[1]);
+    }
+    
+    // Pattern 2: URL path "/defcon-level/2"
+    if (!level) {
+      const pathMatch = html.match(/\/defcon-level\/(\d)/);
+      if (pathMatch) {
+        level = parseInt(pathMatch[1]);
+      }
+    }
+    
+    // Pattern 3: "OSINT Estimate" section
+    if (!level) {
+      const osintMatch = html.match(/OSINT\s+Estimate[^0-9]*DEFCON\s*(\d)/i);
+      if (osintMatch) {
+        level = parseInt(osintMatch[1]);
+      }
+    }
+
+    if (level && level >= 1 && level <= 5) {
       // Color coding based on requirements
       let color: string;
       if (level === 1) {
@@ -42,7 +63,7 @@ async function fetchDefconStatus(): Promise<DefconStatus | null> {
       }
 
       const descriptions = {
-        1: 'MAXIMUM READINESS',
+        1: 'NUCLEAR WAR IMMINENT',
         2: 'NEXT STEP TO WAR',
         3: 'INCREASE READINESS',
         4: 'INCREASED INTELLIGENCE',
@@ -55,22 +76,6 @@ async function fetchDefconStatus(): Promise<DefconStatus | null> {
         color
       };
 
-      cache = { data: result, ts: Date.now() };
-      return result;
-    }
-
-    // Fallback: check for news articles mentioning DEFCON levels
-    const newsDefconMatch = html.match(/(?:raised|lowered|set|placed)\s+(?:to\s+)?DEFCON\s*(\d)/i);
-    if (newsDefconMatch) {
-      const level = parseInt(newsDefconMatch[1]);
-      let color = level === 1 ? '#ef4444' : level <= 3 ? '#DAA520' : '#4ade80';
-      
-      const result: DefconStatus = {
-        level,
-        description: `ASSESSED LEVEL`,
-        color
-      };
-      
       cache = { data: result, ts: Date.now() };
       return result;
     }

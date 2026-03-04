@@ -424,7 +424,7 @@ export default function TerminalPage() {
     fetchDefconStatus();
     
     const marketInterval = setInterval(fetchMarketData, 60000); // Update every minute
-    const defconInterval = setInterval(fetchDefconStatus, 30 * 60000); // Update every 30 minutes
+    const defconInterval = setInterval(fetchDefconStatus, 12 * 60 * 60000); // Update every 12 hours
     
     return () => {
       clearInterval(marketInterval);
