@@ -60,7 +60,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '8.0-RENDR-DEFAULT-ORDER';
+const WIDGET_VERSION = '8.1-SPR-CHART-LINKS-FIXED';
 
 const defaultWidgets: Widget[] = [
   // Rendr's specified order
