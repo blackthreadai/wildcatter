@@ -60,37 +60,31 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '7.0-INTEL-2WIDE-STRATEGIC-RESERVE';
+const WIDGET_VERSION = '8.0-RENDR-DEFAULT-ORDER';
 
 const defaultWidgets: Widget[] = [
-  // Core widgets
+  // Rendr's specified order
   { id: 'youtube', type: 'youtube', title: 'LIVE NEWS', span: { col: 2, row: 2 } },
-  { id: 'intel-feed', type: 'intel-feed', title: 'INTEL FEED', span: { col: 2, row: 1 } },
-  { id: 'strategic-reserve', type: 'news', title: 'STRATEGIC RESERVE', region: 'STRATEGIC RESERVE' },
-  { id: 'greed-fear', type: 'greed-fear', title: 'FEAR & GREED INDEX' },
   { id: 'us-news', type: 'news', title: 'US NEWS', region: 'US' },
   { id: 'us-markets', type: 'stock', title: 'US ENERGY MARKETS' },
+  { id: 'strategic-reserve', type: 'news', title: 'STRATEGIC RESERVE', region: 'STRATEGIC RESERVE' },
+  { id: 'greed-fear', type: 'greed-fear', title: 'FEAR & GREED INDEX' },
   { id: 'world-clock', type: 'world-clock', title: 'WORLD CLOCK' },
-  
-  // Original regional news widgets
+  { id: 'travel', type: 'travel', title: 'TRAVEL ADVISORIES' },
   { id: 'asian-news', type: 'news', title: 'ASIAN NEWS', region: 'ASIAN' },
   { id: 'asian-markets', type: 'asian-stock', title: 'ASIAN ENERGY MARKETS' },
-  { id: 'african-news', type: 'news', title: 'AFRICAN NEWS', region: 'AFRICAN' },
-  { id: 'sa-news', type: 'news', title: 'S. AMERICAN NEWS', region: 'SOUTH AMERICAN' },
-  { id: 'russian-news', type: 'news', title: 'RUSSIAN NEWS', region: 'RUSSIAN' },
-  
-  // Original specialty widgets  
-  { id: 'climate-extremes', type: 'news', title: 'CLIMATE EXTREMES', region: 'CLIMATE EXTREMES' },
-  { id: 'european-energy', type: 'news', title: 'EUROPEAN NEWS', region: 'EUROPEAN ENERGY' },
-  { id: 'middle-east-energy', type: 'news', title: 'MIDDLE EAST NEWS', region: 'MIDDLE EAST ENERGY' },
   { id: 'precious-metals', type: 'news', title: 'PRECIOUS METALS', region: 'PRECIOUS METALS' },
-  { id: 'travel', type: 'travel', title: 'TRAVEL ADVISORIES' },
-  { id: 'predictions', type: 'prediction', title: 'PREDICTION MARKETS' },
-  
-  // NEW widgets you requested
-  { id: 'economic-indicators', type: 'news', title: 'ECONOMIC INDICATORS', region: 'ECONOMIC INDICATORS' },
+  { id: 'sa-news', type: 'news', title: 'S. AMERICAN NEWS', region: 'SOUTH AMERICAN' },
   { id: 'cryptocurrency', type: 'news', title: 'CRYPTOCURRENCY', region: 'CRYPTOCURRENCY' },
+  { id: 'russian-news', type: 'news', title: 'RUSSIAN NEWS', region: 'RUSSIAN' },
+  { id: 'middle-east-energy', type: 'news', title: 'MIDDLE EAST NEWS', region: 'MIDDLE EAST ENERGY' },
+  { id: 'economic-indicators', type: 'news', title: 'ECONOMIC INDICATORS', region: 'ECONOMIC INDICATORS' },
+  { id: 'european-energy', type: 'news', title: 'EUROPEAN NEWS', region: 'EUROPEAN ENERGY' },
   { id: 'european-energy-markets', type: 'news', title: 'EUROPEAN ENERGY MARKETS', region: 'EUROPEAN ENERGY MARKETS' },
+  { id: 'predictions', type: 'prediction', title: 'PREDICTION MARKETS' },
+  { id: 'climate-extremes', type: 'news', title: 'CLIMATE EXTREMES', region: 'CLIMATE EXTREMES' },
+  { id: 'intel-feed', type: 'intel-feed', title: 'INTEL FEED', span: { col: 2, row: 1 } },
+  { id: 'african-news', type: 'news', title: 'AFRICAN NEWS', region: 'AFRICAN' },
 ];
 
 // Draggable Widget Component
