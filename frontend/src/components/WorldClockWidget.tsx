@@ -69,11 +69,11 @@ export default function WorldClockWidget() {
             <div key={timeData.name} className="flex flex-col items-center justify-center">
               {/* LED-style time display */}
               <div 
-                className="text-red-500 font-mono font-bold text-sm mb-1 tracking-wider"
+                className="text-red-500 font-mono font-bold text-lg mb-1 tracking-wider"
                 style={{ 
                   fontFamily: 'monospace',
                   textShadow: '0 0 8px #ef4444',
-                  fontSize: '0.8rem'
+                  fontSize: '1.6rem'
                 }}
               >
                 {timeData.time}

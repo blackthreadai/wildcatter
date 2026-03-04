@@ -27,21 +27,27 @@ async function fetchYahooAsianStock(symbol: string): Promise<AsianEnergyStock | 
   try {
     const url = `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=2d&includePrePost=false`;
     const response = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
+      headers: { 
+        'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
+        'Accept': 'application/json'
+      },
       signal: AbortSignal.timeout(8000)
-    });
+    }).catch(() => null); // Catch network errors gracefully
     
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    
-    const data = await response.json();
-    const meta = data?.chart?.result?.[0]?.meta;
-    
-    if (!meta?.regularMarketPrice || !meta?.chartPreviousClose) {
-      throw new Error('Invalid data structure');
+    if (!response || !response.ok) {
+      throw new Error(`HTTP ${response?.status || 'Network Error'}`);
     }
     
-    const price = meta.regularMarketPrice;
-    const previousClose = meta.chartPreviousClose;
+    const data = await response.json().catch(() => null);
+    const meta = data?.chart?.result?.[0]?.meta;
+    
+    if (!meta?.regularMarketPrice || !meta?.chartPreviousClose || 
+        isNaN(meta.regularMarketPrice) || isNaN(meta.chartPreviousClose)) {
+      throw new Error('Invalid or missing data structure');
+    }
+    
+    const price = parseFloat(meta.regularMarketPrice);
+    const previousClose = parseFloat(meta.chartPreviousClose);
     const change = price - previousClose;
     const changePercent = (change / previousClose) * 100;
     
@@ -145,8 +151,9 @@ export async function GET() {
       }
     }
     
-    // If we couldn't fetch enough live data, mix with mock data
+    // If we couldn't fetch enough live data, use mock data as fallback
     if (successCount < 2) {
+      console.log('Using fallback mock data for Asian energy stocks');
       const mockStocks = getMockAsianEnergyStocks();
       return NextResponse.json(mockStocks);
     }
