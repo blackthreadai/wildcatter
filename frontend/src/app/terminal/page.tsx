@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import NewsWidget from '@/components/NewsWidget';
 import YouTubeWidget from '@/components/YouTubeWidget';
-import IntelFeedWidget from '@/components/IntelFeedWidget';
+import WildcatterWidget from '@/components/IntelFeedWidget';
 import GreedFearWidget from '@/components/GreedFearWidget';
 import StockWidget from '@/components/StockWidget';
 import AsianStockWidget from '@/components/AsianStockWidget';
@@ -88,7 +88,7 @@ const defaultWidgets: Widget[] = [
   { id: 'european-energy-markets', type: 'european-energy-markets', title: 'EURO ENERGY MARKETS' },
   { id: 'predictions', type: 'prediction', title: 'PREDICTION MARKETS' },
   { id: 'climate-extremes', type: 'climate-extremes', title: 'CLIMATE EXTREMES' },
-  { id: 'intel-feed', type: 'intel-feed', title: 'INTEL FEED', span: { col: 2, row: 1 } },
+  { id: 'intel-feed', type: 'intel-feed', title: 'WILDCATTER', span: { col: 2, row: 1 } },
   { id: 'african-news', type: 'news', title: 'AFRICAN NEWS', region: 'AFRICAN' },
 ];
 
@@ -125,7 +125,7 @@ function DraggableWidget({
       case 'youtube':
         return <YouTubeWidget />;
       case 'intel-feed':
-        return <IntelFeedWidget />;
+        return <WildcatterWidget />;
       case 'greed-fear':
         return <GreedFearWidget />;
       case 'stock':

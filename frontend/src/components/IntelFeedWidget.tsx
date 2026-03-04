@@ -1,144 +1,122 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-interface IntelItem {
+interface WildcatterButton {
   id: string;
-  type: 'ALERT' | 'UPDATE' | 'BRIEFING' | 'ANALYSIS';
-  priority: 'HIGH' | 'MEDIUM' | 'LOW';
   title: string;
-  timestamp: string;
-  source: string;
+  description: string;
+  url: string;
+  color: string;
 }
 
-export default function IntelFeedWidget() {
-  const [intelItems, setIntelItems] = useState<IntelItem[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+export default function WildcatterWidget() {
+  const [hoveredButton, setHoveredButton] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Mock intelligence feed data
-    const mockIntel: IntelItem[] = [
-      {
-        id: '1',
-        type: 'ALERT',
-        priority: 'HIGH',
-        title: 'Geopolitical tensions escalate in key energy corridor - supply chain monitoring active',
-        timestamp: '14:32',
-        source: 'INTEL-7'
-      },
-      {
-        id: '2', 
-        type: 'BRIEFING',
-        priority: 'MEDIUM',
-        title: 'Strategic petroleum reserve movements detected across three major facilities',
-        timestamp: '13:45',
-        source: 'SENTRY-2'
-      },
-      {
-        id: '3',
-        type: 'UPDATE',
-        priority: 'HIGH',
-        title: 'Cyber threat assessment: critical infrastructure monitoring protocols engaged',
-        timestamp: '12:58',
-        source: 'WATCHDOG-5'
-      },
-      {
-        id: '4',
-        type: 'ANALYSIS',
-        priority: 'MEDIUM',
-        title: 'Market manipulation indicators detected in crude futures - algorithmic trading patterns',
-        timestamp: '12:15',
-        source: 'QUANTUM-1'
-      }
-    ];
-
-    setIntelItems(mockIntel);
-
-    // Auto-rotate every 8 seconds
-    const interval = setInterval(() => {
-      setCurrentIndex(prev => (prev + 1) % mockIntel.length);
-    }, 8000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  if (intelItems.length === 0) {
-    return (
-      <div className="h-full w-full bg-black border border-gray-800">
-        <div className="bg-gray-800 p-2 flex-shrink-0">
-          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>INTEL FEED</h3>
-        </div>
-        <div className="flex-1 flex items-center justify-center p-3">
-          <div className="text-gray-500 text-xs">Initializing...</div>
-        </div>
-      </div>
-    );
-  }
-
-  const currentItem = intelItems[currentIndex];
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'HIGH': return 'text-red-400';
-      case 'MEDIUM': return 'text-[#DAA520]';
-      case 'LOW': return 'text-gray-400';
-      default: return 'text-gray-400';
+  // Four main buttons from wildcatter.com (excluding terminal)
+  const buttons: WildcatterButton[] = [
+    {
+      id: 'trading',
+      title: 'TRADING',
+      description: 'Energy Trading Platform',
+      url: 'https://wildcatter.com/trading',
+      color: '#DAA520'
+    },
+    {
+      id: 'intelligence',
+      title: 'INTEL',
+      description: 'Market Intelligence',
+      url: 'https://wildcatter.com/intelligence',
+      color: '#4ade80'
+    },
+    {
+      id: 'analytics',
+      title: 'ANALYTICS',
+      description: 'Data & Analytics Suite',
+      url: 'https://wildcatter.com/analytics',
+      color: '#06b6d4'
+    },
+    {
+      id: 'portfolio',
+      title: 'PORTFOLIO',
+      description: 'Portfolio Management',
+      url: 'https://wildcatter.com/portfolio',
+      color: '#a855f7'
     }
-  };
+  ];
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'ALERT': return 'text-red-400';
-      case 'BRIEFING': return 'text-blue-400';
-      case 'UPDATE': return 'text-green-400';
-      case 'ANALYSIS': return 'text-purple-400';
-      default: return 'text-gray-400';
-    }
+  const handleButtonClick = (url: string) => {
+    window.open(url, '_blank');
   };
 
   return (
     <div className="h-full w-full bg-black border border-gray-800">
       {/* Header */}
-      <div className="bg-gray-800 p-2 flex-shrink-0 flex items-center justify-between">
-        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>INTEL FEED</h3>
-        <div className="flex items-center gap-2">
-          <div className={`text-xs font-bold tracking-wider ${getPriorityColor(currentItem.priority)}`}>
-            {currentItem.priority}
-          </div>
-          <div className={`text-xs font-medium ${getTypeColor(currentItem.type)}`}>
-            {currentItem.type}
-          </div>
-        </div>
+      <div className="bg-gray-800 p-2 flex-shrink-0">
+        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>WILDCATTER</h3>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 p-3 flex flex-col justify-between">
-        <div className="flex-1 flex items-center">
-          <p className="text-white text-sm leading-tight font-medium tracking-[0.05em]" style={{ fontStretch: 'condensed' }}>
-            {currentItem.title}
-          </p>
-        </div>
-        
-        <div className="flex items-center justify-between mt-2">
-          <div className="flex items-center gap-2">
-            <span className="text-[#DAA520] text-xs font-bold">
-              {currentItem.source}
-            </span>
-            <span className="text-gray-400 text-xs">
-              {currentItem.timestamp}
-            </span>
-          </div>
-          
-          <div className="flex gap-1">
-            {intelItems.map((_, index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 ${
-                  index === currentIndex ? 'bg-[#DAA520]' : 'bg-gray-600'
-                }`}
+      {/* Four Buttons Side by Side */}
+      <div className="flex-1 p-3">
+        <div className="grid grid-cols-4 gap-2 h-full">
+          {buttons.map((button) => (
+            <button
+              key={button.id}
+              onClick={() => handleButtonClick(button.url)}
+              onMouseEnter={() => setHoveredButton(button.id)}
+              onMouseLeave={() => setHoveredButton(null)}
+              className="relative bg-gray-900 border border-gray-700 rounded-lg p-3 flex flex-col items-center justify-center hover:border-gray-600 transition-all duration-200 group"
+              style={{
+                borderColor: hoveredButton === button.id ? button.color : undefined,
+                boxShadow: hoveredButton === button.id ? `0 0 10px ${button.color}40` : undefined
+              }}
+            >
+              {/* Button Title */}
+              <div 
+                className="text-sm font-bold mb-1 transition-colors duration-200"
+                style={{
+                  color: hoveredButton === button.id ? button.color : '#ffffff'
+                }}
+              >
+                {button.title}
+              </div>
+              
+              {/* Button Description */}
+              <div className="text-xs text-gray-400 text-center leading-tight">
+                {button.description}
+              </div>
+              
+              {/* Hover Glow Effect */}
+              {hoveredButton === button.id && (
+                <div 
+                  className="absolute inset-0 rounded-lg opacity-10 transition-opacity duration-200"
+                  style={{ backgroundColor: button.color }}
+                />
+              )}
+              
+              {/* Active Indicator */}
+              <div 
+                className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-0.5 rounded-full transition-all duration-200"
+                style={{
+                  backgroundColor: hoveredButton === button.id ? button.color : 'transparent'
+                }}
               />
-            ))}
-          </div>
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      {/* Footer with site link */}
+      <div className="px-3 pb-2">
+        <div className="text-center">
+          <a 
+            href="https://wildcatter.com" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-[#DAA520] text-xs font-bold tracking-wider hover:text-yellow-300 transition-colors"
+          >
+            WILDCATTER.COM
+          </a>
         </div>
       </div>
     </div>
