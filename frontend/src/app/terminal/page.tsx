@@ -398,11 +398,11 @@ export default function TerminalPage() {
       try {
         const response = await fetch('/api/market');
         const data = await response.json();
-        // Filter for WTI, Brent, and Gas
+        // Filter for WTI, Brent, and Gasoline
         const filtered = data.filter((item: any) => 
-          item.label === 'WTI Crude' || 
-          item.label === 'Brent Crude' || 
-          item.label === 'Henry Hub Gas'
+          item.label === 'WTI' || 
+          item.label === 'BRENT' || 
+          item.label === 'GASOLINE'
         );
         setMarketData(filtered);
       } catch (error) {
@@ -535,7 +535,7 @@ export default function TerminalPage() {
       {/* Header Bar */}
       <header className="bg-black border-b border-gray-800 px-6 py-4">
         <div className="flex items-center justify-between">
-          {/* Left Side - Logo + Version + Region Dropdown */}
+          {/* Left Side - Logo + Version + Market Data */}
           <div className="flex items-center gap-6">
             {/* Logo */}
             <div className="flex items-center gap-3">
@@ -546,30 +546,15 @@ export default function TerminalPage() {
             {/* Version */}
             <span className="text-gray-400 text-sm">v1.01</span>
 
-            {/* Region Dropdown */}
-            <select 
-              value={selectedRegion}
-              onChange={(e) => setSelectedRegion(e.target.value)}
-              className="bg-gray-900 text-white border border-[#DAA520] pl-3 pr-4 py-1 text-sm focus:border-[#DAA520] focus:outline-none cursor-pointer"
-              style={{ 
-                appearance: 'none',
-                WebkitAppearance: 'none',
-                MozAppearance: 'none'
-              }}
-            >
-              {regions.map(region => (
-                <option key={region.value} value={region.value}>
-                  {region.label}
-                </option>
-              ))}
-            </select>
+            {/* Separator */}
+            <span className="text-gray-400 text-sm">|</span>
 
             {/* Market Snapshot */}
             <div className="flex items-center gap-4 text-sm">
               <span className="text-gray-400 tracking-wider">MARKET SNAPSHOT</span>
               {marketData.map((item, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <span className="text-[#DAA520] text-xs">{item.label.replace(' Crude', '').replace('Henry Hub ', '')}</span>
+                  <span className="text-[#DAA520] text-xs">{item.label}</span>
                   <span className="text-white font-medium tracking-[0.1em]" style={{ fontStretch: 'condensed' }}>{item.value}</span>
                   <span className={`text-xs ${item.change >= 0 ? 'text-[#4ade80]' : 'text-red-400'}`}>
                     {item.change >= 0 ? '+' : ''}{item.change.toFixed(2)}%
@@ -577,16 +562,16 @@ export default function TerminalPage() {
                 </div>
               ))}
             </div>
+          </div>
 
+          {/* Right Side - DEFCON + Control Buttons */}
+          <div className="flex items-center gap-4">
             {/* DEFCON 3 Indicator */}
             <div className="flex items-center gap-1 text-[#DAA520] text-xs font-bold tracking-[0.2em] border border-[#DAA520] px-2 py-1" style={{ fontStretch: 'condensed', animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}>
               <div className="w-2 h-2 bg-[#DAA520] rounded-full shadow-[0_0_8px_#DAA520]"></div>
               DEFCON 3
             </div>
-          </div>
 
-          {/* Right Side - Control Buttons */}
-          <div className="flex items-center">
             {/* Control Buttons Group */}
             <div className="flex items-center gap-1">
               {/* Homepage Button */}

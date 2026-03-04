@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 
 const SYMBOLS = [
-  { symbol: 'CL=F', label: 'WTI Crude', sub: '/bbl' },
-  { symbol: 'BZ=F', label: 'Brent Crude', sub: '/bbl' },
+  { symbol: 'CL=F', label: 'WTI', sub: '/bbl' },
+  { symbol: 'BZ=F', label: 'BRENT', sub: '/bbl' },
+  { symbol: 'RB=F', label: 'GASOLINE', sub: '/gal' },
   { symbol: 'NG=F', label: 'Henry Hub Gas', sub: '/mmbtu' },
-  { symbol: 'RB=F', label: 'RBOB Gasoline', sub: '/gal' },
 ];
 
 interface MarketItem {
