@@ -33,12 +33,12 @@ async function fetchDefconStatus(): Promise<DefconStatus | null> {
       
       // Color coding based on requirements
       let color: string;
-      if (level <= 2) {
-        color = '#4ade80'; // green - DEFCON 1/2
-      } else if (level <= 4) {
-        color = '#DAA520'; // yellow/gold - DEFCON 3/4  
+      if (level === 1) {
+        color = '#ef4444'; // red - DEFCON 1 (nuclear war imminent)
+      } else if (level <= 3) {
+        color = '#DAA520'; // yellow/gold - DEFCON 2/3 (elevated readiness)
       } else {
-        color = '#ef4444'; // red - DEFCON 5
+        color = '#4ade80'; // green - DEFCON 4/5 (normal/low readiness)
       }
 
       const descriptions = {
@@ -63,7 +63,7 @@ async function fetchDefconStatus(): Promise<DefconStatus | null> {
     const newsDefconMatch = html.match(/(?:raised|lowered|set|placed)\s+(?:to\s+)?DEFCON\s*(\d)/i);
     if (newsDefconMatch) {
       const level = parseInt(newsDefconMatch[1]);
-      let color = level <= 2 ? '#4ade80' : level <= 4 ? '#DAA520' : '#ef4444';
+      let color = level === 1 ? '#ef4444' : level <= 3 ? '#DAA520' : '#4ade80';
       
       const result: DefconStatus = {
         level,
@@ -98,7 +98,7 @@ async function getGeopoliticalRisk(): Promise<DefconStatus> {
     // Time-based fallback (just for demo - real implementation would use actual data)
     // Typically DEFCON 4 or 5 during peacetime
     let level = 4;
-    let color = '#DAA520'; // yellow
+    let color = '#4ade80'; // green
     
     const result: DefconStatus = {
       level,
@@ -110,9 +110,9 @@ async function getGeopoliticalRisk(): Promise<DefconStatus> {
   } catch {
     // Final fallback
     return {
-      level: 3,
-      description: 'INCREASE READINESS', 
-      color: '#DAA520'
+      level: 4,
+      description: 'INCREASED INTELLIGENCE', 
+      color: '#4ade80'
     };
   }
 }
@@ -134,7 +134,7 @@ export async function GET() {
     return NextResponse.json({
       level: 4,
       description: 'SYSTEM ERROR',
-      color: '#DAA520'
+      color: '#4ade80'
     });
   }
 }

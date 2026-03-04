@@ -243,9 +243,9 @@ export default function TerminalPage() {
   const [activeLayers, setActiveLayers] = useState<string[]>(['geopolitical']); // Default active
   const [marketData, setMarketData] = useState<{label: string; value: string; change: number}[]>([]);
   const [defconStatus, setDefconStatus] = useState<{level: number; description: string; color: string}>({
-    level: 3,
-    description: 'INCREASE READINESS',
-    color: '#DAA520'
+    level: 4,
+    description: 'INCREASED INTELLIGENCE',
+    color: '#4ade80'
   });
   const [widgets, setWidgets] = useState<Widget[]>(defaultWidgets);
   const [hiddenWidgets, setHiddenWidgets] = useState<string[]>([]);
@@ -682,7 +682,7 @@ export default function TerminalPage() {
         {/* Map Header with Date/Time */}
         <div className="bg-gray-800 border-b border-gray-700 py-2 px-6 pb-3">
           <div className="text-center">
-            <span className="text-white text-sm font-medium tracking-[0.1em]" style={{ fontStretch: 'condensed' }}>
+            <span className="text-white text-sm font-thin tracking-[0.1em] uppercase" style={{ fontStretch: 'condensed' }}>
               {formatDateTime(currentTime)}
             </span>
           </div>
