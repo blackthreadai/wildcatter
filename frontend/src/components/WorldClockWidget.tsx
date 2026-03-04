@@ -16,14 +16,12 @@ export default function WorldClockWidget() {
     const updateTimes = () => {
       const now = new Date();
       
-      // 6 time zones in the order shown in the LED clock image
+      // 4 key energy markets time zones
       const timeZones = [
-        { name: 'PACIFIC', zone: 'America/Los_Angeles' },
-        { name: 'LOCAL', zone: 'America/Chicago' }, // Assuming Central as local
-        { name: 'CENTRAL', zone: 'America/Chicago' },
-        { name: 'EASTERN', zone: 'America/New_York' },
-        { name: 'ATLANTIC', zone: 'America/Halifax' },
-        { name: 'GMT', zone: 'GMT' }
+        { name: 'CHICAGO', zone: 'America/Chicago' },
+        { name: 'LONDON', zone: 'Europe/London' },
+        { name: 'BEIJING', zone: 'Asia/Shanghai' },
+        { name: 'RIYADH', zone: 'Asia/Riyadh' }
       ];
 
       const newTimes = timeZones.map(tz => ({
@@ -65,8 +63,8 @@ export default function WorldClockWidget() {
       </div>
       
       <div className="flex-1 bg-black p-2">
-        {/* 2x3 Grid Layout like the LED clock image */}
-        <div className="grid grid-cols-3 grid-rows-2 gap-1 h-full">
+        {/* 2x2 Grid Layout for 4 key energy markets */}
+        <div className="grid grid-cols-2 grid-rows-2 gap-2 h-full">
           {times.map((timeData, i) => (
             <div key={timeData.name} className="flex flex-col items-center justify-center">
               {/* LED-style time display */}

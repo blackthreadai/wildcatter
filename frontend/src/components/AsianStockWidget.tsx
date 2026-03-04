@@ -7,39 +7,55 @@ interface Stock {
   name: string;
   price: number;
   change: number;
+  currency?: string;
 }
 
 export default function AsianStockWidget() {
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const formatPrice = (price: number, currency: string = 'USD') => {
+    if (currency === 'INR') {
+      return `₹${price.toFixed(0)}`; // INR without decimals
+    }
+    return `$${price.toFixed(2)}`; // USD with decimals
+  };
+
   useEffect(() => {
     const fetchStocks = async () => {
       try {
-        // Top 4 Asian energy stocks
-        const topAsianEnergyStocks: Stock[] = [
+        const response = await fetch('/api/asian-energy-stocks');
+        const data = await response.json();
+        
+        // Map the API response to our Stock interface
+        const mappedStocks: Stock[] = data.map((stock: any) => ({
+          symbol: stock.symbol,
+          name: stock.name,
+          price: stock.price,
+          change: stock.changePercent, // Use percentage change for display
+          currency: stock.currency
+        }));
+        
+        setStocks(mappedStocks);
+        setLoading(false);
+      } catch (error) {
+        console.error('Failed to fetch Asian stock data:', error);
+        
+        // Fallback to mock data
+        const fallbackStocks: Stock[] = [
           { symbol: 'PTR', name: 'PetroChina', price: 45.23, change: 1.7 },
           { symbol: 'SNP', name: 'Sinopec', price: 52.18, change: -0.8 },
           { symbol: 'CEO', name: 'CNOOC Ltd', price: 38.91, change: 2.4 },
           { symbol: 'RIL', name: 'Reliance Ind', price: 78.45, change: 0.9 }
         ];
-
-        // Randomize the changes slightly for demo
-        const randomizedStocks = topAsianEnergyStocks.map(stock => ({
-          ...stock,
-          change: stock.change + (Math.random() - 0.5) * 2
-        }));
-
-        setStocks(randomizedStocks);
-        setLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch stock data:', error);
+        
+        setStocks(fallbackStocks);
         setLoading(false);
       }
     };
 
     fetchStocks();
-    const interval = setInterval(fetchStocks, 60000); // Update every minute
+    const interval = setInterval(fetchStocks, 5 * 60 * 1000); // Update every 5 minutes
     return () => clearInterval(interval);
   }, []);
 
@@ -70,7 +86,7 @@ export default function AsianStockWidget() {
               <div className="text-gray-400 text-xs truncate">{stock.name}</div>
             </div>
             <div className="text-right ml-1">
-              <div className="text-white text-xs font-mono">${stock.price.toFixed(2)}</div>
+              <div className="text-white text-xs font-mono">{formatPrice(stock.price, stock.currency)}</div>
               <div className={`text-xs ${stock.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                 {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)}%
               </div>
