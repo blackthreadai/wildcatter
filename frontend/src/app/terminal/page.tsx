@@ -13,6 +13,8 @@ import TravelAdvisoryWidget from '@/components/TravelAdvisoryWidget';
 import PredictionMarketsWidget from '@/components/PredictionMarketsWidget';
 import PreciousMetalsWidget from '@/components/PreciousMetalsWidget';
 import CryptocurrencyWidget from '@/components/CryptocurrencyWidget';
+import EuropeanEnergyMarketsWidget from '@/components/EuropeanEnergyMarketsWidget';
+import EconomicIndicatorsWidget from '@/components/EconomicIndicatorsWidget';
 
 // Drag and drop imports
 import {
@@ -55,7 +57,7 @@ const WorldMap = dynamic(() => import('@/components/WorldMap'), {
 // Widget configuration - defines all widgets in the grid
 type Widget = {
   id: string;
-  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency';
+  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'economic-indicators';
   title: string;
   span?: { col: number; row: number };
   region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS' | 'STRATEGIC RESERVE';
@@ -80,9 +82,9 @@ const defaultWidgets: Widget[] = [
   { id: 'cryptocurrency', type: 'cryptocurrency', title: 'CRYPTOCURRENCY' },
   { id: 'russian-news', type: 'news', title: 'RUSSIAN NEWS', region: 'RUSSIAN' },
   { id: 'middle-east-energy', type: 'news', title: 'MIDDLE EAST NEWS', region: 'MIDDLE EAST ENERGY' },
-  { id: 'economic-indicators', type: 'news', title: 'ECONOMIC INDICATORS', region: 'ECONOMIC INDICATORS' },
+  { id: 'economic-indicators', type: 'economic-indicators', title: 'ECONOMIC INDICATORS' },
   { id: 'european-energy', type: 'news', title: 'EUROPEAN NEWS', region: 'EUROPEAN ENERGY' },
-  { id: 'european-energy-markets', type: 'news', title: 'EUROPEAN ENERGY MARKETS', region: 'EUROPEAN ENERGY MARKETS' },
+  { id: 'european-energy-markets', type: 'european-energy-markets', title: 'EURO ENERGY MARKETS' },
   { id: 'predictions', type: 'prediction', title: 'PREDICTION MARKETS' },
   { id: 'climate-extremes', type: 'news', title: 'CLIMATE EXTREMES', region: 'CLIMATE EXTREMES' },
   { id: 'intel-feed', type: 'intel-feed', title: 'INTEL FEED', span: { col: 2, row: 1 } },
@@ -139,6 +141,10 @@ function DraggableWidget({
         return <PreciousMetalsWidget />;
       case 'cryptocurrency':
         return <CryptocurrencyWidget />;
+      case 'european-energy-markets':
+        return <EuropeanEnergyMarketsWidget />;
+      case 'economic-indicators':
+        return <EconomicIndicatorsWidget />;
       default:
         return <NewsWidget region="US" title="US NEWS" />;
     }
@@ -667,7 +673,6 @@ export default function TerminalPage() {
             <span className="text-white text-sm font-thin tracking-[0.1em] uppercase" style={{ fontStretch: 'condensed' }}>
               {formatDateTime(currentTime)}
             </span>
-            <span className="text-gray-400">|</span>
             <div 
               className="flex items-center gap-1 text-xs font-bold tracking-[0.2em] border px-2 py-1" 
               style={{ 
