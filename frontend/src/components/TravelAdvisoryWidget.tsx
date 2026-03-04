@@ -15,42 +15,55 @@ export default function TravelAdvisoryWidget() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mock travel advisory data for key energy regions
-    const mockAdvisories: TravelAdvisory[] = [
-      {
-        country: 'Iraq',
-        level: 'Level 4',
-        severity: 'critical',
-        lastUpdated: '2026-02-21T10:00:00Z',
-        reason: 'Terrorism, kidnapping'
-      },
-      {
-        country: 'Venezuela',
-        level: 'Level 4', 
-        severity: 'critical',
-        lastUpdated: '2026-02-21T08:30:00Z',
-        reason: 'Crime, civil unrest'
-      },
-      {
-        country: 'Nigeria',
-        level: 'Level 3',
-        severity: 'high',
-        lastUpdated: '2026-02-21T12:15:00Z',
-        reason: 'Terrorism, kidnapping'
-      },
-      {
-        country: 'Russia',
-        level: 'Level 4',
-        severity: 'critical', 
-        lastUpdated: '2026-02-21T14:45:00Z',
-        reason: 'Armed conflict'
+    const fetchTravelAdvisories = async () => {
+      try {
+        const response = await fetch('/api/travel-advisories');
+        const data = await response.json();
+        setAdvisories(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Failed to fetch travel advisories:', error);
+        
+        // Fallback data
+        const fallbackAdvisories: TravelAdvisory[] = [
+          {
+            country: 'Iraq',
+            level: 'Level 4',
+            severity: 'critical',
+            lastUpdated: '2026-02-21T10:00:00Z',
+            reason: 'Terrorism, kidnapping'
+          },
+          {
+            country: 'Venezuela',
+            level: 'Level 4', 
+            severity: 'critical',
+            lastUpdated: '2026-02-21T08:30:00Z',
+            reason: 'Crime, civil unrest'
+          },
+          {
+            country: 'Nigeria',
+            level: 'Level 3',
+            severity: 'high',
+            lastUpdated: '2026-02-21T12:15:00Z',
+            reason: 'Terrorism, kidnapping'
+          },
+          {
+            country: 'Russia',
+            level: 'Level 4',
+            severity: 'critical', 
+            lastUpdated: '2026-02-21T14:45:00Z',
+            reason: 'Armed conflict'
+          }
+        ];
+        
+        setAdvisories(fallbackAdvisories);
+        setLoading(false);
       }
-    ];
+    };
 
-    setTimeout(() => {
-      setAdvisories(mockAdvisories);
-      setLoading(false);
-    }, 1000);
+    fetchTravelAdvisories();
+    const interval = setInterval(fetchTravelAdvisories, 6 * 60 * 60 * 1000); // Update every 6 hours
+    return () => clearInterval(interval);
   }, []);
 
   const getSeverityColor = (severity: string) => {

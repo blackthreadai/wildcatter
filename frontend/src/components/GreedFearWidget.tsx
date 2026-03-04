@@ -15,21 +15,13 @@ export default function GreedFearWidget() {
   useEffect(() => {
     const fetchGreedFearData = async () => {
       try {
-        // Mock data - in production, this would fetch from Fear & Greed API
-        const mockValue = Math.floor(Math.random() * 100);
-        const mockChange = (Math.random() - 0.5) * 10;
+        const response = await fetch('/api/fear-greed');
+        const fearGreedData = await response.json();
         
-        let label = '';
-        if (mockValue <= 25) label = 'EXTREME FEAR';
-        else if (mockValue <= 45) label = 'FEAR';
-        else if (mockValue <= 55) label = 'NEUTRAL';
-        else if (mockValue <= 75) label = 'GREED';
-        else label = 'EXTREME GREED';
-
         setData({
-          value: mockValue,
-          label,
-          change: mockChange
+          value: fearGreedData.value,
+          label: fearGreedData.label,
+          change: fearGreedData.change
         });
         setLoading(false);
       } catch (error) {
@@ -45,7 +37,7 @@ export default function GreedFearWidget() {
     };
 
     fetchGreedFearData();
-    const interval = setInterval(fetchGreedFearData, 5 * 60 * 1000); // Update every 5 minutes
+    const interval = setInterval(fetchGreedFearData, 60 * 60 * 1000); // Update every hour
     return () => clearInterval(interval);
   }, []);
 
