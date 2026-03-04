@@ -16,30 +16,37 @@ export default function StockWidget() {
   useEffect(() => {
     const fetchStocks = async () => {
       try {
-        // Top 4 US energy stocks only
-        const topEnergyStocks: Stock[] = [
+        const response = await fetch('/api/energy-stocks');
+        const data = await response.json();
+        
+        // Map the API response to our Stock interface
+        const mappedStocks: Stock[] = data.map((stock: any) => ({
+          symbol: stock.symbol,
+          name: stock.name,
+          price: stock.price,
+          change: stock.changePercent // Use percentage change for display
+        }));
+        
+        setStocks(mappedStocks);
+        setLoading(false);
+      } catch (error) {
+        console.error('Failed to fetch stock data:', error);
+        
+        // Fallback to mock data
+        const fallbackStocks: Stock[] = [
           { symbol: 'XOM', name: 'Exxon Mobil', price: 118.45, change: 2.3 },
           { symbol: 'CVX', name: 'Chevron Corp', price: 162.87, change: 1.8 },
           { symbol: 'COP', name: 'ConocoPhillips', price: 134.22, change: -0.5 },
           { symbol: 'SLB', name: 'Schlumberger', price: 63.91, change: 3.2 }
         ];
-
-        // Randomize the changes slightly for demo
-        const randomizedStocks = topEnergyStocks.map(stock => ({
-          ...stock,
-          change: stock.change + (Math.random() - 0.5) * 2
-        }));
-
-        setStocks(randomizedStocks);
-        setLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch stock data:', error);
+        
+        setStocks(fallbackStocks);
         setLoading(false);
       }
     };
 
     fetchStocks();
-    const interval = setInterval(fetchStocks, 60000); // Update every minute
+    const interval = setInterval(fetchStocks, 5 * 60 * 1000); // Update every 5 minutes
     return () => clearInterval(interval);
   }, []);
 

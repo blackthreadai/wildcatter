@@ -21,7 +21,9 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await fetch(`/api/news?region=${region}`);
+        // Use specialized energy news API for US region
+        const apiEndpoint = region === 'US' ? '/api/energy-news' : `/api/news?region=${region}`;
+        const response = await fetch(apiEndpoint);
         const data = await response.json();
         setArticles(data.slice(0, region === 'US' ? 3 : 2)); // Show 3 articles for US, 2 for others
         setLoading(false);
@@ -237,6 +239,12 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
     };
 
     fetchNews();
+    
+    // Set up refresh interval - more frequent for US energy news
+    const refreshInterval = region === 'US' ? 15 * 60 * 1000 : 30 * 60 * 1000; // 15 min for US, 30 min for others
+    const interval = setInterval(fetchNews, refreshInterval);
+    
+    return () => clearInterval(interval);
   }, [region]);
 
   const formatTime = (dateString: string) => {
