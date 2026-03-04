@@ -13,64 +13,88 @@ interface PreciousMetal {
 let cache: { data: PreciousMetal[]; ts: number } | null = null;
 const CACHE_MS = 10 * 60 * 1000;
 
-async function fetchMetalsAPI(): Promise<PreciousMetal[]> {
+async function fetchYahooFinanceMetals(): Promise<PreciousMetal[]> {
   try {
-    // Try metals-api.com (free tier available)
-    const response = await fetch('https://api.metals.live/v1/spot', {
-      headers: { 
-        'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
-        'Accept': 'application/json'
-      },
-      signal: AbortSignal.timeout(10000)
-    });
+    // Use Yahoo Finance for precious metals (same API as stocks)
+    const symbols = ['GC=F', 'SI=F', 'PL=F']; // Gold, Silver, Platinum futures
+    const promises = symbols.map(symbol => fetchMetalFromYahoo(symbol));
     
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    
-    const data = await response.json();
+    const results = await Promise.allSettled(promises);
     const metals: PreciousMetal[] = [];
     
-    // Parse gold, silver, platinum data if available
-    if (data.gold) {
-      const goldChange = (Math.random() - 0.5) * 50; // Mock change for now
-      metals.push({
-        symbol: 'XAU',
-        name: 'Gold',
-        price: data.gold,
-        change: goldChange,
-        changePercent: (goldChange / data.gold) * 100,
-        unit: 'USD/oz'
-      });
-    }
-    
-    if (data.silver) {
-      const silverChange = (Math.random() - 0.5) * 3;
-      metals.push({
-        symbol: 'XAG', 
-        name: 'Silver',
-        price: data.silver,
-        change: silverChange,
-        changePercent: (silverChange / data.silver) * 100,
-        unit: 'USD/oz'
-      });
-    }
-    
-    if (data.platinum) {
-      const platinumChange = (Math.random() - 0.5) * 30;
-      metals.push({
-        symbol: 'XPT',
-        name: 'Platinum', 
-        price: data.platinum,
-        change: platinumChange,
-        changePercent: (platinumChange / data.platinum) * 100,
-        unit: 'USD/oz'
-      });
+    for (const result of results) {
+      if (result.status === 'fulfilled' && result.value) {
+        metals.push(result.value);
+      }
     }
     
     return metals;
     
   } catch (error) {
-    console.error('Metals API fetch error:', error);
+    console.error('Yahoo Finance metals fetch error:', error);
     return [];
+  }
+}
+
+async function fetchMetalFromYahoo(symbol: string): Promise<PreciousMetal | null> {
+  try {
+    const url = `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=2d&includePrePost=false`;
+    const response = await fetch(url, {
+      headers: { 
+        'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
+        'Accept': 'application/json'
+      },
+      signal: AbortSignal.timeout(8000)
+    }).catch(() => null);
+    
+    if (!response || !response.ok) {
+      throw new Error(`HTTP ${response?.status || 'Network Error'}`);
+    }
+    
+    const data = await response.json().catch(() => null);
+    const meta = data?.chart?.result?.[0]?.meta;
+    
+    if (!meta?.regularMarketPrice || !meta?.chartPreviousClose || 
+        isNaN(meta.regularMarketPrice) || isNaN(meta.chartPreviousClose)) {
+      throw new Error('Invalid or missing data structure');
+    }
+    
+    const price = parseFloat(meta.regularMarketPrice);
+    const previousClose = parseFloat(meta.chartPreviousClose);
+    const change = price - previousClose;
+    const changePercent = (change / previousClose) * 100;
+    
+    // Map Yahoo symbols to metal info
+    let name = 'Unknown';
+    let metalSymbol = symbol;
+    
+    switch (symbol) {
+      case 'GC=F':
+        name = 'Gold';
+        metalSymbol = 'XAU';
+        break;
+      case 'SI=F':
+        name = 'Silver';
+        metalSymbol = 'XAG';
+        break;
+      case 'PL=F':
+        name = 'Platinum';
+        metalSymbol = 'XPT';
+        break;
+    }
+    
+    return {
+      symbol: metalSymbol,
+      name,
+      price: parseFloat(price.toFixed(2)),
+      change: parseFloat(change.toFixed(2)),
+      changePercent: parseFloat(changePercent.toFixed(2)),
+      unit: 'USD/oz'
+    };
+    
+  } catch (error) {
+    console.error(`Failed to fetch ${symbol}:`, error);
+    return null;
   }
 }
 
@@ -123,8 +147,8 @@ export async function GET() {
       return NextResponse.json(cache.data);
     }
 
-    // Try to fetch live data first
-    let metals = await fetchMetalsAPI();
+    // Try to fetch live data from Yahoo Finance first
+    let metals = await fetchYahooFinanceMetals();
     
     // Fallback to mock data if API unavailable
     if (metals.length === 0) {
