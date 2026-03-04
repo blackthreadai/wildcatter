@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import SPRChartWidget from './SPRChartWidget';
 
 interface NewsArticle {
   title: string;
@@ -258,6 +259,11 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
     return `${diffHours} hours ago`;
   };
 
+  // Special handling for Strategic Reserve - show chart instead of news
+  if (region === 'STRATEGIC RESERVE') {
+    return <SPRChartWidget />;
+  }
+
   if (loading) {
     return (
       <div className="h-full w-full flex flex-col bg-black">
@@ -284,9 +290,17 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
               href={article.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="block"
+              className="block group"
+              onClick={(e) => {
+                // Ensure the link works and add debugging
+                console.log('Opening article:', article.title, article.url);
+                if (article.url === '#' || !article.url || article.url.startsWith('#')) {
+                  e.preventDefault();
+                  console.log('Invalid URL, prevented navigation');
+                }
+              }}
             >
-              <h4 className="text-[#DAA520] text-xs leading-tight mb-1 line-clamp-2 cursor-pointer">
+              <h4 className="text-[#DAA520] group-hover:text-yellow-300 text-xs leading-tight mb-1 line-clamp-2 cursor-pointer transition-colors">
                 {article.title}
               </h4>
             </a>

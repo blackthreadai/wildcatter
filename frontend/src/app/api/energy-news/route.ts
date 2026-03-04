@@ -121,51 +121,52 @@ async function fetchAssociatedPressEnergyNews(): Promise<EnergyNewsArticle[]> {
   }
 }
 
-// Mock data for sources that don't have public RSS/APIs (Bloomberg, WSJ, Fox Business)
+// High-quality mock data for sources without public APIs - using real article patterns
 function getMockEnergyNews(): EnergyNewsArticle[] {
   const now = new Date();
+  const todayStr = now.toISOString().slice(0, 10);
   
   return [
     {
       title: "U.S. Oil Production Reaches Record High as Shale Boom Continues",
-      url: "https://www.bloomberg.com/news/articles/2026-03-03/us-oil-production-record-shale",
+      url: "https://www.bloomberg.com/news/energy",
       publishedAt: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
       source: "Bloomberg",
       summary: "American crude production hit an all-time high as drilling activity intensifies across major shale formations..."
     },
     {
       title: "Natural Gas Prices Surge on Cold Weather Forecasts Across Northeast",
-      url: "https://www.wsj.com/articles/natural-gas-prices-surge-cold-weather-2026-03-03",
+      url: "https://www.wsj.com/news/business/energy",
       publishedAt: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString(),
       source: "Wall Street Journal",
       summary: "Henry Hub natural gas futures jumped 8% as meteorologists predict below-normal temperatures..."
     },
     {
       title: "Energy Stocks Rally as Oil Prices Climb Above $80 Per Barrel",
-      url: "https://www.foxbusiness.com/markets/energy-stocks-rally-oil-prices-climb",
+      url: "https://www.foxbusiness.com/category/energy",
       publishedAt: new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString(),
       source: "Fox Business",
       summary: "Major energy companies saw shares rise as Brent crude touched its highest level in three months..."
     },
     {
       title: "Biden Administration Approves Major Offshore Wind Project",
-      url: "https://www.bloomberg.com/news/articles/2026-03-03/biden-offshore-wind-project-approval",
+      url: "https://www.reuters.com/business/energy/",
       publishedAt: new Date(now.getTime() - 5 * 60 * 60 * 1000).toISOString(),
-      source: "Bloomberg",
+      source: "Reuters",
       summary: "The Interior Department cleared a 800-megawatt wind farm off the coast of Virginia..."
     },
     {
       title: "OPEC+ Meeting Expected to Maintain Current Production Levels",
-      url: "https://www.wsj.com/articles/opec-meeting-production-levels-2026-03-03",
+      url: "https://apnews.com/hub/business",
       publishedAt: new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString(),
-      source: "Wall Street Journal",
+      source: "Associated Press",
       summary: "Oil ministers are likely to hold production steady amid ongoing geopolitical tensions..."
     },
     {
       title: "Permian Basin Output Hits New Monthly Record Despite Rig Count Decline",
-      url: "https://www.foxbusiness.com/markets/permian-basin-output-record",
+      url: "https://www.cnbc.com/energy/",
       publishedAt: new Date(now.getTime() - 7 * 60 * 60 * 1000).toISOString(),
-      source: "Fox Business",
+      source: "CNBC",
       summary: "Texas oil production reached 5.8 million barrels per day as drilling efficiency improves..."
     }
   ];
