@@ -81,7 +81,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '11.0-STANDARDIZED-WIDGET-DIMENSIONS';
+const WIDGET_VERSION = '11.1-FIXED-MULTISPAN-WIDGET-HEIGHTS';
 
 const defaultWidgets: Widget[] = [
   // Rendr's specified order
@@ -238,7 +238,7 @@ function DraggableWidget({
         ...style,
         cursor: isDragging ? 'grabbing' : 'grab',
         opacity: isHidden ? 0.5 : 1,
-        height: widget.span?.row === 2 ? '500px' : '400px', // Consistent heights
+        height: widget.span?.row === 2 ? '816px' : '400px', // 2-row widgets = 2 × 400px + 16px gap
         filter: isDragging 
           ? 'drop-shadow(0 0 20px rgba(218, 165, 32, 0.5))'
           : isHidden 
