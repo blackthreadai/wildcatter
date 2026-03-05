@@ -122,13 +122,13 @@ export async function GET() {
       return order.indexOf(a.symbol) - order.indexOf(b.symbol);
     });
     
-    // Take top 4 for the widget
-    const top4Stocks = sortedStocks.slice(0, 4);
+    // Take top 8 for the widget
+    const top8Stocks = sortedStocks.slice(0, 8);
     
     // Cache the results
-    cache = { data: top4Stocks, ts: Date.now() };
+    cache = { data: top8Stocks, ts: Date.now() };
     
-    return NextResponse.json(top4Stocks);
+    return NextResponse.json(top8Stocks);
     
   } catch (error) {
     console.error('Energy stocks API error:', error);
@@ -138,7 +138,11 @@ export async function GET() {
       { symbol: 'XOM', name: 'Exxon Mobil Corp', price: 118.45, change: 2.15, changePercent: 1.85, sector: 'Oil & Gas' },
       { symbol: 'CVX', name: 'Chevron Corp', price: 162.87, change: -1.23, changePercent: -0.75, sector: 'Oil & Gas' },
       { symbol: 'COP', name: 'ConocoPhillips', price: 134.22, change: 3.44, changePercent: 2.63, sector: 'Oil & Gas' },
-      { symbol: 'SLB', name: 'Schlumberger Ltd', price: 63.91, change: 1.87, changePercent: 3.02, sector: 'Oil Services' }
+      { symbol: 'EOG', name: 'EOG Resources Inc', price: 145.67, change: 1.85, changePercent: 1.29, sector: 'Oil & Gas' },
+      { symbol: 'SLB', name: 'Schlumberger Ltd', price: 63.91, change: 1.87, changePercent: 3.02, sector: 'Oil Services' },
+      { symbol: 'PXD', name: 'Pioneer Natural Resources', price: 267.89, change: 2.14, changePercent: 0.81, sector: 'Oil & Gas' },
+      { symbol: 'KMI', name: 'Kinder Morgan Inc', price: 18.43, change: -0.06, changePercent: -0.32, sector: 'Pipeline' },
+      { symbol: 'WMB', name: 'Williams Companies', price: 41.26, change: 0.61, changePercent: 1.50, sector: 'Pipeline' }
     ];
     
     return NextResponse.json(fallbackStocks);

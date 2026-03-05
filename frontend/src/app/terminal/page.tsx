@@ -81,7 +81,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '12.0-FORCE-REFRESH-EXPANDED-CONTENT';
+const WIDGET_VERSION = '12.1-CRITICAL-API-LIMITS-FIXED';
 
 const defaultWidgets: Widget[] = [
   // Rendr's specified order

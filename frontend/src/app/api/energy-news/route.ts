@@ -176,7 +176,7 @@ export async function GET() {
   try {
     // Return cached data if fresh
     if (cache && Date.now() - cache.ts < CACHE_MS) {
-      return NextResponse.json(cache.data.slice(0, 3));
+      return NextResponse.json(cache.data.slice(0, 8)); // Allow up to 8 articles
     }
 
     // Fetch from multiple sources in parallel
@@ -219,14 +219,14 @@ export async function GET() {
     // Cache the results
     cache = { data: uniqueArticles, ts: Date.now() };
     
-    // Return top 3 most recent articles
-    return NextResponse.json(uniqueArticles.slice(0, 3));
+    // Return top 8 most recent articles
+    return NextResponse.json(uniqueArticles.slice(0, 8));
     
   } catch (error) {
     console.error('Energy news API error:', error);
     
     // Fallback to mock data only
     const mockArticles = getMockEnergyNews();
-    return NextResponse.json(mockArticles.slice(0, 3));
+    return NextResponse.json(mockArticles.slice(0, 8));
   }
 }
