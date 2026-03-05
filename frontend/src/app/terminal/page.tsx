@@ -81,7 +81,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '15.3-CLIMATE-EXTREMES-8-ITEMS-API-FIX';
+const WIDGET_VERSION = '15.4-REMOVE-TRADE-SIGNALS-WIDGET';
 
 const defaultWidgets: Widget[] = [
   // NEW DEFAULT ORDER - Rendr's priority layout
@@ -122,7 +122,6 @@ const defaultWidgets: Widget[] = [
   { id: 'ai-price-forecast', type: 'ai-price-forecast', title: 'AI PRICE FORECAST' },
   { id: 'african-news', type: 'news', title: 'AFRICAN NEWS', region: 'AFRICAN' },
   { id: 'event-calendar', type: 'event-calendar', title: 'EVENT CALENDAR' },
-  { id: 'trade-signals', type: 'trade-signals', title: 'TRADE SIGNALS' },
 ];
 
 // Draggable Widget Component
