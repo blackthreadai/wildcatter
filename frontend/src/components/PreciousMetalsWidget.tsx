@@ -73,7 +73,7 @@ export default function PreciousMetalsWidget() {
 
   if (loading) {
     return (
-      <div className="h-full w-full flex flex-col bg-black">
+      <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
         <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>PRECIOUS METALS</h3>
         </div>
@@ -85,7 +85,7 @@ export default function PreciousMetalsWidget() {
   }
 
   return (
-    <div className="h-full w-full flex flex-col bg-black">
+    <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
       <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>PRECIOUS METALS</h3>
       </div>

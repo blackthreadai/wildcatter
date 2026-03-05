@@ -99,7 +99,7 @@ export default function NaturalGasWidget() {
 
   if (loading) {
     return (
-      <div className="h-full w-full flex flex-col bg-black">
+      <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
         <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>NATURAL GAS</h3>
         </div>
@@ -112,7 +112,7 @@ export default function NaturalGasWidget() {
 
   if (!data) {
     return (
-      <div className="h-full w-full flex flex-col bg-black">
+      <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
         <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>NATURAL GAS</h3>
         </div>
@@ -124,12 +124,12 @@ export default function NaturalGasWidget() {
   }
 
   return (
-    <div className="h-full w-full flex flex-col bg-black">
+    <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
       <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>NATURAL GAS</h3>
       </div>
       
-      <div className="flex-1 bg-black px-3 py-2 overflow-y-auto">
+      <div className="flex-1 bg-black px-3 py-2 overflow-y-auto h-0">
         {/* Key Prices */}
         <div className="mb-3 pb-2 border-b border-gray-700">
           <div className="text-[#DAA520] text-xs font-bold mb-2">BENCHMARK PRICES</div>

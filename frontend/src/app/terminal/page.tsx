@@ -81,7 +81,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '10.1-FIXED-5-COLUMN-GRID';
+const WIDGET_VERSION = '11.0-STANDARDIZED-WIDGET-DIMENSIONS';
 
 const defaultWidgets: Widget[] = [
   // Rendr's specified order
@@ -233,20 +233,17 @@ function DraggableWidget({
   return (
     <div 
       ref={setNodeRef}
-      className={`bg-black border overflow-hidden relative group ${getSpanClasses()}`}
+      className={`relative group ${getSpanClasses()}`}
       style={{
         ...style,
-        borderColor: isDragging ? '#DAA520' : (isHidden ? '#666666' : '#333333'),
-        borderWidth: isDragging ? '2px' : '1px',
-        boxShadow: isDragging 
-          ? '0 0 20px rgba(218, 165, 32, 0.5), 0 0 40px rgba(218, 165, 32, 0.3)'
-          : isHidden 
-            ? '0 0 10px rgba(102, 102, 102, 0.2)'
-            : '0 0 10px rgba(218, 165, 32, 0.2), 0 0 20px rgba(218, 165, 32, 0.1)',
         cursor: isDragging ? 'grabbing' : 'grab',
         opacity: isHidden ? 0.5 : 1,
-        minHeight: widget.span?.row === 2 ? '400px' : '350px', // Natural content height
-        height: 'fit-content' // Allow content to determine height
+        height: widget.span?.row === 2 ? '500px' : '400px', // Consistent heights
+        filter: isDragging 
+          ? 'drop-shadow(0 0 20px rgba(218, 165, 32, 0.5))'
+          : isHidden 
+            ? 'drop-shadow(0 0 10px rgba(102, 102, 102, 0.2))'
+            : 'drop-shadow(0 0 10px rgba(218, 165, 32, 0.2))'
       }}
       {...attributes}
       {...listeners}
@@ -648,9 +645,21 @@ export default function TerminalPage() {
           color: black !important;
         }
         
-        /* Grid Layout with Natural Heights */
-        .grid {
-          grid-auto-rows: minmax(min-content, max-content);
+        /* Standardized Widget Grid */
+        .widget-grid {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          grid-auto-rows: minmax(400px, max-content);
+          gap: 1rem;
+          align-items: start;
+        }
+        
+        /* Consistent Widget Heights */
+        .energy-widget {
+          min-height: 400px;
+          max-height: 500px;
+          width: 100%;
+          overflow: hidden;
         }
       `}</style>
 
@@ -964,9 +973,10 @@ export default function TerminalPage() {
               strategy={rectSortingStrategy}
             >
               <div 
-                className="grid grid-cols-5 gap-4 h-full overflow-y-auto p-2"
+                className="grid grid-cols-5 gap-4 h-full overflow-y-auto p-4"
                 style={{
-                  gridAutoRows: 'min-content'
+                  gridAutoRows: 'minmax(400px, max-content)',
+                  alignItems: 'start'
                 }}
               >
                 {visibleWidgets.map((widget) => (
