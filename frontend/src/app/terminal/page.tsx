@@ -81,7 +81,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '9.0-ALL-16-ENERGY-MODULES-COMPLETE';
+const WIDGET_VERSION = '10.0-MASONRY-LAYOUT-OPTIMIZATION';
 
 const defaultWidgets: Widget[] = [
   // Rendr's specified order
@@ -233,10 +233,14 @@ function DraggableWidget({
   return (
     <div 
       ref={setNodeRef}
-      className={`bg-black border overflow-hidden relative group ${getSpanClasses()}`}
+      className="bg-black border overflow-hidden relative group"
       style={{
         ...style,
-        margin: '5px',
+        display: 'inline-block',
+        width: '100%',
+        marginBottom: '16px',
+        breakInside: 'avoid',
+        pageBreakInside: 'avoid',
         borderColor: isDragging ? '#DAA520' : (isHidden ? '#666666' : '#333333'),
         borderWidth: isDragging ? '2px' : '1px',
         boxShadow: isDragging 
@@ -244,9 +248,9 @@ function DraggableWidget({
           : isHidden 
             ? '0 0 10px rgba(102, 102, 102, 0.2)'
             : '0 0 10px rgba(218, 165, 32, 0.2), 0 0 20px rgba(218, 165, 32, 0.1)',
-        maxHeight: '100%',
         cursor: isDragging ? 'grabbing' : 'grab',
-        opacity: isHidden ? 0.5 : 1
+        opacity: isHidden ? 0.5 : 1,
+        minHeight: widget.span?.row === 2 ? '400px' : '300px' // Respect intended size hints
       }}
       {...attributes}
       {...listeners}
@@ -559,7 +563,7 @@ export default function TerminalPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Leaflet CSS overrides for dark theme */}
+      {/* Leaflet CSS overrides for dark theme + Masonry Layout Styles */}
       <style jsx global>{`
         .leaflet-container {
           background: #374151 !important;
@@ -646,6 +650,41 @@ export default function TerminalPage() {
         select option:checked {
           background-color: #DAA520 !important;
           color: black !important;
+        }
+        
+        /* Masonry Layout Styles */
+        .masonry-container {
+          -webkit-column-break-inside: avoid;
+          -moz-column-break-inside: avoid;
+          column-break-inside: avoid;
+          break-inside: avoid;
+        }
+        
+        .masonry-container > * {
+          -webkit-column-break-inside: avoid;
+          -moz-column-break-inside: avoid;
+          column-break-inside: avoid;
+          break-inside: avoid;
+          page-break-inside: avoid;
+          display: inline-block;
+          width: 100%;
+        }
+        
+        /* Responsive column count */
+        @media (min-width: 1920px) {
+          .masonry-container { column-count: 6; }
+        }
+        @media (min-width: 1600px) and (max-width: 1919px) {
+          .masonry-container { column-count: 5; }
+        }
+        @media (min-width: 1200px) and (max-width: 1599px) {
+          .masonry-container { column-count: 4; }
+        }
+        @media (min-width: 800px) and (max-width: 1199px) {
+          .masonry-container { column-count: 3; }
+        }
+        @media (max-width: 799px) {
+          .masonry-container { column-count: 2; }
         }
       `}</style>
 
@@ -959,10 +998,11 @@ export default function TerminalPage() {
               strategy={rectSortingStrategy}
             >
               <div 
-                className="grid grid-cols-5 gap-2 h-full"
-                style={{ 
-                  gridTemplateRows: '1fr 1fr 1fr 1fr 1fr',
-                  maxHeight: '100%'
+                className="masonry-container h-full overflow-y-auto"
+                style={{
+                  columnGap: '16px',
+                  columnFill: 'balance',
+                  padding: '8px'
                 }}
               >
                 {visibleWidgets.map((widget) => (
