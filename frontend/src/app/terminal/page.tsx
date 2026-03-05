@@ -26,6 +26,12 @@ import SanctionsWidget from '@/components/SanctionsWidget';
 import EnergyFuturesWidget from '@/components/EnergyFuturesWidget';
 import CrackSpreadWidget from '@/components/CrackSpreadWidget';
 import GlobalLNGWidget from '@/components/GlobalLNGWidget';
+import CarbonCreditWidget from '@/components/CarbonCreditWidget';
+import GlobalFuelDemandWidget from '@/components/GlobalFuelDemandWidget';
+import PositionMonitorWidget from '@/components/PositionMonitorWidget';
+import AIPriceForecastWidget from '@/components/AIPriceForecastWidget';
+import EventCalendarWidget from '@/components/EventCalendarWidget';
+import TradeSignalsWidget from '@/components/TradeSignalsWidget';
 
 // Drag and drop imports
 import {
@@ -68,7 +74,7 @@ const WorldMap = dynamic(() => import('@/components/WorldMap'), {
 // Widget configuration - defines all widgets in the grid
 type Widget = {
   id: string;
-  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'economic-indicators' | 'climate-extremes' | 'global-oil-tracker' | 'opec' | 'natural-gas' | 'oil-rig-tracker' | 'power-grid-stress' | 'refinery-outages' | 'sanctions' | 'energy-futures' | 'crack-spread' | 'global-lng';
+  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'economic-indicators' | 'climate-extremes' | 'global-oil-tracker' | 'opec' | 'natural-gas' | 'oil-rig-tracker' | 'power-grid-stress' | 'refinery-outages' | 'sanctions' | 'energy-futures' | 'crack-spread' | 'global-lng' | 'carbon-credit' | 'global-fuel-demand' | 'position-monitor' | 'ai-price-forecast' | 'event-calendar' | 'trade-signals';
   title: string;
   span?: { col: number; row: number };
   region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS' | 'STRATEGIC RESERVE';
@@ -110,6 +116,12 @@ const defaultWidgets: Widget[] = [
   { id: 'energy-futures', type: 'energy-futures', title: 'ENERGY FUTURES' },
   { id: 'crack-spread', type: 'crack-spread', title: 'CRACK SPREAD' },
   { id: 'global-lng', type: 'global-lng', title: 'GLOBAL LNG' },
+  { id: 'carbon-credit', type: 'carbon-credit', title: 'CARBON CREDIT' },
+  { id: 'global-fuel-demand', type: 'global-fuel-demand', title: 'GLOBAL FUEL DEMAND' },
+  { id: 'position-monitor', type: 'position-monitor', title: 'POSITION MONITOR' },
+  { id: 'ai-price-forecast', type: 'ai-price-forecast', title: 'AI PRICE FORECAST' },
+  { id: 'event-calendar', type: 'event-calendar', title: 'EVENT CALENDAR' },
+  { id: 'trade-signals', type: 'trade-signals', title: 'TRADE SIGNALS' },
 ];
 
 // Draggable Widget Component
@@ -190,6 +202,18 @@ function DraggableWidget({
         return <CrackSpreadWidget />;
       case 'global-lng':
         return <GlobalLNGWidget />;
+      case 'carbon-credit':
+        return <CarbonCreditWidget />;
+      case 'global-fuel-demand':
+        return <GlobalFuelDemandWidget />;
+      case 'position-monitor':
+        return <PositionMonitorWidget />;
+      case 'ai-price-forecast':
+        return <AIPriceForecastWidget />;
+      case 'event-calendar':
+        return <EventCalendarWidget />;
+      case 'trade-signals':
+        return <TradeSignalsWidget />;
       default:
         return <NewsWidget region="US" title="US NEWS" />;
     }
