@@ -81,7 +81,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '14.3-CRITICAL-FIXES-WILDCATTER-AFRICAN-US-MARKETS';
+const WIDGET_VERSION = '14.4-CLIMATE-8-ITEMS-KALSHI-PREDICTION-MARKETS';
 
 const defaultWidgets: Widget[] = [
   // Rendr's specified order

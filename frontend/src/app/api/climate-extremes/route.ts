@@ -139,7 +139,7 @@ export async function GET() {
   try {
     // Return cached data if fresh
     if (cache && Date.now() - cache.ts < CACHE_MS) {
-      return NextResponse.json(cache.data.slice(0, 4));
+      return NextResponse.json(cache.data.slice(0, 8));
     }
 
     // Try to fetch from NOAA API first
@@ -150,7 +150,7 @@ export async function GET() {
     
     // If we got some real data, combine with mock, otherwise use all mock
     if (extremes.length > 0) {
-      extremes = [...extremes, ...mockData.slice(0, 4 - extremes.length)];
+      extremes = [...extremes, ...mockData.slice(0, 8 - extremes.length)];
     } else {
       extremes = mockData;
     }
@@ -173,13 +173,13 @@ export async function GET() {
     cache = { data: uniqueExtremes, ts: Date.now() };
     
     // Return top 4 most recent/relevant extremes
-    return NextResponse.json(uniqueExtremes.slice(0, 4));
+    return NextResponse.json(uniqueExtremes.slice(0, 8));
     
   } catch (error) {
     console.error('Climate extremes API error:', error);
     
     // Ultimate fallback
     const fallbackData = getMockClimateExtremes();
-    return NextResponse.json(fallbackData.slice(0, 4));
+    return NextResponse.json(fallbackData.slice(0, 8));
   }
 }

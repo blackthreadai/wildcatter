@@ -2,58 +2,72 @@
 
 import { useState, useEffect } from 'react';
 
-interface Prediction {
+interface PredictionMarket {
+  id: string;
   question: string;
   probability: number;
   volume: string;
   lastUpdated: string;
+  url: string;
+  category: string;
+  endDate: string;
 }
 
 export default function PredictionMarketsWidget() {
-  const [predictions, setPredictions] = useState<Prediction[]>([]);
+  const [predictions, setPredictions] = useState<PredictionMarket[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPredictions = async () => {
       try {
-        // Mock Polymarket-style energy predictions
-        const mockPredictions: Prediction[] = [
-          {
-            question: "Oil above $80 by March 2026?",
-            probability: 68,
-            volume: "$2.4M",
-            lastUpdated: "2026-02-21T16:30:00Z"
-          },
-          {
-            question: "US gas reserves increase Q1 2026?",
-            probability: 42,
-            volume: "$890K", 
-            lastUpdated: "2026-02-21T14:15:00Z"
-          },
-          {
-            question: "New oil field discovered this year?",
-            probability: 35,
-            volume: "$1.2M",
-            lastUpdated: "2026-02-21T13:45:00Z"
-          }
-        ];
-
-        // Add some randomization to probabilities
-        const randomizedPredictions = mockPredictions.map(pred => ({
-          ...pred,
-          probability: Math.max(5, Math.min(95, pred.probability + (Math.random() - 0.5) * 10))
-        }));
-
-        setPredictions(randomizedPredictions);
+        const response = await fetch('/api/prediction-markets');
+        const data = await response.json();
+        setPredictions(data.slice(0, 3)); // Show top 3 markets
         setLoading(false);
       } catch (error) {
-        console.error('Failed to fetch prediction data:', error);
+        console.error('Failed to fetch prediction markets:', error);
+        
+        // Fallback data
+        const fallbackPredictions: PredictionMarket[] = [
+          {
+            id: 'FED-RATES-26',
+            question: "Will the Fed cut rates by March 2026?",
+            probability: 68,
+            volume: "$2.4M",
+            lastUpdated: new Date().toISOString(),
+            url: 'https://kalshi.com',
+            category: 'Economics',
+            endDate: '2026-03-15'
+          },
+          {
+            id: 'OIL-80-26',
+            question: "Will oil be above $80 by year end?",
+            probability: 42,
+            volume: "$890K", 
+            lastUpdated: new Date().toISOString(),
+            url: 'https://kalshi.com',
+            category: 'Energy',
+            endDate: '2026-12-31'
+          },
+          {
+            id: 'CLIMATE-RECORD',
+            question: "Will 2026 be warmest year on record?",
+            probability: 35,
+            volume: "$1.2M",
+            lastUpdated: new Date().toISOString(),
+            url: 'https://kalshi.com',
+            category: 'Climate',
+            endDate: '2026-12-31'
+          }
+        ];
+        
+        setPredictions(fallbackPredictions);
         setLoading(false);
       }
     };
 
     fetchPredictions();
-    const interval = setInterval(fetchPredictions, 2 * 60 * 1000); // Update every 2 minutes
+    const interval = setInterval(fetchPredictions, 5 * 60 * 1000); // Update every 5 minutes
     return () => clearInterval(interval);
   }, []);
 
@@ -90,30 +104,68 @@ export default function PredictionMarketsWidget() {
 
   return (
     <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
-      <div className="bg-gray-800 p-2 flex-shrink-0">
-        <h3 className="text-white text-xs font-semibold tracking-wider">PREDICTION MARKETS</h3>
+      <div className="bg-gray-800 p-2 flex-shrink-0 flex items-center justify-between">
+        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>PREDICTION MARKETS</h3>
+        <div className="text-[#DAA520] text-xs font-bold">KALSHI</div>
       </div>
       
-      <div className="flex-1 bg-black px-3 py-1 overflow-y-auto">
+      <div className="flex-1 bg-black p-3 space-y-3 overflow-y-auto">
         {predictions.slice(0, 3).map((prediction, i) => (
-          <div key={i} className="border-b border-gray-700 pb-1 mb-1 last:border-b-0 last:mb-0">
-            <div className="mb-1">
-              <div className="text-[#DAA520] text-xs font-semibold mb-1">{prediction.question}</div>
-              <div className="flex items-center justify-between">
+          <div key={prediction.id} className="bg-gray-900 rounded-lg border border-gray-700 hover:border-[#DAA520] transition-all duration-200">
+            <a 
+              href={prediction.url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block p-3 hover:bg-gray-800 rounded-lg transition-all duration-200"
+            >
+              {/* Header with category and probability */}
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-gray-400 uppercase tracking-wider px-2 py-1 bg-gray-800 rounded">
+                  {prediction.category}
+                </span>
                 <div className="flex items-center gap-2">
                   <div 
-                    className="text-xs font-bold"
-                    style={{ color: getProbabilityColor(prediction.probability) }}
+                    className="text-lg font-bold px-2 py-1 rounded"
+                    style={{ 
+                      color: getProbabilityColor(prediction.probability),
+                      backgroundColor: `${getProbabilityColor(prediction.probability)}20`
+                    }}
                   >
                     {Math.round(prediction.probability)}%
                   </div>
-                  <div className="text-gray-500 text-xs">Vol: {prediction.volume}</div>
                 </div>
-                <div className="text-gray-500 text-xs">
+              </div>
+              
+              {/* Question */}
+              <div className="text-white text-sm font-medium mb-2 leading-tight">
+                {prediction.question}
+              </div>
+              
+              {/* Stats row */}
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-3">
+                  <div className="text-gray-400">
+                    Volume: <span className="text-[#DAA520] font-mono">{prediction.volume}</span>
+                  </div>
+                  <div className="text-gray-400">
+                    Ends: <span className="text-white">{new Date(prediction.endDate).toLocaleDateString()}</span>
+                  </div>
+                </div>
+                <div className="text-gray-500">
                   {formatTime(prediction.lastUpdated)}
                 </div>
               </div>
-            </div>
+              
+              {/* External link indicator */}
+              <div className="flex items-center justify-end mt-2">
+                <div className="text-[#DAA520] text-xs flex items-center gap-1">
+                  <span>Trade on Kalshi</span>
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </div>
+              </div>
+            </a>
           </div>
         ))}
       </div>
