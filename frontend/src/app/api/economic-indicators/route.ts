@@ -80,13 +80,6 @@ function getMockEconomicIndicators(): EconomicIndicator[] {
       period: `Q4 ${currentYear - 1}`
     },
     {
-      name: '10-Year Treasury',
-      value: `${(baseTreasury + treasuryVariation).toFixed(2)}%`,
-      change: (Math.random() - 0.5) * 0.5,
-      unit: 'Yield Percentage',
-      period: 'Current'
-    },
-    {
       name: 'Unemployment',
       value: `${(baseUnemployment + unemploymentVariation).toFixed(1)}%`,
       change: (Math.random() - 0.5) * 0.3,
@@ -105,6 +98,13 @@ function getMockEconomicIndicators(): EconomicIndicator[] {
       value: `${(baseFedRate + fedRateVariation).toFixed(2)}%`,
       change: (Math.random() - 0.5) * 0.25,
       unit: 'Fed Funds Rate',
+      period: 'Current'
+    },
+    {
+      name: '10-Year Treasury',
+      value: `${(baseTreasury + treasuryVariation).toFixed(2)}%`,
+      change: (Math.random() - 0.5) * 0.5,
+      unit: 'Yield Percentage',
       period: 'Current'
     },
     {

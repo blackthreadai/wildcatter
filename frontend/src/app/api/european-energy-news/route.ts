@@ -144,7 +144,7 @@ export async function GET() {
   try {
     // Return cached data if fresh
     if (cache && Date.now() - cache.ts < CACHE_MS) {
-      return NextResponse.json(cache.data.slice(0, 3));
+      return NextResponse.json(cache.data.slice(0, 8));
     }
 
     // Try to fetch from Euractiv RSS first
@@ -176,13 +176,13 @@ export async function GET() {
     cache = { data: uniqueArticles, ts: Date.now() };
     
     // Return top 3 most recent articles
-    return NextResponse.json(uniqueArticles.slice(0, 3));
+    return NextResponse.json(uniqueArticles.slice(0, 8));
     
   } catch (error) {
     console.error('European energy news API error:', error);
     
     // Fallback to mock data only
     const fallbackData = getMockEuropeanEnergyNews();
-    return NextResponse.json(fallbackData.slice(0, 3));
+    return NextResponse.json(fallbackData.slice(0, 8));
   }
 }

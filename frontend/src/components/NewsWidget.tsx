@@ -43,7 +43,7 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
           articleCount = 5;
         } else if (region === 'EUROPEAN ENERGY') {
           apiEndpoint = '/api/european-energy-news';
-          articleCount = 3;
+          articleCount = 5;
         } else if (region === 'AFRICAN') {
           apiEndpoint = '/api/african-energy-news';
           articleCount = 3;

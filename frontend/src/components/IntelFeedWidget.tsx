@@ -29,9 +29,9 @@ export default function WildcatterWidget() {
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>WILDCATTER</h3>
       </div>
 
-      {/* Four Buttons in 2x2 Grid */}
+      {/* Four Buttons in Single Column */}
       <div className="flex-1 p-3">
-        <div className="grid grid-cols-2 grid-rows-2 gap-3 h-full">
+        <div className="grid grid-cols-1 grid-rows-4 gap-3 h-full">
           {APPS.map((app, i) => (
             <button
               key={i}

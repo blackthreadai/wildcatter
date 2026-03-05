@@ -16,7 +16,11 @@ const EUROPEAN_ENERGY_SYMBOLS = [
   { symbol: 'SHEL', name: 'Shell PLC', currency: 'USD', market: 'NYSE', sector: 'Oil & Gas' },
   { symbol: 'TTE', name: 'TotalEnergies SE', currency: 'USD', market: 'NYSE', sector: 'Oil & Gas' },
   { symbol: 'BP', name: 'BP PLC', currency: 'USD', market: 'NYSE', sector: 'Oil & Gas' },
-  { symbol: 'EQNR', name: 'Equinor ASA', currency: 'USD', market: 'NYSE', sector: 'Oil & Gas' }
+  { symbol: 'EQNR', name: 'Equinor ASA', currency: 'USD', market: 'NYSE', sector: 'Oil & Gas' },
+  { symbol: 'ENI', name: 'Eni S.p.A.', currency: 'USD', market: 'NYSE', sector: 'Oil & Gas' },
+  { symbol: 'REPSOL', name: 'Repsol S.A.', currency: 'EUR', market: 'BME', sector: 'Oil & Gas' },
+  { symbol: 'ORSTED', name: 'Ørsted A/S', currency: 'DKK', market: 'CPH', sector: 'Renewables' },
+  { symbol: 'GALP', name: 'Galp Energia SGPS SA', currency: 'EUR', market: 'ELI', sector: 'Oil & Gas' }
 ];
 
 // Cache for 5 minutes (stock prices update frequently during market hours)
@@ -119,6 +123,46 @@ function getMockEuropeanEnergyStocks(): EuropeanEnergyStock[] {
       currency: 'USD',
       sector: 'Oil & Gas',
       market: 'NYSE'
+    },
+    {
+      symbol: 'ENI',
+      name: 'Eni S.p.A.',
+      price: 15.25 + (Math.random() - 0.5) * 2,
+      change: (Math.random() - 0.5) * 1.2,
+      changePercent: (Math.random() - 0.5) * 4,
+      currency: 'USD',
+      sector: 'Oil & Gas',
+      market: 'NYSE'
+    },
+    {
+      symbol: 'REPSOL',
+      name: 'Repsol S.A.',
+      price: 14.80 + (Math.random() - 0.5) * 1.8,
+      change: (Math.random() - 0.5) * 1.0,
+      changePercent: (Math.random() - 0.5) * 3.5,
+      currency: 'EUR',
+      sector: 'Oil & Gas',
+      market: 'BME'
+    },
+    {
+      symbol: 'ORSTED',
+      name: 'Ørsted A/S',
+      price: 45.60 + (Math.random() - 0.5) * 4,
+      change: (Math.random() - 0.5) * 2.2,
+      changePercent: (Math.random() - 0.5) * 5,
+      currency: 'DKK',
+      sector: 'Renewables',
+      market: 'CPH'
+    },
+    {
+      symbol: 'GALP',
+      name: 'Galp Energia SGPS SA',
+      price: 13.45 + (Math.random() - 0.5) * 1.5,
+      change: (Math.random() - 0.5) * 0.8,
+      changePercent: (Math.random() - 0.5) * 3,
+      currency: 'EUR',
+      sector: 'Oil & Gas',
+      market: 'ELI'
     }
   ].map(stock => ({
     ...stock,
@@ -159,7 +203,7 @@ export async function GET() {
     }
     
     // Fill remaining slots with mock data if needed
-    while (stocks.length < 4) {
+    while (stocks.length < 8) {
       const mockStocks = getMockEuropeanEnergyStocks();
       const missing = mockStocks.find(mock => 
         !stocks.some(real => real.symbol === mock.symbol)
@@ -168,9 +212,9 @@ export async function GET() {
     }
     
     // Cache the results
-    cache = { data: stocks.slice(0, 4), ts: Date.now() };
+    cache = { data: stocks.slice(0, 8), ts: Date.now() };
     
-    return NextResponse.json(stocks.slice(0, 4));
+    return NextResponse.json(stocks.slice(0, 8));
     
   } catch (error) {
     console.error('European energy stocks API error:', error);

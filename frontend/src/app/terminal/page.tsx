@@ -81,7 +81,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '14.1-CRITICAL-FIXES-DISPLAY-IMPROVEMENTS';
+const WIDGET_VERSION = '14.2-FINAL-POLISH-5-MORE-ENHANCEMENTS';
 
 const defaultWidgets: Widget[] = [
   // Rendr's specified order

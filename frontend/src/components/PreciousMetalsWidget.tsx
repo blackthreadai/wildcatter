@@ -109,8 +109,8 @@ export default function PreciousMetalsWidget() {
       </div>
       
       <div className="flex-1 bg-black p-2">
-        {/* Grid layout for 6 metal bars - 2 columns, 3 rows */}
-        <div className="grid grid-cols-2 grid-rows-3 gap-2 h-full">
+        {/* Grid layout for 6 metal bars - 2 columns, 3 rows with 10px row spacing */}
+        <div className="grid grid-cols-2 grid-rows-3 gap-x-2 gap-y-3 h-full">
           {metals.map((metal) => {
             const barStyle = getMetalBarStyle(metal.name);
             
