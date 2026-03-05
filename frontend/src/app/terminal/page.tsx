@@ -81,11 +81,11 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '11.1-FIXED-MULTISPAN-WIDGET-HEIGHTS';
+const WIDGET_VERSION = '11.2-LIVE-NEWS-2COL-1ROW-OPTIMIZED';
 
 const defaultWidgets: Widget[] = [
   // Rendr's specified order
-  { id: 'youtube', type: 'youtube', title: 'LIVE NEWS', span: { col: 2, row: 2 } },
+  { id: 'youtube', type: 'youtube', title: 'LIVE NEWS', span: { col: 2, row: 1 } },
   { id: 'us-news', type: 'news', title: 'US NEWS', region: 'US' },
   { id: 'us-markets', type: 'stock', title: 'US ENERGY MARKETS' },
   { id: 'strategic-reserve', type: 'news', title: 'STRATEGIC RESERVE', region: 'STRATEGIC RESERVE' },
@@ -238,7 +238,7 @@ function DraggableWidget({
         ...style,
         cursor: isDragging ? 'grabbing' : 'grab',
         opacity: isHidden ? 0.5 : 1,
-        height: widget.span?.row === 2 ? '816px' : '400px', // 2-row widgets = 2 × 400px + 16px gap
+        height: '400px', // All widgets now single-row height
         filter: isDragging 
           ? 'drop-shadow(0 0 20px rgba(218, 165, 32, 0.5))'
           : isHidden 

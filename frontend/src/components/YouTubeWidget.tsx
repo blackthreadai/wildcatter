@@ -26,17 +26,17 @@ export default function YouTubeWidget() {
         </div>
       </div>
 
-      {/* Channel Selector */}
-      <div className="bg-gray-900 p-2 flex-shrink-0 overflow-x-auto">
+      {/* Channel Selector - Compact */}
+      <div className="bg-gray-900 px-2 py-1 flex-shrink-0 overflow-x-auto">
         <div className="flex gap-1 min-w-max">
           {channels.map((channel) => (
             <button
               key={channel.id}
               onClick={() => setActiveChannel(channel.id)}
-              className={`px-3 py-1 text-xs font-bold tracking-[0.1em] whitespace-nowrap border ${
+              className={`px-2 py-1 text-xs font-bold tracking-[0.1em] whitespace-nowrap border ${
                 activeChannel === channel.id
-                  ? 'bg-yellow-500 text-black border-yellow-500'
-                  : 'bg-gray-900 text-gray-300 border-gray-700'
+                  ? 'bg-[#DAA520] text-black border-[#DAA520]'
+                  : 'bg-gray-900 text-gray-300 border-gray-700 hover:border-gray-500'
               }`}
             >
               {channel.name}
@@ -45,8 +45,8 @@ export default function YouTubeWidget() {
         </div>
       </div>
 
-      {/* Content Area */}
-      <div className="flex-1 p-2 bg-black min-h-0">
+      {/* Content Area - Optimized for shorter height */}
+      <div className="flex-1 p-1 bg-black min-h-0">
         {(() => {
           const channel = channels.find(c => c.id === activeChannel);
           const url = channel?.url;
