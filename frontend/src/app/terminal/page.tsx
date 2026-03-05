@@ -74,14 +74,14 @@ const WorldMap = dynamic(() => import('@/components/WorldMap'), {
 // Widget configuration - defines all widgets in the grid
 type Widget = {
   id: string;
-  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'economic-indicators' | 'climate-extremes' | 'global-oil-tracker' | 'opec' | 'natural-gas' | 'oil-rig-tracker' | 'power-grid-stress' | 'refinery-outages' | 'sanctions' | 'energy-futures' | 'crack-spread' | 'global-lng' | 'carbon-credit' | 'global-fuel-demand' | 'position-monitor' | 'ai-price-forecast' | 'event-calendar' | 'trade-signals';
+  type: 'news' | 'youtube' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'economic-indicators' | 'climate-extremes' | 'global-oil-tracker' | 'opec' | 'natural-gas' | 'oil-rig-tracker' | 'power-grid-stress' | 'refinery-outages' | 'sanctions' | 'energy-futures' | 'crack-spread' | 'global-lng' | 'carbon-credit' | 'global-fuel-demand' | 'position-monitor' | 'ai-price-forecast' | 'event-calendar' | 'trade-signals';
   title: string;
   span?: { col: number; row: number };
   region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS' | 'STRATEGIC RESERVE';
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '12.1-CRITICAL-API-LIMITS-FIXED';
+const WIDGET_VERSION = '13.0-MAJOR-CONTENT-OVERHAUL-COMPLETE';
 
 const defaultWidgets: Widget[] = [
   // Rendr's specified order
@@ -89,7 +89,6 @@ const defaultWidgets: Widget[] = [
   { id: 'us-news', type: 'news', title: 'US NEWS', region: 'US' },
   { id: 'us-markets', type: 'stock', title: 'US ENERGY MARKETS' },
   { id: 'strategic-reserve', type: 'news', title: 'STRATEGIC RESERVE', region: 'STRATEGIC RESERVE' },
-  { id: 'greed-fear', type: 'greed-fear', title: 'FEAR & GREED INDEX' },
   { id: 'world-clock', type: 'world-clock', title: 'WORLD CLOCK' },
   { id: 'travel', type: 'travel', title: 'TRAVEL ADVISORIES' },
   { id: 'asian-news', type: 'news', title: 'ASIAN NEWS', region: 'ASIAN' },
@@ -160,8 +159,6 @@ function DraggableWidget({
         return <YouTubeWidget />;
       case 'intel-feed':
         return <WildcatterWidget />;
-      case 'greed-fear':
-        return <GreedFearWidget />;
       case 'stock':
         return <StockWidget />;
       case 'asian-stock':

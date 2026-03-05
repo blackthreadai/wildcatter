@@ -18,10 +18,12 @@ export default function WorldClockWidget() {
     const updateTimes = () => {
       const now = new Date();
       
-      // 4 key energy markets time zones
+      // 6 key global time zones
       const timeZones = [
         { name: 'CHICAGO', zone: 'America/Chicago' },
         { name: 'LONDON', zone: 'Europe/London' },
+        { name: 'MOSCOW', zone: 'Europe/Moscow' },
+        { name: 'TOKYO', zone: 'Asia/Tokyo' },
         { name: 'BEIJING', zone: 'Asia/Shanghai' },
         { name: 'RIYADH', zone: 'Asia/Riyadh' }
       ];
@@ -53,28 +55,33 @@ export default function WorldClockWidget() {
     const minuteAngle = (time.minutes * 6 + time.seconds * 0.1) - 90; // 6 degrees per minute
     const hourAngle = ((time.hours % 12) * 30 + time.minutes * 0.5) - 90; // 30 degrees per hour
     
-    const centerX = 35;
-    const centerY = 35;
-    const clockRadius = 32;
+    const centerX = 30;
+    const centerY = 30;
+    const clockRadius = 28;
+    
+    // Determine AM/PM color
+    const isAM = time.hours < 12;
+    const clockColor = isAM ? '#22c55e' : '#ef4444'; // Green for AM, Red for PM
+    const amPmText = isAM ? 'AM' : 'PM';
     
     return (
       <div className="flex flex-col items-center">
-        <svg width="70" height="70" className="mb-2">
+        <svg width="60" height="60" className="mb-1">
           {/* Clock face */}
           <circle
             cx={centerX}
             cy={centerY}
             r={clockRadius}
             fill="black"
-            stroke="#DAA520"
+            stroke={clockColor}
             strokeWidth="2"
           />
           
           {/* Hour markers */}
           {[...Array(12)].map((_, i) => {
             const angle = (i * 30) - 90;
-            const x1 = centerX + (clockRadius - 6) * Math.cos(angle * Math.PI / 180);
-            const y1 = centerY + (clockRadius - 6) * Math.sin(angle * Math.PI / 180);
+            const x1 = centerX + (clockRadius - 5) * Math.cos(angle * Math.PI / 180);
+            const y1 = centerY + (clockRadius - 5) * Math.sin(angle * Math.PI / 180);
             const x2 = centerX + (clockRadius - 2) * Math.cos(angle * Math.PI / 180);
             const y2 = centerY + (clockRadius - 2) * Math.sin(angle * Math.PI / 180);
             
@@ -85,8 +92,8 @@ export default function WorldClockWidget() {
                 y1={y1}
                 x2={x2}
                 y2={y2}
-                stroke="#DAA520"
-                strokeWidth="2"
+                stroke={clockColor}
+                strokeWidth="1.5"
               />
             );
           })}
@@ -97,8 +104,8 @@ export default function WorldClockWidget() {
             y1={centerY}
             x2={centerX + 18 * Math.cos(hourAngle * Math.PI / 180)}
             y2={centerY + 18 * Math.sin(hourAngle * Math.PI / 180)}
-            stroke="white"
-            strokeWidth="4"
+            stroke={clockColor}
+            strokeWidth="3"
             strokeLinecap="round"
           />
           
@@ -108,8 +115,8 @@ export default function WorldClockWidget() {
             y1={centerY}
             x2={centerX + 26 * Math.cos(minuteAngle * Math.PI / 180)}
             y2={centerY + 26 * Math.sin(minuteAngle * Math.PI / 180)}
-            stroke="white"
-            strokeWidth="3"
+            stroke={clockColor}
+            strokeWidth="2"
             strokeLinecap="round"
           />
           
@@ -133,9 +140,14 @@ export default function WorldClockWidget() {
           />
         </svg>
         
-        {/* City name */}
-        <div className="text-white text-xs font-bold tracking-wider">
-          {time.name}
+        {/* City name and AM/PM */}
+        <div className="text-center">
+          <div className="text-white text-xs font-bold tracking-wider">
+            {time.name}
+          </div>
+          <div className={`text-xs font-bold ${isAM ? 'text-green-500' : 'text-red-500'}`}>
+            {amPmText}
+          </div>
         </div>
       </div>
     );
@@ -160,9 +172,9 @@ export default function WorldClockWidget() {
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>WORLD CLOCK</h3>
       </div>
       
-      <div className="flex-1 bg-black p-2">
-        {/* 2x2 Grid for 4 analog clocks */}
-        <div className="grid grid-cols-2 grid-rows-2 gap-3 h-full">
+      <div className="flex-1 bg-black p-2 flex items-center justify-center">
+        {/* 3x2 Grid for 6 analog clocks */}
+        <div className="grid grid-cols-3 grid-rows-2 gap-2">
           {times.map((timeData) => (
             <div key={timeData.name} className="flex items-center justify-center">
               {createAnalogClock(timeData)}

@@ -161,20 +161,49 @@ export default function SPRChartWidget() {
           {renderChart()}
         </div>
         
-        {/* Stats */}
+        {/* Enhanced Stats */}
         {latestData && (
-          <div className="space-y-1 px-2">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400 text-xs">Current Level</span>
-              <span className="text-[#DAA520] text-xs font-mono font-bold">{latestData.value}M bbls</span>
+          <div className="space-y-2 px-2">
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 text-xs">Current Level</span>
+                <span className="text-[#DAA520] text-xs font-mono font-bold">{latestData.value}M bbls</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 text-xs">Capacity Usage</span>
+                <span className="text-white text-xs font-mono">{((latestData.value / 714) * 100).toFixed(0)}% of 714M</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 text-xs">YoY Change</span>
+                <span className={`text-xs font-mono ${change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {change >= 0 ? '+' : ''}{change.toFixed(1)}M ({changePercent >= 0 ? '+' : ''}{changePercent.toFixed(1)}%)
+                </span>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400 text-xs">YoY Change</span>
-              <span className={`text-xs font-mono ${change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {change >= 0 ? '+' : ''}{change.toFixed(1)}M ({changePercent >= 0 ? '+' : ''}{changePercent.toFixed(1)}%)
-              </span>
+            
+            <div className="border-t border-gray-700 pt-2">
+              <div className="text-[#DAA520] text-xs font-bold mb-1">KEY METRICS</div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <div className="text-gray-400">Import Coverage</div>
+                  <div className="text-white font-mono">{Math.round(latestData.value / (7.8 * 30))} days</div>
+                </div>
+                <div>
+                  <div className="text-gray-400">vs Peak (2020)</div>
+                  <div className="text-red-400 font-mono">-38%</div>
+                </div>
+                <div>
+                  <div className="text-gray-400">Sites Active</div>
+                  <div className="text-white font-mono">4 locations</div>
+                </div>
+                <div>
+                  <div className="text-gray-400">Max Drawdown</div>
+                  <div className="text-white font-mono">4.4M bpd</div>
+                </div>
+              </div>
             </div>
-            <div className="text-xs text-gray-500 text-center mt-2">
+            
+            <div className="text-xs text-gray-500 text-center">
               Source: U.S. Energy Information Administration
             </div>
           </div>

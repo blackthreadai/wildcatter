@@ -188,13 +188,13 @@ export async function GET() {
     cache = { data: advisories, ts: Date.now() };
     
     // Return top 5 most relevant advisories
-    return NextResponse.json(advisories.slice(0, 5));
+    return NextResponse.json(advisories.slice(0, 8));
     
   } catch (error) {
     console.error('Travel advisories API error:', error);
     
     // Ultimate fallback
-    const fallbackData = getCurrentEnergyCountryAdvisories().slice(0, 5);
+    const fallbackData = getCurrentEnergyCountryAdvisories().slice(0, 8);
     return NextResponse.json(fallbackData);
   }
 }

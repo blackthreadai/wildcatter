@@ -129,7 +129,7 @@ export async function GET() {
   try {
     // Return cached data if fresh
     if (cache && Date.now() - cache.ts < CACHE_MS) {
-      return NextResponse.json(cache.data.slice(0, 3));
+      return NextResponse.json(cache.data.slice(0, 8));
     }
 
     // Try to fetch from Nikkei first
@@ -159,13 +159,13 @@ export async function GET() {
     cache = { data: uniqueArticles, ts: Date.now() };
     
     // Return top 3 most recent articles
-    return NextResponse.json(uniqueArticles.slice(0, 3));
+    return NextResponse.json(uniqueArticles.slice(0, 8));
     
   } catch (error) {
     console.error('Asian energy news API error:', error);
     
     // Fallback to mock data only
     const mockArticles = getMockAsianEnergyNews();
-    return NextResponse.json(mockArticles.slice(0, 3));
+    return NextResponse.json(mockArticles.slice(0, 8));
   }
 }
