@@ -81,7 +81,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '8.1-SPR-CHART-LINKS-FIXED';
+const WIDGET_VERSION = '9.0-ALL-16-ENERGY-MODULES-COMPLETE';
 
 const defaultWidgets: Widget[] = [
   // Rendr's specified order
