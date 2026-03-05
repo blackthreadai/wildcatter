@@ -198,7 +198,7 @@ function DraggableWidget({
             }}
             onMouseEnter={() => setWidgetTooltip('visibility')}
             onMouseLeave={() => setWidgetTooltip(null)}
-            className="text-[#DAA520] hover:text-yellow-300 transition-colors pointer-events-auto p-1"
+            className="text-[#DAA520] pointer-events-auto p-1"
           >
             {isHidden ? (
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
@@ -933,7 +933,7 @@ export default function TerminalPage() {
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={handleSetHomepage}
-                  className="bg-[#DAA520] text-black px-6 py-2 rounded font-semibold hover:bg-yellow-500 transition-colors"
+                  className="bg-[#DAA520] text-black px-6 py-2 rounded font-semibold"
                 >
                   YES
                 </button>

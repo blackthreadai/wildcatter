@@ -328,7 +328,7 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
                 }
               }}
             >
-              <h4 className="text-[#DAA520] group-hover:text-yellow-300 text-xs leading-tight mb-1 line-clamp-2 cursor-pointer transition-colors">
+              <h4 className="text-[#DAA520] text-xs leading-tight mb-1 line-clamp-2 cursor-pointer">
                 {article.title}
               </h4>
             </a>
