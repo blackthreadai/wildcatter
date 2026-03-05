@@ -173,8 +173,8 @@ export default function WorldClockWidget() {
       </div>
       
       <div className="flex-1 bg-black p-2 flex items-center justify-center">
-        {/* 3x2 Grid for 6 analog clocks */}
-        <div className="grid grid-cols-3 grid-rows-2 gap-2">
+        {/* 2x3 Grid for 6 analog clocks with even spacing */}
+        <div className="grid grid-cols-2 grid-rows-3 gap-4 h-full w-full justify-items-center items-center">
           {times.map((timeData) => (
             <div key={timeData.name} className="flex items-center justify-center">
               {createAnalogClock(timeData)}

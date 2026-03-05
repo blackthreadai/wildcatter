@@ -34,13 +34,13 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
           articleCount = 5;
         } else if (region === 'SOUTH AMERICAN') {
           apiEndpoint = '/api/south-american-energy-news';
-          articleCount = 3;
+          articleCount = 5;
         } else if (region === 'RUSSIAN') {
           apiEndpoint = '/api/russian-energy-news';
-          articleCount = 3;
+          articleCount = 5;
         } else if (region === 'MIDDLE EAST ENERGY') {
           apiEndpoint = '/api/middle-east-energy-news';
-          articleCount = 3;
+          articleCount = 5;
         } else if (region === 'EUROPEAN ENERGY') {
           apiEndpoint = '/api/european-energy-news';
           articleCount = 3;

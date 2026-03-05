@@ -62,6 +62,24 @@ export default function PreciousMetalsWidget() {
           symbol: 'Pt',
           textColor: 'text-gray-700'
         };
+      case 'Palladium':
+        return {
+          background: 'linear-gradient(135deg, #CED0DD 0%, #A8AAB5 50%, #7D7F8A 100%)',
+          symbol: 'Pd',
+          textColor: 'text-gray-700'
+        };
+      case 'Rhodium':
+        return {
+          background: 'linear-gradient(135deg, #F0F0F0 0%, #D4D4D4 50%, #B8B8B8 100%)',
+          symbol: 'Rh',
+          textColor: 'text-gray-700'
+        };
+      case 'Copper':
+        return {
+          background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #A0522D 100%)',
+          symbol: 'Cu',
+          textColor: 'text-orange-900'
+        };
       default:
         return {
           background: 'linear-gradient(135deg, #666 0%, #444 100%)',
@@ -91,8 +109,8 @@ export default function PreciousMetalsWidget() {
       </div>
       
       <div className="flex-1 bg-black p-2">
-        {/* Grid layout for 3 metal bars */}
-        <div className="grid grid-cols-3 gap-2 h-full">
+        {/* Grid layout for 6 metal bars - 2 columns, 3 rows */}
+        <div className="grid grid-cols-2 grid-rows-3 gap-2 h-full">
           {metals.map((metal) => {
             const barStyle = getMetalBarStyle(metal.name);
             
@@ -100,18 +118,18 @@ export default function PreciousMetalsWidget() {
               <div key={metal.symbol} className="flex flex-col h-full">
                 {/* Metal bar - takes up most of the space */}
                 <div 
-                  className="flex-1 rounded-lg flex flex-col items-center justify-center mb-2 shadow-lg"
+                  className="flex-1 rounded-lg flex flex-col items-center justify-center mb-1 shadow-lg"
                   style={{ 
                     background: barStyle.background,
-                    minHeight: '60%'
+                    minHeight: '75%'
                   }}
                 >
                   {/* Chemical symbol */}
-                  <div className={`text-2xl font-bold ${barStyle.textColor} mb-1`}>
+                  <div className={`text-3xl font-bold ${barStyle.textColor} mb-1`}>
                     {barStyle.symbol}
                   </div>
                   {/* Metal name */}
-                  <div className={`text-xs font-semibold ${barStyle.textColor}`}>
+                  <div className={`text-sm font-semibold ${barStyle.textColor}`}>
                     {metal.name}
                   </div>
                 </div>

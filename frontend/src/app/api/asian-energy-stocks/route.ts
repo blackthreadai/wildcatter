@@ -16,7 +16,11 @@ const ASIAN_ENERGY_SYMBOLS = [
   { symbol: 'PTR', name: 'PetroChina Co Ltd', currency: 'USD', market: 'NYSE', sector: 'Oil & Gas' },
   { symbol: 'SNP', name: 'China Petroleum & Chemical', currency: 'USD', market: 'NYSE', sector: 'Oil & Gas' }, 
   { symbol: 'CEO', name: 'CNOOC Ltd', currency: 'USD', market: 'NYSE', sector: 'Oil & Gas' },
-  { symbol: 'RELIANCE.NS', name: 'Reliance Industries', currency: 'INR', market: 'NSE', sector: 'Oil & Gas' }
+  { symbol: 'RELIANCE.NS', name: 'Reliance Industries', currency: 'INR', market: 'NSE', sector: 'Oil & Gas' },
+  { symbol: 'ONGC.NS', name: 'Oil & Natural Gas Corp', currency: 'INR', market: 'NSE', sector: 'Oil & Gas' },
+  { symbol: 'INPEX', name: 'INPEX Corp', currency: 'JPY', market: 'TSE', sector: 'Oil & Gas' },
+  { symbol: 'ENEOS', name: 'ENEOS Holdings Inc', currency: 'JPY', market: 'TSE', sector: 'Oil & Gas' },
+  { symbol: 'PETRONAS', name: 'Petroliam Nasional Bhd', currency: 'MYR', market: 'KLSE', sector: 'Oil & Gas' }
 ];
 
 // Cache for 5 minutes (stock prices update frequently during market hours)
@@ -119,6 +123,46 @@ function getMockAsianEnergyStocks(): AsianEnergyStock[] {
       currency: 'INR',
       sector: 'Oil & Gas',
       market: 'NSE'
+    },
+    {
+      symbol: 'ONGC',
+      name: 'Oil & Natural Gas Corp',
+      price: 245.80 + (Math.random() - 0.5) * 20, // INR price
+      change: (Math.random() - 0.5) * 8,
+      changePercent: (Math.random() - 0.5) * 3,
+      currency: 'INR',
+      sector: 'Oil & Gas',
+      market: 'NSE'
+    },
+    {
+      symbol: 'INPEX',
+      name: 'INPEX Corp',
+      price: 1680.0 + (Math.random() - 0.5) * 150, // JPY price
+      change: (Math.random() - 0.5) * 40,
+      changePercent: (Math.random() - 0.5) * 2.5,
+      currency: 'JPY',
+      sector: 'Oil & Gas',
+      market: 'TSE'
+    },
+    {
+      symbol: 'ENEOS',
+      name: 'ENEOS Holdings Inc',
+      price: 520.5 + (Math.random() - 0.5) * 50, // JPY price
+      change: (Math.random() - 0.5) * 15,
+      changePercent: (Math.random() - 0.5) * 3,
+      currency: 'JPY',
+      sector: 'Oil & Gas',
+      market: 'TSE'
+    },
+    {
+      symbol: 'PETRONAS',
+      name: 'Petroliam Nasional Bhd',
+      price: 32.50 + (Math.random() - 0.5) * 4, // MYR price
+      change: (Math.random() - 0.5) * 1.2,
+      changePercent: (Math.random() - 0.5) * 3.5,
+      currency: 'MYR',
+      sector: 'Oil & Gas',
+      market: 'KLSE'
     }
   ].map(stock => ({
     ...stock,
@@ -136,7 +180,7 @@ export async function GET() {
     }
 
     // Fetch data for Asian energy stocks in parallel
-    const stockPromises = ASIAN_ENERGY_SYMBOLS.slice(0, 4).map(stock => 
+    const stockPromises = ASIAN_ENERGY_SYMBOLS.slice(0, 8).map(stock => 
       fetchYahooAsianStock(stock.symbol)
     );
     
@@ -159,7 +203,7 @@ export async function GET() {
     }
     
     // Fill remaining slots with mock data if needed
-    while (stocks.length < 4) {
+    while (stocks.length < 8) {
       const mockStocks = getMockAsianEnergyStocks();
       const missing = mockStocks.find(mock => 
         !stocks.some(real => real.symbol === mock.symbol)
@@ -168,9 +212,9 @@ export async function GET() {
     }
     
     // Cache the results
-    cache = { data: stocks.slice(0, 4), ts: Date.now() };
+    cache = { data: stocks.slice(0, 8), ts: Date.now() };
     
-    return NextResponse.json(stocks.slice(0, 4));
+    return NextResponse.json(stocks.slice(0, 8));
     
   } catch (error) {
     console.error('Asian energy stocks API error:', error);

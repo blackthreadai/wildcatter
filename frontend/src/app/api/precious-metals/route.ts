@@ -16,7 +16,8 @@ const CACHE_MS = 10 * 60 * 1000;
 async function fetchYahooFinanceMetals(): Promise<PreciousMetal[]> {
   try {
     // Use Yahoo Finance for precious metals (same API as stocks)
-    const symbols = ['GC=F', 'SI=F', 'PL=F']; // Gold, Silver, Platinum futures
+    const symbols = ['GC=F', 'SI=F', 'PL=F', 'PA=F', 'HG=F']; // Gold, Silver, Platinum, Palladium, Copper futures
+    // Note: Rhodium doesn't have a standard Yahoo Finance symbol, will use mock data
     const promises = symbols.map(symbol => fetchMetalFromYahoo(symbol));
     
     const results = await Promise.allSettled(promises);
@@ -26,6 +27,13 @@ async function fetchYahooFinanceMetals(): Promise<PreciousMetal[]> {
       if (result.status === 'fulfilled' && result.value) {
         metals.push(result.value);
       }
+    }
+    
+    // Add Rhodium manually since it doesn't have a Yahoo Finance symbol
+    const mockData = getMockPreciousMetalsData();
+    const rhodium = mockData.find(m => m.name === 'Rhodium');
+    if (rhodium) {
+      metals.push(rhodium);
     }
     
     return metals;
@@ -81,6 +89,14 @@ async function fetchMetalFromYahoo(symbol: string): Promise<PreciousMetal | null
         name = 'Platinum';
         metalSymbol = 'XPT';
         break;
+      case 'PA=F':
+        name = 'Palladium';
+        metalSymbol = 'XPD';
+        break;
+      case 'HG=F':
+        name = 'Copper';
+        metalSymbol = 'XCU';
+        break;
     }
     
     return {
@@ -107,10 +123,16 @@ function getMockPreciousMetalsData(): PreciousMetal[] {
   const goldBase = 2045.50;
   const silverBase = 24.85;
   const platinumBase = 1028.75;
+  const palladiumBase = 2150.00;
+  const rhodiumBase = 4500.00;
+  const copperBase = 3.85;
   
   const goldVariance = (Math.random() - 0.5) * 60;
   const silverVariance = (Math.random() - 0.5) * 4;
   const platinumVariance = (Math.random() - 0.5) * 40;
+  const palladiumVariance = (Math.random() - 0.5) * 120;
+  const rhodiumVariance = (Math.random() - 0.5) * 300;
+  const copperVariance = (Math.random() - 0.5) * 0.25;
   
   return [
     {
@@ -136,6 +158,30 @@ function getMockPreciousMetalsData(): PreciousMetal[] {
       change: parseFloat(platinumVariance.toFixed(2)),
       changePercent: parseFloat(((platinumVariance / platinumBase) * 100).toFixed(2)),
       unit: 'USD/oz'
+    },
+    {
+      symbol: 'XPD',
+      name: 'Palladium',
+      price: parseFloat((palladiumBase + palladiumVariance).toFixed(2)),
+      change: parseFloat(palladiumVariance.toFixed(2)),
+      changePercent: parseFloat(((palladiumVariance / palladiumBase) * 100).toFixed(2)),
+      unit: 'USD/oz'
+    },
+    {
+      symbol: 'XRH',
+      name: 'Rhodium',
+      price: parseFloat((rhodiumBase + rhodiumVariance).toFixed(2)),
+      change: parseFloat(rhodiumVariance.toFixed(2)),
+      changePercent: parseFloat(((rhodiumVariance / rhodiumBase) * 100).toFixed(2)),
+      unit: 'USD/oz'
+    },
+    {
+      symbol: 'XCU',
+      name: 'Copper',
+      price: parseFloat((copperBase + copperVariance).toFixed(2)),
+      change: parseFloat(copperVariance.toFixed(2)),
+      changePercent: parseFloat(((copperVariance / copperBase) * 100).toFixed(2)),
+      unit: 'USD/lb'
     }
   ];
 }
@@ -155,8 +201,8 @@ export async function GET() {
       metals = getMockPreciousMetalsData();
     }
     
-    // Ensure we have all 3 metals
-    const metalNames = ['Gold', 'Silver', 'Platinum'];
+    // Ensure we have all 6 metals
+    const metalNames = ['Gold', 'Silver', 'Platinum', 'Palladium', 'Rhodium', 'Copper'];
     const completedMetals: PreciousMetal[] = [];
     
     for (const metalName of metalNames) {

@@ -81,7 +81,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '13.0-MAJOR-CONTENT-OVERHAUL-COMPLETE';
+const WIDGET_VERSION = '14.0-MEGA-EXPANSION-ALL-MODULES-ENHANCED';
 
 const defaultWidgets: Widget[] = [
   // Rendr's specified order
