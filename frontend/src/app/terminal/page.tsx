@@ -81,43 +81,45 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '14.4-CLIMATE-8-ITEMS-KALSHI-PREDICTION-MARKETS';
+const WIDGET_VERSION = '15.0-NEW-DEFAULT-LAYOUT-PRIORITY-ORDER';
 
 const defaultWidgets: Widget[] = [
-  // Rendr's specified order
+  // NEW DEFAULT ORDER - Rendr's priority layout
   { id: 'youtube', type: 'youtube', title: 'LIVE NEWS', span: { col: 2, row: 1 } },
   { id: 'us-news', type: 'news', title: 'US NEWS', region: 'US' },
   { id: 'us-markets', type: 'stock', title: 'US ENERGY MARKETS' },
+  { id: 'position-monitor', type: 'position-monitor', title: 'POSITION MONITOR' },
+  { id: 'energy-futures', type: 'energy-futures', title: 'ENERGY FUTURES' },
   { id: 'strategic-reserve', type: 'news', title: 'STRATEGIC RESERVE', region: 'STRATEGIC RESERVE' },
   { id: 'world-clock', type: 'world-clock', title: 'WORLD CLOCK' },
+  { id: 'opec', type: 'opec', title: 'OPEC' },
   { id: 'travel', type: 'travel', title: 'TRAVEL ADVISORIES' },
+  { id: 'economic-indicators', type: 'economic-indicators', title: 'ECONOMIC INDICATORS' },
+  { id: 'european-energy', type: 'news', title: 'EUROPEAN NEWS', region: 'EUROPEAN ENERGY' },
+  { id: 'european-energy-markets', type: 'european-energy-markets', title: 'EURO ENERGY MARKETS' },
+  { id: 'precious-metals', type: 'precious-metals', title: 'PRECIOUS METALS' },
+  
+  // Additional modules (secondary priority)
   { id: 'asian-news', type: 'news', title: 'ASIAN NEWS', region: 'ASIAN' },
   { id: 'asian-markets', type: 'asian-stock', title: 'ASIAN ENERGY MARKETS' },
-  { id: 'precious-metals', type: 'precious-metals', title: 'PRECIOUS METALS' },
   { id: 'sa-news', type: 'news', title: 'S. AMERICAN NEWS', region: 'SOUTH AMERICAN' },
   { id: 'cryptocurrency', type: 'cryptocurrency', title: 'CRYPTOCURRENCY' },
   { id: 'russian-news', type: 'news', title: 'RUSSIAN NEWS', region: 'RUSSIAN' },
   { id: 'middle-east-energy', type: 'news', title: 'MIDDLE EAST NEWS', region: 'MIDDLE EAST ENERGY' },
-  { id: 'economic-indicators', type: 'economic-indicators', title: 'ECONOMIC INDICATORS' },
-  { id: 'european-energy', type: 'news', title: 'EUROPEAN NEWS', region: 'EUROPEAN ENERGY' },
-  { id: 'european-energy-markets', type: 'european-energy-markets', title: 'EURO ENERGY MARKETS' },
   { id: 'predictions', type: 'prediction', title: 'PREDICTION MARKETS' },
   { id: 'climate-extremes', type: 'climate-extremes', title: 'CLIMATE EXTREMES' },
   { id: 'intel-feed', type: 'intel-feed', title: 'WILDCATTER' },
   { id: 'african-news', type: 'news', title: 'AFRICAN NEWS', region: 'AFRICAN' },
   { id: 'global-oil-tracker', type: 'global-oil-tracker', title: 'GLOBAL O/G TRACKER' },
-  { id: 'opec', type: 'opec', title: 'OPEC' },
   { id: 'natural-gas', type: 'natural-gas', title: 'NATURAL GAS' },
   { id: 'oil-rig-tracker', type: 'oil-rig-tracker', title: 'OIL RIG TRACKER' },
   { id: 'power-grid-stress', type: 'power-grid-stress', title: 'POWER GRID STRESS' },
   { id: 'refinery-outages', type: 'refinery-outages', title: 'REFINERY OUTAGES' },
   { id: 'sanctions', type: 'sanctions', title: 'SANCTIONS' },
-  { id: 'energy-futures', type: 'energy-futures', title: 'ENERGY FUTURES' },
   { id: 'crack-spread', type: 'crack-spread', title: 'CRACK SPREAD' },
   { id: 'global-lng', type: 'global-lng', title: 'GLOBAL LNG' },
   { id: 'carbon-credit', type: 'carbon-credit', title: 'CARBON CREDIT' },
   { id: 'global-fuel-demand', type: 'global-fuel-demand', title: 'GLOBAL FUEL DEMAND' },
-  { id: 'position-monitor', type: 'position-monitor', title: 'POSITION MONITOR' },
   { id: 'ai-price-forecast', type: 'ai-price-forecast', title: 'AI PRICE FORECAST' },
   { id: 'event-calendar', type: 'event-calendar', title: 'EVENT CALENDAR' },
   { id: 'trade-signals', type: 'trade-signals', title: 'TRADE SIGNALS' },
