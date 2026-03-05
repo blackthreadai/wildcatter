@@ -16,6 +16,10 @@ import CryptocurrencyWidget from '@/components/CryptocurrencyWidget';
 import EuropeanEnergyMarketsWidget from '@/components/EuropeanEnergyMarketsWidget';
 import EconomicIndicatorsWidget from '@/components/EconomicIndicatorsWidget';
 import ClimateExtremesWidget from '@/components/ClimateExtremesWidget';
+import GlobalOilTrackerWidget from '@/components/GlobalOilTrackerWidget';
+import OPECWidget from '@/components/OPECWidget';
+import NaturalGasWidget from '@/components/NaturalGasWidget';
+import OilRigTrackerWidget from '@/components/OilRigTrackerWidget';
 
 // Drag and drop imports
 import {
@@ -58,7 +62,7 @@ const WorldMap = dynamic(() => import('@/components/WorldMap'), {
 // Widget configuration - defines all widgets in the grid
 type Widget = {
   id: string;
-  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'economic-indicators' | 'climate-extremes';
+  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'economic-indicators' | 'climate-extremes' | 'global-oil-tracker' | 'opec' | 'natural-gas' | 'oil-rig-tracker';
   title: string;
   span?: { col: number; row: number };
   region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS' | 'STRATEGIC RESERVE';
@@ -90,6 +94,10 @@ const defaultWidgets: Widget[] = [
   { id: 'climate-extremes', type: 'climate-extremes', title: 'CLIMATE EXTREMES' },
   { id: 'intel-feed', type: 'intel-feed', title: 'WILDCATTER', span: { col: 2, row: 1 } },
   { id: 'african-news', type: 'news', title: 'AFRICAN NEWS', region: 'AFRICAN' },
+  { id: 'global-oil-tracker', type: 'global-oil-tracker', title: 'GLOBAL O/G TRACKER' },
+  { id: 'opec', type: 'opec', title: 'OPEC' },
+  { id: 'natural-gas', type: 'natural-gas', title: 'NATURAL GAS' },
+  { id: 'oil-rig-tracker', type: 'oil-rig-tracker', title: 'OIL RIG TRACKER' },
 ];
 
 // Draggable Widget Component
@@ -150,6 +158,14 @@ function DraggableWidget({
         return <EconomicIndicatorsWidget />;
       case 'climate-extremes':
         return <ClimateExtremesWidget />;
+      case 'global-oil-tracker':
+        return <GlobalOilTrackerWidget />;
+      case 'opec':
+        return <OPECWidget />;
+      case 'natural-gas':
+        return <NaturalGasWidget />;
+      case 'oil-rig-tracker':
+        return <OilRigTrackerWidget />;
       default:
         return <NewsWidget region="US" title="US NEWS" />;
     }
