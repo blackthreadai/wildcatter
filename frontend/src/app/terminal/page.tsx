@@ -81,7 +81,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '15.0-NEW-DEFAULT-LAYOUT-PRIORITY-ORDER';
+const WIDGET_VERSION = '15.1-COMPLETE-WIDGET-ORDER-REMAINDER-SEQUENCE';
 
 const defaultWidgets: Widget[] = [
   // NEW DEFAULT ORDER - Rendr's priority layout
@@ -99,21 +99,20 @@ const defaultWidgets: Widget[] = [
   { id: 'european-energy-markets', type: 'european-energy-markets', title: 'EURO ENERGY MARKETS' },
   { id: 'precious-metals', type: 'precious-metals', title: 'PRECIOUS METALS' },
   
-  // Additional modules (secondary priority)
+  // Secondary modules (Rendr's specified remainder order)
+  { id: 'global-oil-tracker', type: 'global-oil-tracker', title: 'GLOBAL O/G TRACKER' },
+  { id: 'predictions', type: 'prediction', title: 'PREDICTION MARKETS' },
+  { id: 'natural-gas', type: 'natural-gas', title: 'NATURAL GAS' },
   { id: 'asian-news', type: 'news', title: 'ASIAN NEWS', region: 'ASIAN' },
   { id: 'asian-markets', type: 'asian-stock', title: 'ASIAN ENERGY MARKETS' },
-  { id: 'sa-news', type: 'news', title: 'S. AMERICAN NEWS', region: 'SOUTH AMERICAN' },
-  { id: 'cryptocurrency', type: 'cryptocurrency', title: 'CRYPTOCURRENCY' },
-  { id: 'russian-news', type: 'news', title: 'RUSSIAN NEWS', region: 'RUSSIAN' },
-  { id: 'middle-east-energy', type: 'news', title: 'MIDDLE EAST NEWS', region: 'MIDDLE EAST ENERGY' },
-  { id: 'predictions', type: 'prediction', title: 'PREDICTION MARKETS' },
-  { id: 'climate-extremes', type: 'climate-extremes', title: 'CLIMATE EXTREMES' },
   { id: 'intel-feed', type: 'intel-feed', title: 'WILDCATTER' },
-  { id: 'african-news', type: 'news', title: 'AFRICAN NEWS', region: 'AFRICAN' },
-  { id: 'global-oil-tracker', type: 'global-oil-tracker', title: 'GLOBAL O/G TRACKER' },
-  { id: 'natural-gas', type: 'natural-gas', title: 'NATURAL GAS' },
-  { id: 'oil-rig-tracker', type: 'oil-rig-tracker', title: 'OIL RIG TRACKER' },
+  { id: 'sa-news', type: 'news', title: 'S. AMERICAN NEWS', region: 'SOUTH AMERICAN' },
   { id: 'power-grid-stress', type: 'power-grid-stress', title: 'POWER GRID STRESS' },
+  { id: 'climate-extremes', type: 'climate-extremes', title: 'CLIMATE EXTREMES' },
+  { id: 'russian-news', type: 'news', title: 'RUSSIAN NEWS', region: 'RUSSIAN' },
+  { id: 'cryptocurrency', type: 'cryptocurrency', title: 'CRYPTOCURRENCY' },
+  { id: 'oil-rig-tracker', type: 'oil-rig-tracker', title: 'OIL RIG TRACKER' },
+  { id: 'middle-east-energy', type: 'news', title: 'MIDDLE EAST NEWS', region: 'MIDDLE EAST ENERGY' },
   { id: 'refinery-outages', type: 'refinery-outages', title: 'REFINERY OUTAGES' },
   { id: 'sanctions', type: 'sanctions', title: 'SANCTIONS' },
   { id: 'crack-spread', type: 'crack-spread', title: 'CRACK SPREAD' },
@@ -121,6 +120,7 @@ const defaultWidgets: Widget[] = [
   { id: 'carbon-credit', type: 'carbon-credit', title: 'CARBON CREDIT' },
   { id: 'global-fuel-demand', type: 'global-fuel-demand', title: 'GLOBAL FUEL DEMAND' },
   { id: 'ai-price-forecast', type: 'ai-price-forecast', title: 'AI PRICE FORECAST' },
+  { id: 'african-news', type: 'news', title: 'AFRICAN NEWS', region: 'AFRICAN' },
   { id: 'event-calendar', type: 'event-calendar', title: 'EVENT CALENDAR' },
   { id: 'trade-signals', type: 'trade-signals', title: 'TRADE SIGNALS' },
 ];
