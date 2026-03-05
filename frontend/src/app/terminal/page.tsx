@@ -81,7 +81,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '10.0-MASONRY-LAYOUT-OPTIMIZATION';
+const WIDGET_VERSION = '10.1-FIXED-5-COLUMN-GRID';
 
 const defaultWidgets: Widget[] = [
   // Rendr's specified order
@@ -233,14 +233,9 @@ function DraggableWidget({
   return (
     <div 
       ref={setNodeRef}
-      className="bg-black border overflow-hidden relative group"
+      className={`bg-black border overflow-hidden relative group ${getSpanClasses()}`}
       style={{
         ...style,
-        display: 'inline-block',
-        width: '100%',
-        marginBottom: '16px',
-        breakInside: 'avoid',
-        pageBreakInside: 'avoid',
         borderColor: isDragging ? '#DAA520' : (isHidden ? '#666666' : '#333333'),
         borderWidth: isDragging ? '2px' : '1px',
         boxShadow: isDragging 
@@ -250,7 +245,8 @@ function DraggableWidget({
             : '0 0 10px rgba(218, 165, 32, 0.2), 0 0 20px rgba(218, 165, 32, 0.1)',
         cursor: isDragging ? 'grabbing' : 'grab',
         opacity: isHidden ? 0.5 : 1,
-        minHeight: widget.span?.row === 2 ? '400px' : '300px' // Respect intended size hints
+        minHeight: widget.span?.row === 2 ? '400px' : '350px', // Natural content height
+        height: 'fit-content' // Allow content to determine height
       }}
       {...attributes}
       {...listeners}
@@ -652,39 +648,9 @@ export default function TerminalPage() {
           color: black !important;
         }
         
-        /* Masonry Layout Styles */
-        .masonry-container {
-          -webkit-column-break-inside: avoid;
-          -moz-column-break-inside: avoid;
-          column-break-inside: avoid;
-          break-inside: avoid;
-        }
-        
-        .masonry-container > * {
-          -webkit-column-break-inside: avoid;
-          -moz-column-break-inside: avoid;
-          column-break-inside: avoid;
-          break-inside: avoid;
-          page-break-inside: avoid;
-          display: inline-block;
-          width: 100%;
-        }
-        
-        /* Responsive column count */
-        @media (min-width: 1920px) {
-          .masonry-container { column-count: 6; }
-        }
-        @media (min-width: 1600px) and (max-width: 1919px) {
-          .masonry-container { column-count: 5; }
-        }
-        @media (min-width: 1200px) and (max-width: 1599px) {
-          .masonry-container { column-count: 4; }
-        }
-        @media (min-width: 800px) and (max-width: 1199px) {
-          .masonry-container { column-count: 3; }
-        }
-        @media (max-width: 799px) {
-          .masonry-container { column-count: 2; }
+        /* Grid Layout with Natural Heights */
+        .grid {
+          grid-auto-rows: minmax(min-content, max-content);
         }
       `}</style>
 
@@ -998,11 +964,9 @@ export default function TerminalPage() {
               strategy={rectSortingStrategy}
             >
               <div 
-                className="masonry-container h-full overflow-y-auto"
+                className="grid grid-cols-5 gap-4 h-full overflow-y-auto p-2"
                 style={{
-                  columnGap: '16px',
-                  columnFill: 'balance',
-                  padding: '8px'
+                  gridAutoRows: 'min-content'
                 }}
               >
                 {visibleWidgets.map((widget) => (
