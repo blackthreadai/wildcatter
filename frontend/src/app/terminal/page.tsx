@@ -81,7 +81,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '11.2-LIVE-NEWS-2COL-1ROW-OPTIMIZED';
+const WIDGET_VERSION = '11.3-EXPANDED-US-NEWS-AND-MARKETS';
 
 const defaultWidgets: Widget[] = [
   // Rendr's specified order

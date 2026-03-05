@@ -37,7 +37,11 @@ export default function StockWidget() {
           { symbol: 'XOM', name: 'Exxon Mobil', price: 118.45, change: 2.3 },
           { symbol: 'CVX', name: 'Chevron Corp', price: 162.87, change: 1.8 },
           { symbol: 'COP', name: 'ConocoPhillips', price: 134.22, change: -0.5 },
-          { symbol: 'SLB', name: 'Schlumberger', price: 63.91, change: 3.2 }
+          { symbol: 'EOG', name: 'EOG Resources', price: 145.67, change: 1.2 },
+          { symbol: 'SLB', name: 'Schlumberger', price: 63.91, change: 3.2 },
+          { symbol: 'PXD', name: 'Pioneer Natural', price: 267.89, change: 0.8 },
+          { symbol: 'KMI', name: 'Kinder Morgan', price: 18.43, change: -0.3 },
+          { symbol: 'WMB', name: 'Williams Cos', price: 41.26, change: 1.5 }
         ];
         
         setStocks(fallbackStocks);
