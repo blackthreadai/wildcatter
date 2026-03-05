@@ -10,7 +10,7 @@ interface ClimateExtreme {
   source: string;
 }
 
-// Cache for 1 hour (climate data changes relatively slowly)
+// Cache for 1 hour (climate data changes relatively slowly) - reset for 8-item update
 let cache: { data: ClimateExtreme[]; ts: number } | null = null;
 const CACHE_MS = 60 * 60 * 1000;
 
@@ -131,6 +131,24 @@ function getMockClimateExtremes(): ClimateExtreme[] {
       description: 'Temperatures expected to reach 118°F, heat index values up to 125°F',
       lastUpdated: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString(),
       source: 'NOAA/NWS'
+    },
+    {
+      type: 'flood',
+      title: 'Flash Flood Emergency',
+      location: 'Texas Hill Country',
+      severity: 'extreme',
+      description: 'Life-threatening flash flooding in progress due to training thunderstorms',
+      lastUpdated: new Date(now.getTime() - 1 * 60 * 60 * 1000).toISOString(),
+      source: 'National Weather Service'
+    },
+    {
+      type: 'wildfire',
+      title: 'Mega Fire Complex',
+      location: 'British Columbia',
+      severity: 'extreme',
+      description: 'Multiple fires burning 50,000+ acres, evacuation alerts issued for several communities',
+      lastUpdated: new Date(now.getTime() - 5 * 60 * 60 * 1000).toISOString(),
+      source: 'BC Wildfire Service'
     }
   ];
 }
@@ -163,7 +181,7 @@ export async function GET() {
     const seenLocations = new Set();
     
     for (const extreme of extremes) {
-      if (!seenLocations.has(extreme.location) && uniqueExtremes.length < 4) {
+      if (!seenLocations.has(extreme.location) && uniqueExtremes.length < 8) {
         uniqueExtremes.push(extreme);
         seenLocations.add(extreme.location);
       }
@@ -172,7 +190,7 @@ export async function GET() {
     // Cache the results
     cache = { data: uniqueExtremes, ts: Date.now() };
     
-    // Return top 4 most recent/relevant extremes
+    // Return top 8 most recent/relevant extremes
     return NextResponse.json(uniqueExtremes.slice(0, 8));
     
   } catch (error) {
