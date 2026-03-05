@@ -87,7 +87,7 @@ export async function GET() {
   try {
     // Return cached data if fresh
     if (cache && Date.now() - cache.ts < CACHE_MS) {
-      return NextResponse.json(cache.data.slice(0, 3));
+      return NextResponse.json(cache.data.slice(0, 8));
     }
 
     // For African energy news, we primarily use high-quality mock data from major international sources
@@ -101,13 +101,13 @@ export async function GET() {
     cache = { data: articles, ts: Date.now() };
     
     // Return top 3 most recent articles
-    return NextResponse.json(articles.slice(0, 3));
+    return NextResponse.json(articles.slice(0, 8));
     
   } catch (error) {
     console.error('African energy news API error:', error);
     
     // Fallback to mock data
     const fallbackData = getMockAfricanEnergyNews();
-    return NextResponse.json(fallbackData.slice(0, 3));
+    return NextResponse.json(fallbackData.slice(0, 8));
   }
 }

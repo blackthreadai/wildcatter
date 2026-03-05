@@ -81,7 +81,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '14.2-FINAL-POLISH-5-MORE-ENHANCEMENTS';
+const WIDGET_VERSION = '14.3-CRITICAL-FIXES-WILDCATTER-AFRICAN-US-MARKETS';
 
 const defaultWidgets: Widget[] = [
   // Rendr's specified order
@@ -103,7 +103,7 @@ const defaultWidgets: Widget[] = [
   { id: 'european-energy-markets', type: 'european-energy-markets', title: 'EURO ENERGY MARKETS' },
   { id: 'predictions', type: 'prediction', title: 'PREDICTION MARKETS' },
   { id: 'climate-extremes', type: 'climate-extremes', title: 'CLIMATE EXTREMES' },
-  { id: 'intel-feed', type: 'intel-feed', title: 'WILDCATTER', span: { col: 2, row: 1 } },
+  { id: 'intel-feed', type: 'intel-feed', title: 'WILDCATTER' },
   { id: 'african-news', type: 'news', title: 'AFRICAN NEWS', region: 'AFRICAN' },
   { id: 'global-oil-tracker', type: 'global-oil-tracker', title: 'GLOBAL O/G TRACKER' },
   { id: 'opec', type: 'opec', title: 'OPEC' },
