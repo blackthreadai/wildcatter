@@ -51,12 +51,18 @@ function getMockEconomicIndicators(): EconomicIndicator[] {
   const baseDebt = 33800; // ~$33.8T current US debt
   const baseGDP = 27000; // ~$27T US GDP
   const baseTreasury = 4.25; // ~4.25% current 10-year
+  const base30Year = 4.35; // ~4.35% current 30-year treasury
   const baseUnemployment = 3.8; // ~3.8% current unemployment
+  const baseInflation = 3.2; // ~3.2% current CPI inflation
+  const baseFedRate = 5.25; // ~5.25% current Fed funds rate
   
   const debtVariation = (Math.random() - 0.5) * 100;
   const gdpVariation = (Math.random() - 0.5) * 500;
   const treasuryVariation = (Math.random() - 0.5) * 0.2;
+  const treasury30Variation = (Math.random() - 0.5) * 0.2;
   const unemploymentVariation = (Math.random() - 0.5) * 0.2;
+  const inflationVariation = (Math.random() - 0.5) * 0.3;
+  const fedRateVariation = (Math.random() - 0.5) * 0.25;
   
   return [
     {
@@ -86,6 +92,27 @@ function getMockEconomicIndicators(): EconomicIndicator[] {
       change: (Math.random() - 0.5) * 0.3,
       unit: 'Percentage',
       period: `${currentMonth} ${currentYear}`
+    },
+    {
+      name: 'Inflation Rate',
+      value: `${(baseInflation + inflationVariation).toFixed(1)}%`,
+      change: (Math.random() - 0.5) * 0.4,
+      unit: 'CPI Y/Y %',
+      period: `${currentMonth} ${currentYear}`
+    },
+    {
+      name: 'Interest Rate',
+      value: `${(baseFedRate + fedRateVariation).toFixed(2)}%`,
+      change: (Math.random() - 0.5) * 0.25,
+      unit: 'Fed Funds Rate',
+      period: 'Current'
+    },
+    {
+      name: '30-Year Treasury',
+      value: `${(base30Year + treasury30Variation).toFixed(2)}%`,
+      change: (Math.random() - 0.5) * 0.4,
+      unit: 'Yield Percentage',
+      period: 'Current'
     }
   ];
 }

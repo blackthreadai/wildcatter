@@ -27,7 +27,9 @@ export default function StockWidget() {
           change: stock.changePercent // Use percentage change for display
         }));
         
-        setStocks(mappedStocks);
+        // Ensure we have exactly 8 stocks for display
+        const displayStocks = mappedStocks.slice(0, 8);
+        setStocks(displayStocks);
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch stock data:', error);

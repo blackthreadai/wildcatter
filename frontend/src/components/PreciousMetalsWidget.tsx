@@ -121,26 +121,26 @@ export default function PreciousMetalsWidget() {
                   className="flex-1 rounded-lg flex flex-col items-center justify-center mb-1 shadow-lg"
                   style={{ 
                     background: barStyle.background,
-                    minHeight: '75%'
+                    minHeight: '68%'
                   }}
                 >
                   {/* Chemical symbol */}
-                  <div className={`text-3xl font-bold ${barStyle.textColor} mb-1`}>
+                  <div className={`text-2xl font-bold ${barStyle.textColor} mb-0.5`}>
                     {barStyle.symbol}
                   </div>
                   {/* Metal name */}
-                  <div className={`text-sm font-semibold ${barStyle.textColor}`}>
+                  <div className={`text-xs font-semibold ${barStyle.textColor}`}>
                     {metal.name}
                   </div>
                 </div>
                 
                 {/* Price and change info below the bar */}
-                <div className="text-center">
+                <div className="text-center space-y-0.5">
                   {/* Price */}
-                  <div className="text-white text-xs font-mono font-bold mb-1">
+                  <div className="text-white text-xs font-mono font-bold">
                     ${metal.price.toFixed(2)}
                   </div>
-                  {/* Change with up/down indicator */}
+                  {/* Change with up/down indicator and percentage combined */}
                   <div className={`text-xs flex items-center justify-center gap-1 ${
                     metal.change >= 0 ? 'text-green-400' : 'text-red-400'
                   }`}>
@@ -148,16 +148,10 @@ export default function PreciousMetalsWidget() {
                     <span className="text-xs">
                       {metal.change >= 0 ? '▲' : '▼'}
                     </span>
-                    {/* Change amount and percentage */}
-                    <span className="font-mono">
-                      {metal.change >= 0 ? '+' : ''}{metal.change.toFixed(2)}
+                    {/* Combined change amount and percentage */}
+                    <span className="font-mono text-xs">
+                      {metal.change >= 0 ? '+' : ''}{metal.change.toFixed(1)} ({metal.changePercent >= 0 ? '+' : ''}{metal.changePercent.toFixed(1)}%)
                     </span>
-                  </div>
-                  {/* Percentage change */}
-                  <div className={`text-xs font-mono ${
-                    metal.changePercent >= 0 ? 'text-green-400' : 'text-red-400'
-                  }`}>
-                    ({metal.changePercent >= 0 ? '+' : ''}{metal.changePercent.toFixed(2)}%)
                   </div>
                 </div>
               </div>
