@@ -616,9 +616,9 @@ export default function TerminalPage() {
                   </svg>
                 </button>
                 {hoveredTooltip === 'homepage' && (
-                  <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-black text-[#DAA520] text-xs font-medium whitespace-nowrap z-50 rounded border border-[#DAA520]">
+                  <div className="absolute top-full right-0 mt-2 px-3 py-2 bg-black text-[#DAA520] text-xs font-medium whitespace-nowrap z-50 rounded border border-[#DAA520]">
                     Make Terminal Your Homepage
-                    <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-[#DAA520]"></div>
+                    <div className="absolute bottom-full right-2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-[#DAA520]"></div>
                   </div>
                 )}
               </div>
@@ -650,9 +650,9 @@ export default function TerminalPage() {
                   )}
                 </button>
                 {hoveredTooltip === 'visibility' && (
-                  <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-black text-[#DAA520] text-xs font-medium whitespace-nowrap z-50 rounded border border-[#DAA520]">
+                  <div className="absolute top-full right-0 mt-2 px-3 py-2 bg-black text-[#DAA520] text-xs font-medium whitespace-nowrap z-50 rounded border border-[#DAA520]">
                     Hide / Reveal Modules
-                    <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-[#DAA520]"></div>
+                    <div className="absolute bottom-full right-2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-[#DAA520]"></div>
                   </div>
                 )}
               </div>
@@ -677,9 +677,9 @@ export default function TerminalPage() {
                   </svg>
                 </button>
                 {hoveredTooltip === 'reset' && (
-                  <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-black text-[#DAA520] text-xs font-medium whitespace-nowrap z-50 rounded border border-[#DAA520]">
+                  <div className="absolute top-full right-0 mt-2 px-3 py-2 bg-black text-[#DAA520] text-xs font-medium whitespace-nowrap z-50 rounded border border-[#DAA520]">
                     Refresh Module Settings
-                    <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-[#DAA520]"></div>
+                    <div className="absolute bottom-full right-2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-[#DAA520]"></div>
                   </div>
                 )}
               </div>
@@ -697,9 +697,9 @@ export default function TerminalPage() {
                   </svg>
                 </button>
                 {hoveredTooltip === 'settings' && (
-                  <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-black text-[#DAA520] text-xs font-medium whitespace-nowrap z-50 rounded border border-[#DAA520]">
+                  <div className="absolute top-full right-0 mt-2 px-3 py-2 bg-black text-[#DAA520] text-xs font-medium whitespace-nowrap z-50 rounded border border-[#DAA520]">
                     Account Settings (Coming Soon!)
-                    <div className="absolute top-full right-2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-[#DAA520]"></div>
+                    <div className="absolute bottom-full right-2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-[#DAA520]"></div>
                   </div>
                 )}
               </div>
