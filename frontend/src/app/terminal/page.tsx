@@ -102,6 +102,8 @@ function DraggableWidget({
   isHidden: boolean;
   onToggleVisibility: (widgetId: string) => void;
 }) {
+  const [widgetTooltip, setWidgetTooltip] = useState<string | null>(null);
+  
   const {
     attributes,
     listeners,
@@ -188,42 +190,60 @@ function DraggableWidget({
       {/* Control buttons in top-right */}
       <div className="absolute top-1 right-1 z-50 flex items-center gap-1 bg-black/80 rounded px-1 opacity-60 group-hover:opacity-100 transition-opacity">
         {/* Eye icon button */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleVisibility(widget.id);
-          }}
-          className="text-[#DAA520] hover:text-yellow-300 transition-colors pointer-events-auto p-1"
-          title={isHidden ? 'Show widget' : 'Hide widget'}
-        >
-          {isHidden ? (
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-              <path d="M3 3l18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          ) : (
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-            </svg>
+        <div className="relative">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleVisibility(widget.id);
+            }}
+            onMouseEnter={() => setWidgetTooltip('visibility')}
+            onMouseLeave={() => setWidgetTooltip(null)}
+            className="text-[#DAA520] hover:text-yellow-300 transition-colors pointer-events-auto p-1"
+          >
+            {isHidden ? (
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                <path d="M3 3l18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            ) : (
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+              </svg>
+            )}
+          </button>
+          {widgetTooltip === 'visibility' && (
+            <div className="absolute top-full right-0 mt-2 px-3 py-2 bg-black text-[#DAA520] text-xs font-medium whitespace-nowrap z-50 rounded border border-[#DAA520]">
+              Hide Module
+              <div className="absolute bottom-full right-2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-[#DAA520]"></div>
+            </div>
           )}
-        </button>
+        </div>
 
         {/* Drag handle - 4-directional arrows */}
         <div 
-          className="pointer-events-none cursor-move p-1"
-          title="Drag to move widget"
+          className="relative"
+          onMouseEnter={() => setWidgetTooltip('drag')}
+          onMouseLeave={() => setWidgetTooltip(null)}
         >
-          <svg 
-            className="w-3 h-3 text-[#DAA520]" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            {/* Up and down arrows */}
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4M8 15l4 4 4-4" />
-            {/* Left and right arrows */}
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 8l-4 4 4 4M15 8l4 4-4 4" />
-          </svg>
+          <div className="pointer-events-none cursor-move p-1">
+            <svg 
+              className="w-3 h-3 text-[#DAA520]" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              {/* Up and down arrows */}
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4M8 15l4 4 4-4" />
+              {/* Left and right arrows */}
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 8l-4 4 4 4M15 8l4 4-4 4" />
+            </svg>
+          </div>
+          {widgetTooltip === 'drag' && (
+            <div className="absolute top-full right-0 mt-2 px-3 py-2 bg-black text-[#DAA520] text-xs font-medium whitespace-nowrap z-50 rounded border border-[#DAA520]">
+              Drag To Arrange Modules
+              <div className="absolute bottom-full right-2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-[#DAA520]"></div>
+            </div>
+          )}
         </div>
       </div>
       
