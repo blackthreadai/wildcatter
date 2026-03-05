@@ -26,7 +26,7 @@ export default function ClimateExtremesWidget() {
       } catch (error) {
         console.error('Failed to fetch climate extremes:', error);
         
-        // Fallback data
+        // Fallback data - 8 climate extremes
         const fallbackData: ClimateExtreme[] = [
           {
             type: 'hurricane',
@@ -63,6 +63,42 @@ export default function ClimateExtremesWidget() {
             description: 'Creek Fire burning 15,000 acres',
             lastUpdated: new Date().toISOString(),
             source: 'CAL FIRE'
+          },
+          {
+            type: 'extreme-heat',
+            title: 'Heat Wave Warning',
+            location: 'Phoenix Metro',
+            severity: 'extreme',
+            description: 'Excessive heat warning - temps 115°F+',
+            lastUpdated: new Date().toISOString(),
+            source: 'National Weather Service'
+          },
+          {
+            type: 'typhoon',
+            title: 'Typhoon Activity',
+            location: 'Western Pacific',
+            severity: 'high',
+            description: 'Typhoon Megi approaching Philippines',
+            lastUpdated: new Date().toISOString(),
+            source: 'JMA Tokyo'
+          },
+          {
+            type: 'flood',
+            title: 'Flash Flood Emergency',
+            location: 'Texas Hill Country',
+            severity: 'extreme',
+            description: 'Life-threatening flash flooding in progress',
+            lastUpdated: new Date().toISOString(),
+            source: 'National Weather Service'
+          },
+          {
+            type: 'wildfire',
+            title: 'Mega Fire Complex',
+            location: 'British Columbia',
+            severity: 'extreme',
+            description: 'Multiple fires burning 50,000+ acres',
+            lastUpdated: new Date().toISOString(),
+            source: 'BC Wildfire Service'
           }
         ];
         

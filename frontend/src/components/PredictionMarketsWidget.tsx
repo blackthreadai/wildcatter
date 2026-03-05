@@ -104,9 +104,8 @@ export default function PredictionMarketsWidget() {
 
   return (
     <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
-      <div className="bg-gray-800 p-2 flex-shrink-0 flex items-center justify-between">
+      <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>PREDICTION MARKETS</h3>
-        <div className="text-[#DAA520] text-xs font-bold">KALSHI</div>
       </div>
       
       <div className="flex-1 bg-black p-3 space-y-3 overflow-y-auto">

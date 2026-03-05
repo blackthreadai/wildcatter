@@ -81,7 +81,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '15.1-COMPLETE-WIDGET-ORDER-REMAINDER-SEQUENCE';
+const WIDGET_VERSION = '15.2-UI-FIXES-SPACING-CLIMATE-8-KALSHI-HEADER';
 
 const defaultWidgets: Widget[] = [
   // NEW DEFAULT ORDER - Rendr's priority layout
