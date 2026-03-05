@@ -576,7 +576,7 @@ export default function TerminalPage() {
             </div>
 
             {/* Version */}
-            <span className="text-gray-400 text-sm">v1.01</span>
+            <span className="text-gray-400 text-sm">v1.1</span>
 
             {/* Separator */}
             <span className="text-gray-400 text-sm">|</span>
@@ -605,7 +605,7 @@ export default function TerminalPage() {
               {/* Homepage Button */}
               <button 
                 onClick={() => setShowHomepagePopup(true)}
-                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 border border-[#DAA520]"
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800"
                 title="Make Terminal your homepage"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -616,7 +616,7 @@ export default function TerminalPage() {
               {/* View Hidden Widgets Button */}
               <button 
                 onClick={() => setShowHidden(!showHidden)}
-                className={`p-2 transition-colors border border-[#DAA520] ${
+                className={`p-2 transition-colors ${
                   showHidden 
                     ? 'bg-[#DAA520] text-black' 
                     : hiddenWidgets.length > 0
@@ -648,7 +648,7 @@ export default function TerminalPage() {
                   localStorage.removeItem('terminal-hidden-widgets');
                   localStorage.setItem('terminal-widget-version', WIDGET_VERSION);
                 }}
-                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 border border-[#DAA520]"
+                className="p-2 text-gray-400 hover:text-white hover:bg-gray-800"
                 title="Reset widget layout and show all widgets"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -657,7 +657,7 @@ export default function TerminalPage() {
               </button>
 
               {/* Settings Gear */}
-              <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 border border-[#DAA520]">
+              <button className="p-2 text-gray-400 hover:text-white hover:bg-gray-800">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -672,7 +672,7 @@ export default function TerminalPage() {
       <div className="h-[calc(100vh-73px)] relative">
         {/* Map Header with Date/Time and DEFCON Status */}
         <div className="bg-gray-800 border-b border-gray-700 py-2 px-6 pb-3">
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-8">
             <span className="text-white text-sm font-thin tracking-[0.1em] uppercase" style={{ fontStretch: 'condensed' }}>
               {formatDateTime(currentTime)}
             </span>
