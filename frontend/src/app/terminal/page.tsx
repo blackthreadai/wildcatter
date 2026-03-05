@@ -23,6 +23,9 @@ import OilRigTrackerWidget from '@/components/OilRigTrackerWidget';
 import PowerGridStressWidget from '@/components/PowerGridStressWidget';
 import RefineryOutagesWidget from '@/components/RefineryOutagesWidget';
 import SanctionsWidget from '@/components/SanctionsWidget';
+import EnergyFuturesWidget from '@/components/EnergyFuturesWidget';
+import CrackSpreadWidget from '@/components/CrackSpreadWidget';
+import GlobalLNGWidget from '@/components/GlobalLNGWidget';
 
 // Drag and drop imports
 import {
@@ -65,7 +68,7 @@ const WorldMap = dynamic(() => import('@/components/WorldMap'), {
 // Widget configuration - defines all widgets in the grid
 type Widget = {
   id: string;
-  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'economic-indicators' | 'climate-extremes' | 'global-oil-tracker' | 'opec' | 'natural-gas' | 'oil-rig-tracker' | 'power-grid-stress' | 'refinery-outages' | 'sanctions';
+  type: 'news' | 'youtube' | 'greed-fear' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'economic-indicators' | 'climate-extremes' | 'global-oil-tracker' | 'opec' | 'natural-gas' | 'oil-rig-tracker' | 'power-grid-stress' | 'refinery-outages' | 'sanctions' | 'energy-futures' | 'crack-spread' | 'global-lng';
   title: string;
   span?: { col: number; row: number };
   region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS' | 'STRATEGIC RESERVE';
@@ -104,6 +107,9 @@ const defaultWidgets: Widget[] = [
   { id: 'power-grid-stress', type: 'power-grid-stress', title: 'POWER GRID STRESS' },
   { id: 'refinery-outages', type: 'refinery-outages', title: 'REFINERY OUTAGES' },
   { id: 'sanctions', type: 'sanctions', title: 'SANCTIONS' },
+  { id: 'energy-futures', type: 'energy-futures', title: 'ENERGY FUTURES' },
+  { id: 'crack-spread', type: 'crack-spread', title: 'CRACK SPREAD' },
+  { id: 'global-lng', type: 'global-lng', title: 'GLOBAL LNG' },
 ];
 
 // Draggable Widget Component
@@ -178,6 +184,12 @@ function DraggableWidget({
         return <RefineryOutagesWidget />;
       case 'sanctions':
         return <SanctionsWidget />;
+      case 'energy-futures':
+        return <EnergyFuturesWidget />;
+      case 'crack-spread':
+        return <CrackSpreadWidget />;
+      case 'global-lng':
+        return <GlobalLNGWidget />;
       default:
         return <NewsWidget region="US" title="US NEWS" />;
     }
