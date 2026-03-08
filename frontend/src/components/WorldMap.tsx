@@ -248,7 +248,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
             width: 12px; 
             height: 12px; 
             background-color: ${color}; 
-            border: 2px solid white; 
+            border: 2px solid #b91c1c; 
             border-radius: 50%; 
             box-shadow: 0 0 6px rgba(0,0,0,0.3);
             animation: pulse 2s infinite;
