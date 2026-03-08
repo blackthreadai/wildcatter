@@ -725,7 +725,7 @@ export default function TerminalPage() {
                   onClick={() => setShowHidden(!showHidden)}
                   onMouseEnter={() => setHoveredTooltip('visibility')}
                   onMouseLeave={() => setHoveredTooltip(null)}
-                  className={`p-2 transition-colors ${
+                  className={`p-2 transition-colors relative ${
                     showHidden 
                       ? 'bg-[#DAA520] text-black' 
                       : hiddenWidgets.length > 0
@@ -744,10 +744,16 @@ export default function TerminalPage() {
                       <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                     </svg>
                   )}
+                  {/* Hidden Widget Counter */}
+                  {hiddenWidgets.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {hiddenWidgets.length}
+                    </span>
+                  )}
                 </button>
                 {hoveredTooltip === 'visibility' && (
                   <div className="absolute top-full right-0 mt-2 px-3 py-2 bg-black text-[#DAA520] text-xs font-medium whitespace-nowrap z-50 rounded border border-[#DAA520]">
-                    Hide / Reveal Modules
+                    {hiddenWidgets.length > 0 ? `Show ${hiddenWidgets.length} Hidden Module${hiddenWidgets.length !== 1 ? 's' : ''}` : 'Hide / Reveal Modules'}
                     <div className="absolute bottom-full right-2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-[#DAA520]"></div>
                   </div>
                 )}
