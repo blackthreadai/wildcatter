@@ -351,8 +351,151 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
   // loadActiveWells function removed - active wells layer disabled
 
   const loadDrillingRigs = (layerGroup: L.LayerGroup) => {
-    // Similar simplified implementation for other static layers
-    // ... (keeping brief for space)
+    // Global active drilling rigs across all major oil & gas regions
+    const drillingRigs = [
+      // North America - Permian Basin (Texas)
+      { lat: 31.8, lng: -102.3, name: "PERMIAN EXPLORER-1", type: "Land Rig", depth: "12,500 ft", target: "Wolfcamp Shale", operator: "ExxonMobil", status: "Drilling", spudDate: "2026-02-15" },
+      { lat: 31.9, lng: -102.1, name: "EAGLE FORD-7", type: "Land Rig", depth: "8,200 ft", target: "Eagle Ford Shale", operator: "ConocoPhillips", status: "Completing", spudDate: "2026-01-28" },
+      { lat: 32.1, lng: -102.5, name: "MIDLAND DRILLER", type: "Land Rig", depth: "15,800 ft", target: "Spraberry Formation", operator: "Pioneer Natural", status: "Drilling", spudDate: "2026-02-22" },
+      
+      // North America - Bakken (North Dakota)
+      { lat: 47.8, lng: -103.2, name: "BAKKEN TITAN", type: "Land Rig", depth: "11,400 ft", target: "Bakken Shale", operator: "Continental Resources", status: "Drilling", spudDate: "2026-02-10" },
+      { lat: 47.9, lng: -103.4, name: "WILLISTON FORCE", type: "Land Rig", depth: "9,800 ft", target: "Three Forks", operator: "Whiting Petroleum", status: "Drilling", spudDate: "2026-03-01" },
+      
+      // Gulf of Mexico - Offshore
+      { lat: 27.5, lng: -91.2, name: "DEEPWATER CHAMPION", type: "Drillship", depth: "28,500 ft", target: "Miocene Formation", operator: "Shell", status: "Drilling", spudDate: "2026-01-15" },
+      { lat: 26.8, lng: -92.1, name: "THUNDERHORSE RIG", type: "Semi-Submersible", depth: "24,200 ft", target: "Pliocene Sands", operator: "BP", status: "Testing", spudDate: "2025-12-20" },
+      
+      // Canada - Oil Sands
+      { lat: 57.1, lng: -111.4, name: "ATHABASCA GIANT", type: "Mining Rig", depth: "Surface", target: "Oil Sands", operator: "Suncor", status: "Extracting", spudDate: "2026-02-01" },
+      
+      // North Sea - Norway
+      { lat: 60.8, lng: 2.5, name: "NORTH SEA VIKING", type: "Platform Rig", depth: "16,800 ft", target: "Brent Formation", operator: "Equinor", status: "Drilling", spudDate: "2026-02-18" },
+      { lat: 61.2, lng: 2.8, name: "TROLL FIELD RIG", type: "Platform Rig", depth: "12,200 ft", target: "Sognefjord Fm", operator: "Equinor", status: "Producing", spudDate: "2025-11-30" },
+      
+      // North Sea - UK
+      { lat: 57.5, lng: 1.2, name: "BRENT BRAVO", type: "Platform Rig", depth: "14,500 ft", target: "Brent Sands", operator: "Shell", status: "Drilling", spudDate: "2026-02-25" },
+      
+      // Russia - Siberia
+      { lat: 61.5, lng: 72.8, name: "SIBERIAN TITAN", type: "Land Rig", depth: "13,200 ft", target: "Bazhenov Formation", operator: "Rosneft", status: "Drilling", spudDate: "2026-02-12" },
+      { lat: 69.3, lng: 33.2, name: "YAMAL ARCTIC", type: "Land Rig", depth: "2,800 ft", target: "Gas Formation", operator: "Gazprom", status: "Drilling", spudDate: "2026-03-05" },
+      
+      // Middle East - Saudi Arabia
+      { lat: 25.4, lng: 49.6, name: "GHAWAR GIANT", type: "Land Rig", depth: "7,200 ft", target: "Arab Formation", operator: "Saudi Aramco", status: "Drilling", spudDate: "2026-02-20" },
+      { lat: 27.0, lng: 49.8, name: "SAFANIYA OFFSHORE", type: "Jack-up Rig", depth: "8,500 ft", target: "Safaniya Field", operator: "Saudi Aramco", status: "Drilling", spudDate: "2026-02-14" },
+      
+      // Middle East - UAE
+      { lat: 24.3, lng: 54.5, name: "ZAKUM EXPLORER", type: "Jack-up Rig", depth: "9,800 ft", target: "Lower Zakum", operator: "ADNOC", status: "Drilling", spudDate: "2026-02-28" },
+      
+      // Middle East - Qatar
+      { lat: 25.8, lng: 51.2, name: "NORTH FIELD LNG", type: "Platform Rig", depth: "6,400 ft", target: "North Dome", operator: "QatarEnergy", status: "Gas Production", spudDate: "2026-01-10" },
+      
+      // Middle East - Kuwait
+      { lat: 29.2, lng: 47.8, name: "BURGAN FIELD", type: "Land Rig", depth: "5,800 ft", target: "Burgan Formation", operator: "KOC", status: "Drilling", spudDate: "2026-02-16" },
+      
+      // Africa - Nigeria
+      { lat: 4.5, lng: 6.8, name: "BONGA DEEP", type: "FPSO Rig", depth: "18,500 ft", target: "Bonga Field", operator: "Shell Nigeria", status: "Drilling", spudDate: "2026-02-08" },
+      { lat: 4.2, lng: 7.2, name: "AGBAMI EXPLORER", type: "FPSO Rig", depth: "16,200 ft", target: "Agbami Field", operator: "Chevron Nigeria", status: "Producing", spudDate: "2025-12-15" },
+      
+      // Africa - Angola
+      { lat: -8.5, lng: 13.2, name: "CABINDA OFFSHORE", type: "Semi-Submersible", depth: "22,800 ft", target: "Pre-salt Formation", operator: "Total Angola", status: "Drilling", spudDate: "2026-01-25" },
+      
+      // South America - Brazil
+      { lat: -22.5, lng: -40.2, name: "SANTOS PRE-SALT", type: "Drillship", depth: "26,500 ft", target: "Pre-salt Carbonate", operator: "Petrobras", status: "Drilling", spudDate: "2026-02-05" },
+      { lat: -23.1, lng: -41.8, name: "CAMPOS BASIN", type: "Platform Rig", depth: "19,200 ft", target: "Marlim Field", operator: "Petrobras", status: "Producing", spudDate: "2025-11-20" },
+      
+      // South America - Guyana
+      { lat: 6.8, lng: -58.2, name: "STABROEK BLOCK", type: "Drillship", depth: "20,500 ft", target: "Liza Formation", operator: "ExxonMobil Guyana", status: "Drilling", spudDate: "2026-02-18" },
+      
+      // Australia - Bass Strait
+      { lat: -38.5, lng: 146.8, name: "BASS STRAIT RIG", type: "Platform Rig", depth: "8,200 ft", target: "Latrobe Group", operator: "ExxonMobil Australia", status: "Gas Production", spudDate: "2026-01-30" },
+      
+      // Australia - Browse Basin
+      { lat: -14.2, lng: 123.5, name: "BROWSE EXPLORER", type: "Jack-up Rig", depth: "12,800 ft", target: "Browse Formation", operator: "Woodside", status: "Drilling", spudDate: "2026-02-22" },
+      
+      // Asia - Malaysia
+      { lat: 4.2, lng: 108.6, name: "SARAWAK OFFSHORE", type: "Jack-up Rig", depth: "11,500 ft", target: "Sarawak Gas Field", operator: "Petronas", status: "Gas Production", spudDate: "2026-01-18" },
+      
+      // Asia - Indonesia
+      { lat: -2.5, lng: 111.8, name: "MAHAKAM DELTA", type: "Platform Rig", depth: "7,800 ft", target: "Mahakam Gas", operator: "Total Indonesia", status: "Drilling", spudDate: "2026-02-12" },
+      
+      // Asia - China (South China Sea)
+      { lat: 18.2, lng: 108.8, name: "SOUTH CHINA EXPLORER", type: "Semi-Submersible", depth: "15,200 ft", target: "Liwan Gas Field", operator: "CNOOC", status: "Drilling", spudDate: "2026-02-20" },
+      
+      // Central Asia - Kazakhstan
+      { lat: 46.8, lng: 52.2, name: "KASHAGAN OFFSHORE", type: "Artificial Island", depth: "14,800 ft", target: "Kashagan Field", operator: "NCOC", status: "Oil Production", spudDate: "2025-12-10" }
+    ];
+
+    drillingRigs.forEach(rig => {
+      // Color coding by rig status
+      let color = '#4ade80'; // Default green
+      switch (rig.status) {
+        case 'Drilling':
+          color = '#4ade80'; // Green - active drilling
+          break;
+        case 'Completing':
+          color = '#fbbf24'; // Yellow - completing well
+          break;
+        case 'Testing':
+          color = '#f59e0b'; // Orange - testing phase
+          break;
+        case 'Producing':
+        case 'Oil Production':
+        case 'Gas Production':
+        case 'Extracting':
+          color = '#3b82f6'; // Blue - producing
+          break;
+        default:
+          color = '#6b7280'; // Gray - other status
+      }
+      
+      const rigIcon = L.divIcon({
+        html: `<div style="
+          width: 16px; 
+          height: 16px; 
+          display: flex; 
+          align-items: center; 
+          justify-content: center;
+        ">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+            <path d="M12 3v18"/>
+            <path d="M9 3l6 0"/>
+            <path d="M10 6l4 0"/>
+            <path d="M10 9l4 0"/>
+            <path d="M10 12l4 0"/>
+            <path d="M9 3l-2 18"/>
+            <path d="M15 3l2 18"/>
+            <path d="M7 21l10 0"/>
+            <rect x="11" y="4" width="2" height="4" fill="${color}"/>
+            <circle cx="12" cy="15" r="1.5" fill="${color}"/>
+          </svg>
+        </div>`,
+        className: 'drilling-rig',
+        iconSize: [16, 16],
+        iconAnchor: [8, 8]
+      });
+
+      const marker = L.marker([rig.lat, rig.lng], { icon: rigIcon });
+      
+      const popupContent = `
+        <div style="min-width: 220px;">
+          <h4 style="margin: 0 0 8px 0; color: ${color}; font-size: 14px; font-weight: bold;">
+            RIG: ${rig.name}
+          </h4>
+          <div style="font-size: 11px; color: #666; line-height: 1.3;">
+            <strong>Type:</strong> ${rig.type}<br>
+            <strong>Operator:</strong> ${rig.operator}<br>
+            <strong>Status:</strong> <span style="color: ${color}; font-weight: bold;">${rig.status}</span><br>
+            <strong>Target:</strong> ${rig.target}<br>
+            <strong>Depth:</strong> ${rig.depth}<br>
+            <strong>Spud Date:</strong> ${rig.spudDate}
+          </div>
+        </div>
+      `;
+      
+      marker.bindPopup(popupContent);
+      layerGroup.addLayer(marker);
+    });
   };
 
   const loadPipelines = (layerGroup: L.LayerGroup) => {};
