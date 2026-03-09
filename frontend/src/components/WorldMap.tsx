@@ -600,7 +600,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
     }
 
     // Add weather alerts if active
-    if (activeLayers.includes('weather-alerts')) {
+    if (activeLayers.includes('weather')) {
       // Fetch live weather alerts
       fetch('/api/weather-alerts')
         .then(response => response.json())
