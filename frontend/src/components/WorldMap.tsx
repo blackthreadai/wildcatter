@@ -730,7 +730,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
                 break;
             }
             
-            // Create circle icon for earthquakes (different from weather triangles)
+            // Create seismic wave icon (same as map layer menu)
             const alertIcon = L.divIcon({
               html: `<div style="
                 width: 20px; 
@@ -740,8 +740,12 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
                 justify-content: center;
                 ${pulseAnimation}
               ">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="${color}" stroke="rgba(255,255,255,0.8)" stroke-width="1">
-                  <circle cx="12" cy="12" r="10"/>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M2 12l4 0 4-6 4 12 4-6 4 0" 
+                        stroke="${color}" 
+                        stroke-width="3" 
+                        stroke-linecap="round" 
+                        stroke-linejoin="round"/>
                 </svg>
               </div>`,
               className: 'seismic-event',
@@ -761,7 +765,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
             const popupContent = `
               <div style="min-width: 220px;">
                 <h4 style="margin: 0 0 8px 0; color: ${color}; font-size: 14px; font-weight: bold;">
-                  🌍 ${event.title}
+                  📊 ${event.title}
                 </h4>
                 <p style="margin: 0 0 6px 0; font-size: 12px; color: #DAA520; line-height: 1.4;">
                   ${event.description}
