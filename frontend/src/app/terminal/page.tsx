@@ -473,7 +473,6 @@ export default function TerminalPage() {
     { id: 'seismic-activity', label: 'SEISMIC ACTIVITY', color: '#ef4444' },
     { id: 'drilling-rigs', label: 'ACTIVE DRILLING RIGS', color: '#4ade80' },
     { id: 'pipelines', label: 'PIPELINE ROUTES', color: '#ef4444' },
-    { id: 'refineries', label: 'REFINERIES', color: '#DAA520' },
     { id: 'tanker-ships', label: 'TANKER SHIPS', color: '#3b82f6' },
     { id: 'shipping-lanes', label: 'SHIPPING LANES', color: '#4ade80' },
   ];

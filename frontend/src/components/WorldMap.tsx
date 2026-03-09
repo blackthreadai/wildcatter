@@ -43,7 +43,6 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       'seismic-activity': L.layerGroup(),
       'shipping-lanes': L.layerGroup(),
       'drilling-rigs': L.layerGroup(),
-      'refineries': L.layerGroup(),
       'pipelines': L.layerGroup(),
       'tanker-ships': L.layerGroup()
     };
@@ -108,9 +107,6 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         break;
       case 'drilling-rigs':
         loadDrillingRigs(layerGroup);
-        break;
-      case 'refineries':
-        loadRefineries(layerGroup);
         break;
       case 'pipelines':
         loadPipelines(layerGroup);
@@ -359,7 +355,6 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
     // ... (keeping brief for space)
   };
 
-  const loadRefineries = (layerGroup: L.LayerGroup) => {};
   const loadPipelines = (layerGroup: L.LayerGroup) => {};
   const loadTankerShips = (layerGroup: L.LayerGroup) => {
     // Global tanker ships with realistic worldwide distribution
