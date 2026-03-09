@@ -14,46 +14,67 @@ interface GeopoliticalEvent {
   confidence: number;
 }
 
-// Cache for 30 minutes (geopolitical events change frequently)
+// Cache for 2 hours to avoid GDELT rate limiting (max 1 request per 5 seconds)
 let cache: { data: GeopoliticalEvent[]; ts: number } | null = null;
-const CACHE_MS = 30 * 60 * 1000;
+const CACHE_MS = 2 * 60 * 60 * 1000;
 
 async function fetchGDELTData(): Promise<GeopoliticalEvent[]> {
   try {
-    // GDELT Global Knowledge Graph API - energy-related events
-    const searchTerms = 'oil OR gas OR pipeline OR refinery OR energy OR sanctions OR embargo OR strait';
+    // GDELT Global Knowledge Graph API - simplified query to avoid rate limits
     const baseUrl = 'https://api.gdeltproject.org/api/v2/doc/doc';
     
+    // Much simpler query to reduce rate limiting issues
     const params = new URLSearchParams({
-      query: searchTerms,
-      mode: 'artlist',
-      maxrecords: '20',
-      timespan: '1d', // Last 24 hours
-      format: 'json',
-      sourcecountry: 'Iraq OR Iran OR Russia OR Saudi OR UAE OR Kuwait OR Nigeria OR Venezuela OR Libya'
+      query: 'energy pipeline sanctions',
+      mode: 'artlist', 
+      maxrecords: '10',
+      timespan: '3d', // Last 3 days for more results
+      format: 'json'
     });
+
+    console.log(`Fetching GDELT data: ${baseUrl}?${params}`);
 
     const response = await fetch(`${baseUrl}?${params}`, {
       headers: { 
-        'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
+        'User-Agent': 'WildcatterTerminal/1.0 (contact@wildcatter.ai)',
         'Accept': 'application/json'
       },
-      signal: AbortSignal.timeout(15000)
+      signal: AbortSignal.timeout(30000) // Longer timeout
     });
     
-    if (!response.ok) throw new Error(`GDELT API HTTP ${response.status}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`GDELT API HTTP ${response.status}: ${errorText}`);
+      throw new Error(`GDELT API HTTP ${response.status}: ${errorText}`);
+    }
     
-    const data = await response.json();
+    const responseText = await response.text();
+    console.log(`GDELT response (first 500 chars): ${responseText.substring(0, 500)}`);
+    
+    // Handle GDELT rate limiting message
+    if (responseText.includes('Please limit requests to one every 5 seconds')) {
+      console.error('GDELT rate limit hit - using cached data');
+      throw new Error('GDELT rate limited');
+    }
+    
+    const data = JSON.parse(responseText);
     const events: GeopoliticalEvent[] = [];
     
     if (data?.articles && Array.isArray(data.articles)) {
-      for (const article of data.articles.slice(0, 12)) {
-        // Extract coordinates from GDELT data
-        const lat = parseFloat(article.lat || '0');
-        const lng = parseFloat(article.lng || '0');
+      console.log(`Found ${data.articles.length} GDELT articles`);
+      
+      for (const article of data.articles.slice(0, 8)) {
+        // Extract coordinates from GDELT data - be more flexible
+        const lat = parseFloat(article.lat || article.geolat || '0');
+        const lng = parseFloat(article.lng || article.geolon || '0');
         
-        // Skip if no valid coordinates
-        if (!lat || !lng || Math.abs(lat) > 90 || Math.abs(lng) > 180) continue;
+        console.log(`Article: "${article.title}" at ${lat}, ${lng}`);
+        
+        // Skip if no valid coordinates (but be less strict)
+        if (!lat || !lng || Math.abs(lat) > 90 || Math.abs(lng) > 180 || (lat === 0 && lng === 0)) {
+          console.log(`Skipping article with invalid coords: ${lat}, ${lng}`);
+          continue;
+        }
         
         // Classify severity based on keywords
         const title = (article.title || '').toLowerCase();
@@ -91,22 +112,26 @@ async function fetchGDELTData(): Promise<GeopoliticalEvent[]> {
           category = 'conflict';
         }
         
-        events.push({
-          id: `gdelt_${article.url?.split('/').pop() || Date.now()}`,
+        const event = {
+          id: `gdelt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           lat,
           lng,
           title: article.title || 'Energy-Related Event',
-          description: article.socialfeedsharedesc || article.title || 'No description available',
+          description: article.socialfeedsharedesc || article.title || 'Energy sector development',
           severity,
-          source: article.domain || 'GDELT',
-          date: article.seendate || new Date().toISOString(),
+          source: article.domain || article.sourcedomain || 'GDELT',
+          date: article.seendate || article.dateadded || new Date().toISOString(),
           category,
-          countries: [article.sourcecountry || 'Unknown'],
-          confidence: Math.min(0.95, Math.max(0.6, (article.socialsharecount || 1) / 100))
-        });
+          countries: [article.sourcecountry || article.geocountry || 'Global'],
+          confidence: Math.min(0.95, Math.max(0.7, (article.socialsharecount || 10) / 100))
+        };
+        
+        console.log(`Created event: ${event.title} (${event.severity})`);
+        events.push(event);
       }
     }
     
+    console.log(`Returning ${events.length} real GDELT events`);
     return events;
     
   } catch (error) {
@@ -240,15 +265,17 @@ export async function GET() {
 
     // Try to fetch from GDELT API first
     let events = await fetchGDELTData();
-    
-    // Mix with mock data if needed or use all mock if no real data
-    const mockData = getMockGeopoliticalEvents();
+    let dataSource = 'mixed';
     
     if (events.length > 0) {
-      // Combine real and mock data, prioritizing real data
-      const combined = [...events, ...mockData];
-      events = combined.slice(0, 15); // Limit to 15 total events
+      console.log(`Got ${events.length} real GDELT events - using real data only`);
+      dataSource = 'real';
+      // Use only real GDELT data, no mixing with mock
+      events = events.slice(0, 12);
     } else {
+      console.log('No GDELT events found - using fallback data');
+      dataSource = 'fallback';
+      const mockData = getMockGeopoliticalEvents();
       events = mockData;
     }
     
@@ -279,7 +306,8 @@ export async function GET() {
     return NextResponse.json({
       events: uniqueEvents,
       lastUpdate: new Date().toISOString(),
-      totalEvents: uniqueEvents.length
+      totalEvents: uniqueEvents.length,
+      dataSource: dataSource // real, fallback, or mixed
     });
     
   } catch (error) {
