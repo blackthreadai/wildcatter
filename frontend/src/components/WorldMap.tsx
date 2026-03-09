@@ -42,7 +42,6 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       'weather': L.layerGroup(), 
       'seismic-activity': L.layerGroup(),
       'shipping-lanes': L.layerGroup(),
-      'active-wells': L.layerGroup(),
       'drilling-rigs': L.layerGroup(),
       'refineries': L.layerGroup(),
       'pipelines': L.layerGroup(),
@@ -107,9 +106,6 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       case 'shipping-lanes':
         loadShippingLanes(layerGroup);
         break;
-      case 'active-wells':
-        loadActiveWells(layerGroup);
-        break;
       case 'drilling-rigs':
         loadDrillingRigs(layerGroup);
         break;
@@ -153,9 +149,9 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
             break;
         }
         
-        const categoryEmojis: {[key: string]: string} = {
-          pipeline: '🛢️', naval: '⚓', sanctions: '🚫', 
-          facility: '🏭', conflict: '⚔️', protest: '✊', general: '📢'
+        const categoryNames: {[key: string]: string} = {
+          pipeline: 'PIPELINE', naval: 'NAVAL', sanctions: 'SANCTIONS', 
+          facility: 'FACILITY', conflict: 'CONFLICT', protest: 'PROTEST', general: 'ALERT'
         };
         
         const alertIcon = L.divIcon({
@@ -170,7 +166,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         const popupContent = `
           <div style="min-width: 220px;">
             <h4 style="margin: 0 0 8px 0; color: ${color}; font-size: 14px; font-weight: bold;">
-              ${categoryEmojis[event.category] || '📢'} ${event.title}
+              ${categoryNames[event.category] || 'ALERT'}: ${event.title}
             </h4>
             <p style="margin: 0 0 6px 0; font-size: 12px; color: #DAA520; line-height: 1.4;">
               ${event.description}
@@ -243,7 +239,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         const popupContent = `
           <div style="min-width: 240px;">
             <h4 style="margin: 0 0 8px 0; color: ${color}; font-size: 14px; font-weight: bold;">
-              ▼ ${alert.title}
+              WEATHER: ${alert.title}
             </h4>
             <p style="margin: 0 0 6px 0; font-size: 12px; color: #DAA520; line-height: 1.4;">
               ${alert.description}
@@ -312,7 +308,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         const popupContent = `
           <div style="min-width: 220px;">
             <h4 style="margin: 0 0 8px 0; color: ${color}; font-size: 14px; font-weight: bold;">
-              📊 ${event.title}
+              SEISMIC: ${event.title}
             </h4>
             <p style="margin: 0 0 6px 0; font-size: 12px; color: #DAA520; line-height: 1.4;">
               ${event.description}
@@ -356,26 +352,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
     });
   };
 
-  const loadActiveWells = (layerGroup: L.LayerGroup) => {
-    const wells = [
-      { lat: 26.0, lng: 50.0, name: "Kuwait Oil Field", production: "45,000 bbl/day" },
-      { lat: 25.0, lng: 51.0, name: "Qatar Oil Platform", production: "62,000 bbl/day" }
-    ];
-    
-    wells.forEach(well => {
-      const icon = L.divIcon({
-        html: `<div style="width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;">
-                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#DAA520" stroke-width="2">
-                   <path d="M12 3v18"/><path d="M9 3l6 0"/><path d="M10 6l4 0"/>
-                 </svg>
-               </div>`,
-        iconSize: [20, 20], iconAnchor: [10, 10]
-      });
-      const marker = L.marker([well.lat, well.lng], { icon });
-      marker.bindPopup(`<h4>${well.name}</h4><p>Production: ${well.production}</p>`);
-      layerGroup.addLayer(marker);
-    });
-  };
+  // loadActiveWells function removed - active wells layer disabled
 
   const loadDrillingRigs = (layerGroup: L.LayerGroup) => {
     // Similar simplified implementation for other static layers
@@ -384,7 +361,103 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
 
   const loadRefineries = (layerGroup: L.LayerGroup) => {};
   const loadPipelines = (layerGroup: L.LayerGroup) => {};
-  const loadTankerShips = (layerGroup: L.LayerGroup) => {};
+  const loadTankerShips = (layerGroup: L.LayerGroup) => {
+    // Global tanker ships with realistic worldwide distribution
+    const tankerShips = [
+      // Middle East to Asia Route
+      { lat: 26.7, lng: 56.1, name: "NORDIC NAVIGATOR", cargo: "Crude Oil", capacity: "2,000,000 bbls", route: "Persian Gulf → Singapore", speed: "14.2 kts", flag: "Marshall Islands" },
+      { lat: 22.5, lng: 65.2, name: "OCEAN CHAMPION", cargo: "Crude Oil", capacity: "1,800,000 bbls", route: "Ras Tanura → Mumbai", speed: "13.8 kts", flag: "Liberia" },
+      { lat: 15.2, lng: 72.8, name: "PACIFIC VOYAGER", cargo: "Refined Products", capacity: "750,000 bbls", route: "Kuwait → Chennai", speed: "15.1 kts", flag: "Panama" },
+      
+      // Middle East to Europe Route
+      { lat: 18.5, lng: 42.1, name: "ATLANTIC SPIRIT", cargo: "Crude Oil", capacity: "2,200,000 bbls", route: "Saudi Arabia → Rotterdam", speed: "13.5 kts", flag: "Greece" },
+      { lat: 12.8, lng: 43.3, name: "MEDITERRANEAN STAR", cargo: "LNG", capacity: "173,000 m³", route: "Qatar → Italy", speed: "19.2 kts", flag: "Qatar" },
+      { lat: 29.5, lng: 32.9, name: "SUEZ PRINCESS", cargo: "Refined Products", capacity: "950,000 bbls", route: "UAE → Spain", speed: "14.7 kts", flag: "Cyprus" },
+      
+      // Americas Routes  
+      { lat: 25.8, lng: -94.2, name: "GULF TRADER", cargo: "Crude Oil", capacity: "1,900,000 bbls", route: "Port Arthur → Corpus Christi", speed: "12.1 kts", flag: "USA" },
+      { lat: 10.2, lng: -75.5, name: "CARIBBEAN QUEEN", cargo: "Refined Products", capacity: "650,000 bbls", route: "Cartagena → Miami", speed: "16.3 kts", flag: "Colombia" },
+      { lat: -22.9, lng: -43.2, name: "SANTOS EXPLORER", cargo: "Crude Oil", capacity: "2,100,000 bbls", route: "Santos → Houston", speed: "13.9 kts", flag: "Brazil" },
+      { lat: 61.2, lng: -149.9, name: "ALASKAN GIANT", cargo: "Crude Oil", capacity: "1,750,000 bbls", route: "Valdez → Long Beach", speed: "14.8 kts", flag: "USA" },
+      
+      // Trans-Pacific Routes
+      { lat: 35.2, lng: 139.4, name: "TOKYO EXPRESS", cargo: "LNG", capacity: "266,000 m³", route: "Australia → Japan", speed: "18.5 kts", flag: "Japan" },
+      { lat: -33.8, lng: 151.2, name: "SOUTHERN CROSS", cargo: "LNG", capacity: "180,000 m³", route: "Darwin → Seoul", speed: "19.8 kts", flag: "Australia" },
+      { lat: 22.3, lng: 114.2, name: "HONG KONG FORTUNE", cargo: "Refined Products", capacity: "850,000 bbls", route: "Singapore → Hong Kong", speed: "15.4 kts", flag: "Hong Kong" },
+      
+      // Africa Routes
+      { lat: -34.4, lng: 18.4, name: "CAPE GUARDIAN", cargo: "Crude Oil", capacity: "2,300,000 bbls", route: "Nigeria → South Africa", speed: "12.8 kts", flag: "South Africa" },
+      { lat: 4.8, lng: 7.0, name: "WEST AFRICA PRIDE", cargo: "Crude Oil", capacity: "1,950,000 bbls", route: "Bonny → Europe", speed: "13.6 kts", flag: "Nigeria" },
+      { lat: -8.8, lng: 13.2, name: "ANGOLA TRADER", cargo: "Crude Oil", capacity: "2,050,000 bbls", route: "Luanda → China", speed: "14.1 kts", flag: "Angola" },
+      
+      // North Sea / Europe Routes
+      { lat: 60.4, lng: 5.3, name: "NORTH SEA VIKING", cargo: "Crude Oil", capacity: "1,600,000 bbls", route: "Stavanger → Rotterdam", speed: "13.2 kts", flag: "Norway" },
+      { lat: 56.1, lng: 3.2, name: "SCOTTISH HIGHLANDER", cargo: "Crude Oil", capacity: "1,400,000 bbls", route: "Aberdeen → Wilhelmshaven", speed: "14.5 kts", flag: "UK" },
+      { lat: 51.9, lng: 4.1, name: "ROTTERDAM RUNNER", cargo: "Refined Products", capacity: "720,000 bbls", route: "Rotterdam → Hamburg", speed: "16.1 kts", flag: "Netherlands" },
+      
+      // Russian Routes
+      { lat: 69.1, lng: 33.4, name: "ARCTIC PIONEER", cargo: "LNG", capacity: "172,000 m³", route: "Yamal → Europe", speed: "17.9 kts", flag: "Russia" },
+      { lat: 43.1, lng: 131.9, name: "FAR EAST ENERGY", cargo: "Crude Oil", capacity: "1,850,000 bbls", route: "Kozmino → China", speed: "13.7 kts", flag: "Russia" },
+      
+      // Southeast Asia Hub
+      { lat: 1.3, lng: 103.8, name: "SINGAPORE JEWEL", cargo: "Refined Products", capacity: "900,000 bbls", route: "Singapore → Philippines", speed: "15.9 kts", flag: "Singapore" },
+      { lat: 3.1, lng: 101.7, name: "MALAYSIA VISION", cargo: "LNG", capacity: "155,000 m³", route: "Bintulu → Japan", speed: "18.7 kts", flag: "Malaysia" },
+      
+      // India Ocean Routes
+      { lat: -20.2, lng: 57.5, name: "INDIAN OCEAN PEARL", cargo: "Crude Oil", capacity: "2,150,000 bbls", route: "Middle East → Mauritius", speed: "14.0 kts", flag: "Mauritius" },
+      { lat: 6.9, lng: 79.8, name: "COLOMBO MERCHANT", cargo: "Refined Products", capacity: "680,000 bbls", route: "Sri Lanka → Maldives", speed: "16.8 kts", flag: "Sri Lanka" }
+    ];
+
+    tankerShips.forEach(ship => {
+      // Determine icon color based on cargo type
+      let color = '#DAA520'; // Default gold
+      if (ship.cargo.includes('LNG')) {
+        color = '#60a5fa'; // Blue for LNG
+      } else if (ship.cargo.includes('Refined')) {
+        color = '#f59e0b'; // Orange for refined products
+      }
+      
+      const shipIcon = L.divIcon({
+        html: `<div style="
+          width: 18px; 
+          height: 18px; 
+          display: flex; 
+          align-items: center; 
+          justify-content: center;
+        ">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+            <path d="M2 20h20"/>
+            <path d="M4 20V10l4-4h8l4 4v10"/>
+            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            <circle cx="12" cy="13" r="2" fill="${color}"/>
+          </svg>
+        </div>`,
+        className: 'tanker-ship',
+        iconSize: [18, 18],
+        iconAnchor: [9, 9]
+      });
+
+      const marker = L.marker([ship.lat, ship.lng], { icon: shipIcon });
+      
+      const popupContent = `
+        <div style="min-width: 200px;">
+          <h4 style="margin: 0 0 8px 0; color: ${color}; font-size: 14px; font-weight: bold;">
+            VESSEL: ${ship.name}
+          </h4>
+          <div style="font-size: 11px; color: #666; line-height: 1.3;">
+            <strong>Cargo:</strong> ${ship.cargo}<br>
+            <strong>Capacity:</strong> ${ship.capacity}<br>
+            <strong>Route:</strong> ${ship.route}<br>
+            <strong>Speed:</strong> ${ship.speed}<br>
+            <strong>Flag:</strong> ${ship.flag}
+          </div>
+        </div>
+      `;
+      
+      marker.bindPopup(popupContent);
+      layerGroup.addLayer(marker);
+    });
+  };
 
   return (
     <div 

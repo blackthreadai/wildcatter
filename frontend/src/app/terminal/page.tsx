@@ -471,7 +471,6 @@ export default function TerminalPage() {
     { id: 'geopolitical', label: 'GEOPOLITICAL ALERTS', color: '#ef4444' },
     { id: 'weather', label: 'WEATHER ALERTS', color: '#ef4444' },
     { id: 'seismic-activity', label: 'SEISMIC ACTIVITY', color: '#ef4444' },
-    { id: 'active-wells', label: 'ACTIVE OIL & GAS WELLS', color: '#DAA520' },
     { id: 'drilling-rigs', label: 'ACTIVE DRILLING RIGS', color: '#4ade80' },
     { id: 'pipelines', label: 'PIPELINE ROUTES', color: '#ef4444' },
     { id: 'refineries', label: 'REFINERIES', color: '#DAA520' },
