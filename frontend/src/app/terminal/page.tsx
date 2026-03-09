@@ -941,9 +941,9 @@ export default function TerminalPage() {
                     ) : layer.id === 'tanker-ships' ? (
                       <div className="w-3 h-3 flex items-center justify-center">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={layer.color} strokeWidth="2">
-                          <polygon points="12,2 15.09,8.26 22,9 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9 8.91,8.26"/>
-                          <circle cx="12" cy="12" r="1" fill={layer.color}/>
-                          <path d="M12 8v8M8 12h8" stroke={layer.color} strokeWidth="1"/>
+                          <path d="M12 2v20M2 12h20"/>
+                          <path d="M6 6l12 12M18 6L6 18"/>
+                          <circle cx="12" cy="12" r="2" fill={layer.color}/>
                         </svg>
                       </div>
                     ) : layer.id === 'shipping-lanes' ? (

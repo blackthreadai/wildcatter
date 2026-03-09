@@ -421,10 +421,9 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
           justify-content: center;
         ">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
-            <polygon points="12,2 15.09,8.26 22,9 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9 8.91,8.26" fill="${color}" opacity="0.2"/>
-            <polygon points="12,2 15.09,8.26 22,9 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9 8.91,8.26"/>
-            <circle cx="12" cy="12" r="1" fill="${color}"/>
-            <path d="M12 8v8M8 12h8" stroke="${color}" stroke-width="1"/>
+            <path d="M12 2v20M2 12h20"/>
+            <path d="M6 6l12 12M18 6L6 18"/>
+            <circle cx="12" cy="12" r="2" fill="${color}"/>
           </svg>
         </div>`,
         className: 'tanker-ship',
