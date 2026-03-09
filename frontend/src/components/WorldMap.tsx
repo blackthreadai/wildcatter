@@ -202,87 +202,115 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
 
     // Add geopolitical alerts if active
     if (activeLayers.includes('geopolitical')) {
-      // Mock Middle East geopolitical alerts
-      const geopoliticalAlerts = [
-        {
-          lat: 33.3128,
-          lng: 44.3615,
-          title: "Pipeline Security Incident",
-          description: "Reports of infrastructure disruption in Iraq",
-          severity: "high",
-          date: "2026-02-21T14:00:00Z"
-        },
-        {
-          lat: 20.0,
-          lng: 38.0,
-          title: "Red Sea Shipping Alert", 
-          description: "Commercial vessel security concerns reported",
-          severity: "moderate",
-          date: "2026-02-21T10:30:00Z"
-        },
-        {
-          lat: 26.5667,
-          lng: 56.25,
-          title: "Strait of Hormuz Tensions",
-          description: "Naval activity monitoring increased",
-          severity: "critical",
-          date: "2026-02-21T16:15:00Z"
-        },
-        {
-          lat: 24.2134,
-          lng: 55.8713,
-          title: "Energy Infrastructure Alert",
-          description: "UAE facilities on heightened security status",
-          severity: "moderate", 
-          date: "2026-02-21T12:45:00Z"
-        }
-      ];
+      // Fetch live geopolitical events
+      fetch('/api/geopolitical-events')
+        .then(response => response.json())
+        .then(data => {
+          const geopoliticalAlerts = data.events || [];
 
-      // Add markers for each alert
-      geopoliticalAlerts.forEach((alert) => {
-        const color = '#ef4444'; // All geopolitical alerts are red
-        
-        // Create custom icon
-        const alertIcon = L.divIcon({
-          html: `<div style="
-            width: 12px; 
-            height: 12px; 
-            background-color: ${color}; 
-            border: 2px solid #b91c1c; 
-            border-radius: 50%; 
-            box-shadow: 0 0 6px rgba(0,0,0,0.3);
-            animation: pulse 2s infinite;
-          "></div>`,
-          className: 'geopolitical-alert',
-          iconSize: [12, 12],
-          iconAnchor: [6, 6]
+          // Add markers for each alert
+          geopoliticalAlerts.forEach((alert: any) => {
+            // Color coding by severity
+            let color = '#ef4444'; // Default red
+            let pulseAnimation = '';
+            
+            switch (alert.severity) {
+              case 'critical':
+                color = '#dc2626'; // Dark red
+                pulseAnimation = 'animation: pulse 1s infinite;';
+                break;
+              case 'high':
+                color = '#ef4444'; // Red
+                pulseAnimation = 'animation: pulse 2s infinite;';
+                break;
+              case 'moderate':
+                color = '#f59e0b'; // Orange
+                break;
+              case 'low':
+                color = '#eab308'; // Yellow
+                break;
+            }
+            
+            // Create custom icon with severity-based styling
+            const alertIcon = L.divIcon({
+              html: `<div style="
+                width: 12px; 
+                height: 12px; 
+                background-color: ${color}; 
+                border: 2px solid #b91c1c; 
+                border-radius: 50%; 
+                box-shadow: 0 0 6px rgba(0,0,0,0.3);
+                ${pulseAnimation}
+              "></div>`,
+              className: 'geopolitical-alert',
+              iconSize: [12, 12],
+              iconAnchor: [6, 6]
+            });
+
+            const marker = L.marker([alert.lat, alert.lng], { 
+              icon: alertIcon 
+            }).addTo(mapInstanceRef.current!);
+
+            // Enhanced popup with more details
+            const severityColor = alert.severity === 'critical' ? '#dc2626' : 
+                                 alert.severity === 'high' ? '#ea580c' : 
+                                 alert.severity === 'moderate' ? '#f59e0b' : '#eab308';
+            
+            const categoryEmojis = {
+              pipeline: '🛢️',
+              naval: '⚓',
+              sanctions: '🚫',
+              facility: '🏭',
+              conflict: '⚔️',
+              protest: '✊',
+              general: '📢'
+            };
+            
+            const popupContent = `
+              <div style="min-width: 220px;">
+                <h4 style="margin: 0 0 8px 0; color: ${color}; font-size: 14px; font-weight: bold;">
+                  ${categoryEmojis[alert.category as keyof typeof categoryEmojis] || '📢'} ${alert.title}
+                </h4>
+                <p style="margin: 0 0 6px 0; font-size: 12px; color: #DAA520; line-height: 1.4;">
+                  ${alert.description}
+                </p>
+                <div style="font-size: 11px; color: #666; line-height: 1.3;">
+                  <strong>Severity:</strong> <span style="color: ${severityColor}; font-weight: bold;">${alert.severity.toUpperCase()}</span><br>
+                  <strong>Source:</strong> ${alert.source}<br>
+                  <strong>Countries:</strong> ${alert.countries.join(', ')}<br>
+                  <strong>Time:</strong> ${new Date(alert.date).toLocaleString()}<br>
+                  <strong>Confidence:</strong> ${Math.round(alert.confidence * 100)}%
+                </div>
+              </div>
+            `;
+            
+            marker.bindPopup(popupContent);
+          });
+        })
+        .catch(error => {
+          console.error('Failed to fetch geopolitical events:', error);
+          // Fallback to a few critical events if API fails
+          const fallbackAlerts = [
+            {
+              lat: 26.5667, lng: 56.25,
+              title: "Strait of Hormuz Monitoring",
+              description: "Critical shipping lane under enhanced surveillance",
+              severity: "high", category: "naval", source: "Fallback Data",
+              countries: ["Iran", "UAE"], confidence: 0.8,
+              date: new Date().toISOString()
+            }
+          ];
+          
+          fallbackAlerts.forEach((alert) => {
+            const color = '#ef4444';
+            const alertIcon = L.divIcon({
+              html: `<div style="width: 12px; height: 12px; background-color: ${color}; border: 2px solid #b91c1c; border-radius: 50%; animation: pulse 2s infinite;"></div>`,
+              className: 'geopolitical-alert', iconSize: [12, 12], iconAnchor: [6, 6]
+            });
+            L.marker([alert.lat, alert.lng], { icon: alertIcon }).addTo(mapInstanceRef.current!)
+             .bindPopup(`<div><h4>${alert.title}</h4><p>${alert.description}</p></div>`);
+          });
         });
-
-        const marker = L.marker([alert.lat, alert.lng], { 
-          icon: alertIcon 
-        }).addTo(mapInstanceRef.current!);
-
-        // Add popup with alert details (severity shown in text)
-        const severityColor = alert.severity === 'critical' ? '#dc2626' : 
-                             alert.severity === 'high' ? '#ea580c' : '#eab308';
-        
-        const popupContent = `
-          <div style="min-width: 200px;">
-            <h4 style="margin: 0 0 8px 0; color: ${color}; font-size: 14px; font-weight: bold;">
-              ${alert.title}
-            </h4>
-            <p style="margin: 0 0 6px 0; font-size: 12px; color: #DAA520;">
-              ${alert.description}
-            </p>
-            <div style="font-size: 11px; color: #666;">
-              <strong>Severity:</strong> <span style="color: ${severityColor}; font-weight: bold;">${alert.severity.toUpperCase()}</span><br>
-              <strong>Time:</strong> ${new Date(alert.date).toLocaleString()}
-            </div>
-          </div>
-        `;
-        
-        marker.bindPopup(popupContent);
-      });
     }
 
     // Add active wells (oil & gas combined) if active
