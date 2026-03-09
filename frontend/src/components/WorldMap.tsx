@@ -630,23 +630,23 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
                 break;
             }
             
-            // Create upside-down triangle icon (same as map layer menu)
+            // Create upside-down triangle icon (40% larger)
             const alertIcon = L.divIcon({
               html: `<div style="
-                width: 16px; 
-                height: 16px; 
+                width: 22px; 
+                height: 22px; 
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 ${pulseAnimation}
               ">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="${color}">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="${color}">
                   <path d="M12 16l-6-8h12l-6 8z"/>
                 </svg>
               </div>`,
               className: 'weather-alert',
-              iconSize: [16, 16],
-              iconAnchor: [8, 8]
+              iconSize: [22, 22],
+              iconAnchor: [11, 11]
             });
 
             const marker = L.marker([alert.lat, alert.lng], { 
@@ -696,6 +696,93 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         .catch(error => {
           console.error('Failed to fetch weather alerts:', error);
           // No fallback weather alerts - if API fails, show nothing rather than fake data
+        });
+    }
+
+    // Add seismic activity if active
+    if (activeLayers.includes('seismic-activity')) {
+      // Fetch live seismic events
+      fetch('/api/seismic-activity')
+        .then(response => response.json())
+        .then(data => {
+          const seismicEvents = data.events || [];
+
+          // Add markers for each seismic event
+          seismicEvents.forEach((event: any) => {
+            // Color coding by magnitude/severity
+            let color = '#fbbf24'; // Default yellow
+            let pulseAnimation = '';
+            
+            switch (event.severity) {
+              case 'extreme':
+                color = '#dc2626'; // Dark red (magnitude 7.0+)
+                pulseAnimation = 'animation: pulse 0.6s infinite;';
+                break;
+              case 'high':
+                color = '#ea580c'; // Orange-red (magnitude 5.0-6.9)
+                pulseAnimation = 'animation: pulse 1.2s infinite;';
+                break;
+              case 'moderate':
+                color = '#f59e0b'; // Orange (magnitude 3.5-4.9)
+                break;
+              case 'low':
+                color = '#eab308'; // Yellow (magnitude 2.0-3.4)
+                break;
+            }
+            
+            // Create circle icon for earthquakes (different from weather triangles)
+            const alertIcon = L.divIcon({
+              html: `<div style="
+                width: 20px; 
+                height: 20px; 
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                ${pulseAnimation}
+              ">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="${color}" stroke="rgba(255,255,255,0.8)" stroke-width="1">
+                  <circle cx="12" cy="12" r="10"/>
+                </svg>
+              </div>`,
+              className: 'seismic-event',
+              iconSize: [20, 20],
+              iconAnchor: [10, 10]
+            });
+
+            const marker = L.marker([event.lat, event.lng], { 
+              icon: alertIcon 
+            }).addTo(mapInstanceRef.current!);
+
+            // Enhanced popup with earthquake-specific details
+            const severityColor = event.severity === 'extreme' ? '#dc2626' : 
+                                 event.severity === 'high' ? '#ea580c' : 
+                                 event.severity === 'moderate' ? '#f59e0b' : '#eab308';
+            
+            const popupContent = `
+              <div style="min-width: 220px;">
+                <h4 style="margin: 0 0 8px 0; color: ${color}; font-size: 14px; font-weight: bold;">
+                  🌍 ${event.title}
+                </h4>
+                <p style="margin: 0 0 6px 0; font-size: 12px; color: #DAA520; line-height: 1.4;">
+                  ${event.description}
+                </p>
+                <div style="font-size: 11px; color: #666; line-height: 1.3;">
+                  <strong>Magnitude:</strong> <span style="color: ${severityColor}; font-weight: bold;">${event.magnitude.toFixed(1)}</span><br>
+                  <strong>Depth:</strong> ${event.depth.toFixed(1)}km<br>
+                  <strong>Location:</strong> ${event.location}<br>
+                  <strong>Source:</strong> ${event.source}<br>
+                  <strong>Time:</strong> ${new Date(event.date).toLocaleString()}<br>
+                  <strong>Confidence:</strong> ${Math.round(event.confidence * 100)}%
+                </div>
+              </div>
+            `;
+            
+            marker.bindPopup(popupContent);
+          });
+        })
+        .catch(error => {
+          console.error('Failed to fetch seismic events:', error);
+          // No fallback - if seismic API fails, just show nothing
         });
     }
 
