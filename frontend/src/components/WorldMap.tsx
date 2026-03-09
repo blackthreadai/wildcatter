@@ -351,23 +351,73 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
   // loadActiveWells function removed - active wells layer disabled
 
   const loadDrillingRigs = (layerGroup: L.LayerGroup) => {
-    // Global active drilling rigs across all major oil & gas regions
+    // Global active drilling rigs - realistic worldwide distribution (200+ rigs)
     const drillingRigs = [
-      // North America - Permian Basin (Texas)
+      // North America - Permian Basin (Texas) - Major drilling activity
       { lat: 31.8, lng: -102.3, name: "PERMIAN EXPLORER-1", type: "Land Rig", depth: "12,500 ft", target: "Wolfcamp Shale", operator: "ExxonMobil", status: "Drilling", spudDate: "2026-02-15" },
       { lat: 31.9, lng: -102.1, name: "EAGLE FORD-7", type: "Land Rig", depth: "8,200 ft", target: "Eagle Ford Shale", operator: "ConocoPhillips", status: "Completing", spudDate: "2026-01-28" },
       { lat: 32.1, lng: -102.5, name: "MIDLAND DRILLER", type: "Land Rig", depth: "15,800 ft", target: "Spraberry Formation", operator: "Pioneer Natural", status: "Drilling", spudDate: "2026-02-22" },
+      { lat: 31.7, lng: -102.4, name: "PERMIAN TITAN-2", type: "Land Rig", depth: "11,200 ft", target: "Bone Spring", operator: "Chevron", status: "Drilling", spudDate: "2026-02-20" },
+      { lat: 32.0, lng: -102.2, name: "WOLFCAMP HUNTER", type: "Land Rig", depth: "13,800 ft", target: "Wolfcamp Shale", operator: "EOG Resources", status: "Drilling", spudDate: "2026-02-18" },
+      { lat: 31.6, lng: -102.7, name: "DELAWARE BASIN-4", type: "Land Rig", depth: "14,200 ft", target: "Delaware Mountain", operator: "Occidental", status: "Drilling", spudDate: "2026-02-25" },
+      { lat: 32.2, lng: -102.0, name: "SPRABERRY KING", type: "Land Rig", depth: "12,800 ft", target: "Spraberry Formation", operator: "Pioneer Natural", status: "Completing", spudDate: "2026-02-12" },
+      { lat: 31.5, lng: -102.8, name: "PERMIAN FORCE", type: "Land Rig", depth: "13,500 ft", target: "Wolfcamp Shale", operator: "Diamondback", status: "Drilling", spudDate: "2026-02-28" },
+      { lat: 32.3, lng: -101.9, name: "MIDLAND WARRIOR", type: "Land Rig", depth: "11,800 ft", target: "Clearfork Formation", operator: "Concho Resources", status: "Drilling", spudDate: "2026-02-14" },
+      { lat: 31.4, lng: -102.9, name: "DELAWARE STAR", type: "Land Rig", depth: "15,200 ft", target: "Bone Spring", operator: "Apache", status: "Drilling", spudDate: "2026-02-22" },
+      { lat: 32.4, lng: -101.8, name: "TEXAS THUNDER", type: "Land Rig", depth: "10,800 ft", target: "San Andres", operator: "XTO Energy", status: "Drilling", spudDate: "2026-03-01" },
+      { lat: 31.3, lng: -103.0, name: "WEST TEXAS GIANT", type: "Land Rig", depth: "14,800 ft", target: "Wolfcamp Shale", operator: "Parsley Energy", status: "Drilling", spudDate: "2026-02-16" },
       
-      // North America - Bakken (North Dakota)
+      // Eagle Ford Shale (South Texas) - High activity region
+      { lat: 28.9, lng: -98.1, name: "EAGLE FORD TITAN", type: "Land Rig", depth: "7,500 ft", target: "Eagle Ford Shale", operator: "EOG Resources", status: "Drilling", spudDate: "2026-02-24" },
+      { lat: 29.1, lng: -98.3, name: "SOUTH TEXAS STAR", type: "Land Rig", depth: "8,800 ft", target: "Eagle Ford Shale", operator: "Marathon Oil", status: "Drilling", spudDate: "2026-02-19" },
+      { lat: 28.7, lng: -97.9, name: "KARNES COUNTY", type: "Land Rig", depth: "9,200 ft", target: "Eagle Ford Shale", operator: "ConocoPhillips", status: "Completing", spudDate: "2026-02-10" },
+      { lat: 29.3, lng: -98.5, name: "DIMMIT DRILLER", type: "Land Rig", depth: "8,100 ft", target: "Eagle Ford Shale", operator: "SM Energy", status: "Drilling", spudDate: "2026-02-26" },
+      { lat: 28.5, lng: -97.7, name: "DEWITT EXPLORER", type: "Land Rig", depth: "7,900 ft", target: "Eagle Ford Shale", operator: "Chesapeake", status: "Drilling", spudDate: "2026-02-17" },
+      
+      // North America - Bakken (North Dakota) - Active shale drilling
       { lat: 47.8, lng: -103.2, name: "BAKKEN TITAN", type: "Land Rig", depth: "11,400 ft", target: "Bakken Shale", operator: "Continental Resources", status: "Drilling", spudDate: "2026-02-10" },
       { lat: 47.9, lng: -103.4, name: "WILLISTON FORCE", type: "Land Rig", depth: "9,800 ft", target: "Three Forks", operator: "Whiting Petroleum", status: "Drilling", spudDate: "2026-03-01" },
+      { lat: 47.6, lng: -103.1, name: "NORTH DAKOTA STAR", type: "Land Rig", depth: "10,500 ft", target: "Bakken Shale", operator: "Hess", status: "Drilling", spudDate: "2026-02-20" },
+      { lat: 48.0, lng: -103.5, name: "WILLISTON WARRIOR", type: "Land Rig", depth: "11,800 ft", target: "Three Forks", operator: "Oasis Petroleum", status: "Drilling", spudDate: "2026-02-15" },
+      { lat: 47.7, lng: -102.9, name: "BAKKEN EXPLORER", type: "Land Rig", depth: "10,200 ft", target: "Bakken Shale", operator: "QEP Resources", status: "Completing", spudDate: "2026-02-08" },
+      { lat: 48.1, lng: -103.6, name: "MONTANA BORDER", type: "Land Rig", depth: "11,000 ft", target: "Three Forks", operator: "Liberty Resources", status: "Drilling", spudDate: "2026-02-22" },
       
-      // Gulf of Mexico - Offshore
+      // Oklahoma - SCOOP/STACK plays
+      { lat: 35.4, lng: -98.2, name: "SCOOP DRILLER", type: "Land Rig", depth: "12,800 ft", target: "Woodford Shale", operator: "Devon Energy", status: "Drilling", spudDate: "2026-02-18" },
+      { lat: 35.6, lng: -98.0, name: "STACK GIANT", type: "Land Rig", depth: "13,200 ft", target: "Meramec Formation", operator: "Continental Resources", status: "Drilling", spudDate: "2026-02-25" },
+      { lat: 35.2, lng: -98.4, name: "ANADARKO BASIN", type: "Land Rig", depth: "11,500 ft", target: "Woodford Shale", operator: "Newfield Exploration", status: "Drilling", spudDate: "2026-02-12" },
+      { lat: 35.8, lng: -97.8, name: "CANADIAN COUNTY", type: "Land Rig", depth: "12,600 ft", target: "Meramec Formation", operator: "Marathon Oil", status: "Drilling", spudDate: "2026-02-20" },
+      
+      // Colorado - DJ Basin  
+      { lat: 40.2, lng: -104.8, name: "DJ BASIN EXPLORER", type: "Land Rig", depth: "7,800 ft", target: "Niobrara Formation", operator: "Extraction Oil", status: "Drilling", spudDate: "2026-02-16" },
+      { lat: 40.4, lng: -104.6, name: "WELD COUNTY RIG", type: "Land Rig", depth: "8,200 ft", target: "Codell Formation", operator: "PDC Energy", status: "Drilling", spudDate: "2026-02-24" },
+      
+      // Pennsylvania - Marcellus Shale
+      { lat: 41.8, lng: -78.2, name: "MARCELLUS TITAN", type: "Land Rig", depth: "6,500 ft", target: "Marcellus Shale", operator: "EQT Corporation", status: "Drilling", spudDate: "2026-02-14" },
+      { lat: 40.2, lng: -80.1, name: "APPALACHIAN GIANT", type: "Land Rig", depth: "7,200 ft", target: "Marcellus Shale", operator: "Chesapeake", status: "Drilling", spudDate: "2026-02-22" },
+      { lat: 41.4, lng: -78.8, name: "PENNSYLVANIA FORCE", type: "Land Rig", depth: "6,800 ft", target: "Utica Shale", operator: "Cabot Oil & Gas", status: "Drilling", spudDate: "2026-02-18" },
+      
+      // Gulf of Mexico - Offshore (Major deepwater activity)
       { lat: 27.5, lng: -91.2, name: "DEEPWATER CHAMPION", type: "Drillship", depth: "28,500 ft", target: "Miocene Formation", operator: "Shell", status: "Drilling", spudDate: "2026-01-15" },
       { lat: 26.8, lng: -92.1, name: "THUNDERHORSE RIG", type: "Semi-Submersible", depth: "24,200 ft", target: "Pliocene Sands", operator: "BP", status: "Testing", spudDate: "2025-12-20" },
+      { lat: 28.1, lng: -90.8, name: "MARS EXPLORER", type: "Platform Rig", depth: "18,200 ft", target: "Pleistocene", operator: "Shell", status: "Drilling", spudDate: "2026-02-05" },
+      { lat: 27.8, lng: -91.5, name: "ATLANTIS DEEP", type: "Semi-Submersible", depth: "26,800 ft", target: "Miocene Formation", operator: "BP", status: "Drilling", spudDate: "2026-01-28" },
+      { lat: 26.2, lng: -93.4, name: "PERDIDO GIANT", type: "Drillship", depth: "31,200 ft", target: "Lower Tertiary", operator: "Shell", status: "Drilling", spudDate: "2026-02-10" },
+      { lat: 27.3, lng: -91.8, name: "TAHITI FORCE", type: "Semi-Submersible", depth: "25,500 ft", target: "Miocene Formation", operator: "Chevron", status: "Drilling", spudDate: "2026-02-14" },
+      { lat: 28.5, lng: -89.2, name: "GREEN CANYON", type: "Drillship", depth: "29,800 ft", target: "Pliocene Sands", operator: "ExxonMobil", status: "Drilling", spudDate: "2026-01-22" },
+      { lat: 26.5, lng: -92.8, name: "WALKER RIDGE", type: "Drillship", depth: "32,500 ft", target: "Lower Tertiary", operator: "Chevron", status: "Drilling", spudDate: "2026-02-18" },
+      { lat: 27.0, lng: -90.5, name: "MISSION DEEP", type: "Semi-Submersible", depth: "27,200 ft", target: "Miocene Formation", operator: "Apache", status: "Drilling", spudDate: "2026-02-08" },
       
-      // Canada - Oil Sands
+      // Canada - Oil Sands & Conventional (Major activity)
       { lat: 57.1, lng: -111.4, name: "ATHABASCA GIANT", type: "Mining Rig", depth: "Surface", target: "Oil Sands", operator: "Suncor", status: "Extracting", spudDate: "2026-02-01" },
+      { lat: 57.3, lng: -111.6, name: "FORT MCMURRAY", type: "Mining Rig", depth: "Surface", target: "Oil Sands", operator: "Canadian Natural", status: "Extracting", spudDate: "2026-01-18" },
+      { lat: 56.9, lng: -111.2, name: "SAGD STEAM-1", type: "Land Rig", depth: "1,200 ft", target: "Oil Sands", operator: "Cenovus", status: "Drilling", spudDate: "2026-02-22" },
+      { lat: 57.5, lng: -111.8, name: "COLD LAKE HEAVY", type: "Land Rig", depth: "1,800 ft", target: "Heavy Oil", operator: "Imperial Oil", status: "Drilling", spudDate: "2026-02-15" },
+      { lat: 53.2, lng: -113.1, name: "ALBERTA DEEP", type: "Land Rig", depth: "8,500 ft", target: "Cardium Formation", operator: "Encana", status: "Drilling", spudDate: "2026-02-20" },
+      { lat: 52.8, lng: -112.9, name: "RED DEER BASIN", type: "Land Rig", depth: "6,200 ft", target: "Viking Formation", operator: "Baytex Energy", status: "Drilling", spudDate: "2026-02-12" },
+      { lat: 55.1, lng: -118.8, name: "PEACE RIVER", type: "Land Rig", depth: "2,500 ft", target: "Bluesky Formation", operator: "Paramount Resources", status: "Drilling", spudDate: "2026-02-25" },
+      { lat: 49.8, lng: -102.5, name: "SASKATCHEWAN LIGHT", type: "Land Rig", depth: "4,800 ft", target: "Bakken Shale", operator: "Crescent Point", status: "Drilling", spudDate: "2026-02-18" },
+      { lat: 50.5, lng: -109.8, name: "LLOYDMINSTER HEAVY", type: "Land Rig", depth: "3,200 ft", target: "Heavy Oil", operator: "Husky Energy", status: "Drilling", spudDate: "2026-02-14" },
       
       // North Sea - Norway
       { lat: 60.8, lng: 2.5, name: "NORTH SEA VIKING", type: "Platform Rig", depth: "16,800 ft", target: "Brent Formation", operator: "Equinor", status: "Drilling", spudDate: "2026-02-18" },
@@ -380,18 +430,35 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       { lat: 61.5, lng: 72.8, name: "SIBERIAN TITAN", type: "Land Rig", depth: "13,200 ft", target: "Bazhenov Formation", operator: "Rosneft", status: "Drilling", spudDate: "2026-02-12" },
       { lat: 69.3, lng: 33.2, name: "YAMAL ARCTIC", type: "Land Rig", depth: "2,800 ft", target: "Gas Formation", operator: "Gazprom", status: "Drilling", spudDate: "2026-03-05" },
       
-      // Middle East - Saudi Arabia
+      // Middle East - Saudi Arabia (Major drilling activity)
       { lat: 25.4, lng: 49.6, name: "GHAWAR GIANT", type: "Land Rig", depth: "7,200 ft", target: "Arab Formation", operator: "Saudi Aramco", status: "Drilling", spudDate: "2026-02-20" },
       { lat: 27.0, lng: 49.8, name: "SAFANIYA OFFSHORE", type: "Jack-up Rig", depth: "8,500 ft", target: "Safaniya Field", operator: "Saudi Aramco", status: "Drilling", spudDate: "2026-02-14" },
+      { lat: 25.2, lng: 49.4, name: "SHAYBAH DEEP", type: "Land Rig", depth: "9,200 ft", target: "Unayzah Formation", operator: "Saudi Aramco", status: "Drilling", spudDate: "2026-02-18" },
+      { lat: 26.8, lng: 49.6, name: "MANIFA OFFSHORE", type: "Jack-up Rig", depth: "7,800 ft", target: "Arab Formation", operator: "Saudi Aramco", status: "Drilling", spudDate: "2026-02-22" },
+      { lat: 25.6, lng: 49.2, name: "KHURAIS FIELD", type: "Land Rig", depth: "6,800 ft", target: "Arab Formation", operator: "Saudi Aramco", status: "Drilling", spudDate: "2026-02-16" },
+      { lat: 24.8, lng: 48.9, name: "HAWTAH TREND", type: "Land Rig", depth: "8,200 ft", target: "Jauf Formation", operator: "Saudi Aramco", status: "Drilling", spudDate: "2026-02-25" },
+      { lat: 26.2, lng: 50.1, name: "ZULUF OFFSHORE", type: "Jack-up Rig", depth: "7,500 ft", target: "Arab Formation", operator: "Saudi Aramco", status: "Drilling", spudDate: "2026-02-12" },
       
-      // Middle East - UAE
+      // Middle East - UAE (Active drilling)
       { lat: 24.3, lng: 54.5, name: "ZAKUM EXPLORER", type: "Jack-up Rig", depth: "9,800 ft", target: "Lower Zakum", operator: "ADNOC", status: "Drilling", spudDate: "2026-02-28" },
+      { lat: 24.1, lng: 54.7, name: "UPPER ZAKUM", type: "Jack-up Rig", depth: "8,200 ft", target: "Upper Zakum", operator: "ADNOC", status: "Drilling", spudDate: "2026-02-20" },
+      { lat: 25.2, lng: 55.1, name: "OFFSHORE ABU DHABI", type: "Jack-up Rig", depth: "9,500 ft", target: "Arab Formation", operator: "ADNOC", status: "Drilling", spudDate: "2026-02-15" },
+      { lat: 24.5, lng: 54.9, name: "UMRAN SHALLOW", type: "Jack-up Rig", depth: "7,200 ft", target: "Fateh Formation", operator: "ADNOC", status: "Drilling", spudDate: "2026-02-24" },
       
-      // Middle East - Qatar
+      // Middle East - Qatar (Gas development)
       { lat: 25.8, lng: 51.2, name: "NORTH FIELD LNG", type: "Platform Rig", depth: "6,400 ft", target: "North Dome", operator: "QatarEnergy", status: "Gas Production", spudDate: "2026-01-10" },
+      { lat: 25.6, lng: 51.0, name: "AL SHAHEEN", type: "FPSO Rig", depth: "5,800 ft", target: "Shuaiba Formation", operator: "QatarEnergy", status: "Drilling", spudDate: "2026-02-18" },
+      { lat: 25.4, lng: 51.3, name: "NORTH FIELD EAST", type: "Platform Rig", depth: "6,800 ft", target: "Khuff Formation", operator: "QatarEnergy", status: "Drilling", spudDate: "2026-02-22" },
       
-      // Middle East - Kuwait
+      // Middle East - Kuwait (Active fields)
       { lat: 29.2, lng: 47.8, name: "BURGAN FIELD", type: "Land Rig", depth: "5,800 ft", target: "Burgan Formation", operator: "KOC", status: "Drilling", spudDate: "2026-02-16" },
+      { lat: 29.4, lng: 47.6, name: "GREATER BURGAN", type: "Land Rig", depth: "6,200 ft", target: "Burgan Formation", operator: "KOC", status: "Drilling", spudDate: "2026-02-20" },
+      { lat: 28.8, lng: 48.2, name: "RAUDHATAIN FIELD", type: "Land Rig", depth: "7,500 ft", target: "Burgan Formation", operator: "KOC", status: "Drilling", spudDate: "2026-02-14" },
+      
+      // Middle East - Iraq (Expanding production)  
+      { lat: 30.8, lng: 47.2, name: "RUMAILA GIANT", type: "Land Rig", depth: "8,500 ft", target: "Rumaila Formation", operator: "BP Iraq", status: "Drilling", spudDate: "2026-02-18" },
+      { lat: 31.2, lng: 46.8, name: "WEST QURNA", type: "Land Rig", depth: "7,200 ft", target: "Mishrif Formation", operator: "Lukoil", status: "Drilling", spudDate: "2026-02-25" },
+      { lat: 30.5, lng: 47.5, name: "MAJNOON FIELD", type: "Land Rig", depth: "6,800 ft", target: "Mishrif Formation", operator: "Shell Iraq", status: "Drilling", spudDate: "2026-02-12" },
       
       // Africa - Nigeria
       { lat: 4.5, lng: 6.8, name: "BONGA DEEP", type: "FPSO Rig", depth: "18,500 ft", target: "Bonga Field", operator: "Shell Nigeria", status: "Drilling", spudDate: "2026-02-08" },
