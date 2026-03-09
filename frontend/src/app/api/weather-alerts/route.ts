@@ -291,15 +291,10 @@ export async function GET() {
     const globalAlerts = await fetchGlobalWeatherAlerts();
     alerts = [...alerts, ...globalAlerts];
     
-    // Mix with mock data for comprehensive coverage
-    const mockData = getMockWeatherAlerts();
-    
-    if (alerts.length > 0) {
-      // Combine real and mock data, prioritizing real data
-      const combined = [...alerts, ...mockData];
-      alerts = combined.slice(0, 25); // Limit to 25 total alerts for performance
-    } else {
-      alerts = mockData;
+    // Only use real data - no fake weather events
+    if (alerts.length === 0) {
+      // If no real alerts, return empty instead of fake hurricanes
+      alerts = [];
     }
     
     // Sort by severity (extreme first) and then by date (newest first)
@@ -336,12 +331,11 @@ export async function GET() {
   } catch (error) {
     console.error('Weather alerts API error:', error);
     
-    // Ultimate fallback
-    const fallbackData = getMockWeatherAlerts();
+    // Ultimate fallback - return empty instead of fake data
     return NextResponse.json({
-      alerts: fallbackData,
+      alerts: [],
       lastUpdate: new Date().toISOString(),
-      totalAlerts: fallbackData.length
+      totalAlerts: 0
     });
   }
 }

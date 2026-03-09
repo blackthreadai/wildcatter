@@ -630,36 +630,20 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
                 break;
             }
             
-            // Weather type emojis and styling
-            const weatherIcons: {[key: string]: string} = {
-              hurricane: '🌀',
-              typhoon: '🌀', 
-              tornado: '🌪️',
-              flood: '🌊',
-              drought: '🏜️',
-              wildfire: '🔥',
-              blizzard: '❄️',
-              heatwave: '🌡️',
-              thunderstorm: '⛈️'
-            };
-            
-            const weatherIcon = weatherIcons[alert.type] || '⛈️';
-            
-            // Create custom icon with weather-specific styling
+            // Create upside-down triangle icon (same as map layer menu)
             const alertIcon = L.divIcon({
               html: `<div style="
                 width: 16px; 
                 height: 16px; 
-                background-color: ${color}; 
-                border: 2px solid rgba(255,255,255,0.8); 
-                border-radius: 50%; 
-                box-shadow: 0 0 8px rgba(0,0,0,0.4);
-                ${pulseAnimation}
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 10px;
-              ">${weatherIcon}</div>`,
+                ${pulseAnimation}
+              ">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="${color}">
+                  <path d="M12 16l-6-8h12l-6 8z"/>
+                </svg>
+              </div>`,
               className: 'weather-alert',
               iconSize: [16, 16],
               iconAnchor: [8, 8]
@@ -689,7 +673,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
             const popupContent = `
               <div style="min-width: 240px;">
                 <h4 style="margin: 0 0 8px 0; color: ${color}; font-size: 14px; font-weight: bold;">
-                  ${weatherIcon} ${alert.title}
+                  ▼ ${alert.title}
                 </h4>
                 <p style="margin: 0 0 6px 0; font-size: 12px; color: #DAA520; line-height: 1.4;">
                   ${alert.description}
@@ -711,27 +695,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         })
         .catch(error => {
           console.error('Failed to fetch weather alerts:', error);
-          // Fallback to a critical weather alert if API fails
-          const fallbackAlerts = [
-            {
-              lat: 25.7617, lng: -80.1918,
-              title: "Hurricane Warning",
-              description: "Major hurricane approaching with life-threatening conditions",
-              severity: "extreme", type: "hurricane", source: "Fallback Data",
-              location: "South Florida", confidence: 0.95,
-              date: new Date().toISOString()
-            }
-          ];
-          
-          fallbackAlerts.forEach((alert) => {
-            const color = '#dc2626';
-            const alertIcon = L.divIcon({
-              html: `<div style="width: 16px; height: 16px; background-color: ${color}; border: 2px solid rgba(255,255,255,0.8); border-radius: 50%; animation: pulse 0.8s infinite; display: flex; align-items: center; justify-content: center; font-size: 10px;">🌀</div>`,
-              className: 'weather-alert', iconSize: [16, 16], iconAnchor: [8, 8]
-            });
-            L.marker([alert.lat, alert.lng], { icon: alertIcon }).addTo(mapInstanceRef.current!)
-             .bindPopup(`<div><h4>🌀 ${alert.title}</h4><p>${alert.description}</p></div>`);
-          });
+          // No fallback weather alerts - if API fails, show nothing rather than fake data
         });
     }
 
