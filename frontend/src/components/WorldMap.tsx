@@ -409,13 +409,8 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
     ];
 
     tankerShips.forEach(ship => {
-      // Determine icon color based on cargo type
-      let color = '#DAA520'; // Default gold
-      if (ship.cargo.includes('LNG')) {
-        color = '#60a5fa'; // Blue for LNG
-      } else if (ship.cargo.includes('Refined')) {
-        color = '#f59e0b'; // Orange for refined products
-      }
+      // All tanker ships now use blue compass rose
+      const color = '#3b82f6'; // Blue for all tanker ships
       
       const shipIcon = L.divIcon({
         html: `<div style="
@@ -426,10 +421,10 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
           justify-content: center;
         ">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
-            <path d="M2 20h20"/>
-            <path d="M4 20V10l4-4h8l4 4v10"/>
-            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-            <circle cx="12" cy="13" r="2" fill="${color}"/>
+            <polygon points="12,2 15.09,8.26 22,9 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9 8.91,8.26" fill="${color}" opacity="0.2"/>
+            <polygon points="12,2 15.09,8.26 22,9 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9 8.91,8.26"/>
+            <circle cx="12" cy="12" r="1" fill="${color}"/>
+            <path d="M12 8v8M8 12h8" stroke="${color}" stroke-width="1"/>
           </svg>
         </div>`,
         className: 'tanker-ship',
@@ -441,7 +436,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       
       const popupContent = `
         <div style="min-width: 200px;">
-          <h4 style="margin: 0 0 8px 0; color: ${color}; font-size: 14px; font-weight: bold;">
+          <h4 style="margin: 0 0 8px 0; color: #3b82f6; font-size: 14px; font-weight: bold;">
             VESSEL: ${ship.name}
           </h4>
           <div style="font-size: 11px; color: #666; line-height: 1.3;">
