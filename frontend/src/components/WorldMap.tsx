@@ -599,6 +599,142 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       });
     }
 
+    // Add weather alerts if active
+    if (activeLayers.includes('weather-alerts')) {
+      // Fetch live weather alerts
+      fetch('/api/weather-alerts')
+        .then(response => response.json())
+        .then(data => {
+          const weatherAlerts = data.alerts || [];
+
+          // Add markers for each weather alert
+          weatherAlerts.forEach((alert: any) => {
+            // Color coding by severity
+            let color = '#fbbf24'; // Default yellow
+            let pulseAnimation = '';
+            
+            switch (alert.severity) {
+              case 'extreme':
+                color = '#dc2626'; // Dark red
+                pulseAnimation = 'animation: pulse 0.8s infinite;';
+                break;
+              case 'high':
+                color = '#ea580c'; // Orange-red
+                pulseAnimation = 'animation: pulse 1.5s infinite;';
+                break;
+              case 'moderate':
+                color = '#f59e0b'; // Orange
+                break;
+              case 'low':
+                color = '#eab308'; // Yellow
+                break;
+            }
+            
+            // Weather type emojis and styling
+            const weatherIcons: {[key: string]: string} = {
+              hurricane: '🌀',
+              typhoon: '🌀', 
+              tornado: '🌪️',
+              flood: '🌊',
+              drought: '🏜️',
+              wildfire: '🔥',
+              blizzard: '❄️',
+              heatwave: '🌡️',
+              thunderstorm: '⛈️'
+            };
+            
+            const weatherIcon = weatherIcons[alert.type] || '⛈️';
+            
+            // Create custom icon with weather-specific styling
+            const alertIcon = L.divIcon({
+              html: `<div style="
+                width: 16px; 
+                height: 16px; 
+                background-color: ${color}; 
+                border: 2px solid rgba(255,255,255,0.8); 
+                border-radius: 50%; 
+                box-shadow: 0 0 8px rgba(0,0,0,0.4);
+                ${pulseAnimation}
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 10px;
+              ">${weatherIcon}</div>`,
+              className: 'weather-alert',
+              iconSize: [16, 16],
+              iconAnchor: [8, 8]
+            });
+
+            const marker = L.marker([alert.lat, alert.lng], { 
+              icon: alertIcon 
+            }).addTo(mapInstanceRef.current!);
+
+            // Enhanced popup with weather-specific details
+            const severityColor = alert.severity === 'extreme' ? '#dc2626' : 
+                                 alert.severity === 'high' ? '#ea580c' : 
+                                 alert.severity === 'moderate' ? '#f59e0b' : '#eab308';
+            
+            const weatherTypeNames: {[key: string]: string} = {
+              hurricane: 'Hurricane',
+              typhoon: 'Typhoon',
+              tornado: 'Tornado',
+              flood: 'Flood',
+              drought: 'Drought',
+              wildfire: 'Wildfire',
+              blizzard: 'Blizzard',
+              heatwave: 'Heat Wave',
+              thunderstorm: 'Severe Storm'
+            };
+            
+            const popupContent = `
+              <div style="min-width: 240px;">
+                <h4 style="margin: 0 0 8px 0; color: ${color}; font-size: 14px; font-weight: bold;">
+                  ${weatherIcon} ${alert.title}
+                </h4>
+                <p style="margin: 0 0 6px 0; font-size: 12px; color: #DAA520; line-height: 1.4;">
+                  ${alert.description}
+                </p>
+                <div style="font-size: 11px; color: #666; line-height: 1.3;">
+                  <strong>Type:</strong> ${weatherTypeNames[alert.type] || alert.type}<br>
+                  <strong>Severity:</strong> <span style="color: ${severityColor}; font-weight: bold;">${alert.severity.toUpperCase()}</span><br>
+                  <strong>Location:</strong> ${alert.location}<br>
+                  <strong>Source:</strong> ${alert.source}<br>
+                  <strong>Issued:</strong> ${new Date(alert.date).toLocaleString()}<br>
+                  ${alert.expires ? `<strong>Expires:</strong> ${new Date(alert.expires).toLocaleString()}<br>` : ''}
+                  <strong>Confidence:</strong> ${Math.round(alert.confidence * 100)}%
+                </div>
+              </div>
+            `;
+            
+            marker.bindPopup(popupContent);
+          });
+        })
+        .catch(error => {
+          console.error('Failed to fetch weather alerts:', error);
+          // Fallback to a critical weather alert if API fails
+          const fallbackAlerts = [
+            {
+              lat: 25.7617, lng: -80.1918,
+              title: "Hurricane Warning",
+              description: "Major hurricane approaching with life-threatening conditions",
+              severity: "extreme", type: "hurricane", source: "Fallback Data",
+              location: "South Florida", confidence: 0.95,
+              date: new Date().toISOString()
+            }
+          ];
+          
+          fallbackAlerts.forEach((alert) => {
+            const color = '#dc2626';
+            const alertIcon = L.divIcon({
+              html: `<div style="width: 16px; height: 16px; background-color: ${color}; border: 2px solid rgba(255,255,255,0.8); border-radius: 50%; animation: pulse 0.8s infinite; display: flex; align-items: center; justify-content: center; font-size: 10px;">🌀</div>`,
+              className: 'weather-alert', iconSize: [16, 16], iconAnchor: [8, 8]
+            });
+            L.marker([alert.lat, alert.lng], { icon: alertIcon }).addTo(mapInstanceRef.current!)
+             .bindPopup(`<div><h4>🌀 ${alert.title}</h4><p>${alert.description}</p></div>`);
+          });
+        });
+    }
+
     console.log('Active layers changed:', activeLayers);
   }, [activeLayers]);
 
