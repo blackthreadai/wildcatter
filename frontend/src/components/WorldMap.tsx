@@ -567,9 +567,9 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
 
   const loadPipelines = async (layerGroup: L.LayerGroup) => {
     try {
-      console.log('Loading pipeline route data...');
+      console.log('🛡️ LOADING PIPELINE ROUTES (Hardcoded fallback)...');
       
-      // Temporary: Hardcoded pipeline data while API deployment is pending
+      // HARDCODED PIPELINE DATA - API currently 404ing on Vercel
       const pipelines = [
         {
           id: 'keystone_xl',
@@ -680,13 +680,18 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         }
       ];
       
-      console.log(`Loaded ${pipelines.length} pipeline routes from hardcoded source`);
+      console.log(`🛡️ SUCCESS: Loaded ${pipelines.length} pipeline routes from hardcoded source`);
+      console.log('Pipeline IDs:', pipelines.map(p => p.id));
       
       pipelines.forEach((pipeline: any) => {
-        if (!pipeline.coordinates || !Array.isArray(pipeline.coordinates)) return;
+        if (!pipeline.coordinates || !Array.isArray(pipeline.coordinates)) {
+          console.warn(`⚠️ Pipeline ${pipeline.id} has no coordinates:`, pipeline);
+          return;
+        }
         
         // Convert coordinates from [lng, lat] to [lat, lng] for Leaflet
         const latLngCoords = pipeline.coordinates.map((coord: [number, number]) => [coord[1], coord[0]]);
+        console.log(`📍 Processing pipeline ${pipeline.id}: ${latLngCoords.length} coordinates`);
         
         // Determine pipeline color by type
         let color = '#666666'; // Default gray
@@ -752,15 +757,16 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         
         polyline.bindPopup(popupContent);
         layerGroup.addLayer(polyline);
+        console.log(`✅ Added pipeline ${pipeline.name} to layer (${color}, weight: 3, opacity: ${opacity})`);
       });
       
     } catch (error) {
-      console.error('Error loading pipeline routes:', error);
+      console.error('❌ CRITICAL: Error loading pipeline routes:', error);
       
-      // Error indicator
-      const errorMarker = L.marker([0, 0], {
+      // Error indicator at map center
+      const errorMarker = L.marker([29.0, 42.0], {
         icon: L.divIcon({
-          html: '<div style="color: #ef4444;">⚠️ Pipeline data unavailable</div>',
+          html: '<div style="color: #ef4444; background: rgba(0,0,0,0.8); padding: 4px; border-radius: 4px; font-size: 10px;">⚠️ Pipeline data failed</div>',
           className: 'error-marker'
         })
       });
