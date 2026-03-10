@@ -112,7 +112,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         loadPipelines(layerGroup);
         break;
       case 'tanker-ships':
-        loadTankerShips(layerGroup);
+        await loadTankerShips(layerGroup);
         break;
     }
   };
@@ -566,96 +566,79 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
   };
 
   const loadPipelines = (layerGroup: L.LayerGroup) => {};
-  const loadTankerShips = (layerGroup: L.LayerGroup) => {
-    // Global tanker ships with realistic worldwide distribution
-    const tankerShips = [
-      // Middle East to Asia Route
-      { lat: 26.7, lng: 56.1, name: "NORDIC NAVIGATOR", cargo: "Crude Oil", capacity: "2,000,000 bbls", route: "Persian Gulf → Singapore", speed: "14.2 kts", flag: "Marshall Islands" },
-      { lat: 22.5, lng: 65.2, name: "OCEAN CHAMPION", cargo: "Crude Oil", capacity: "1,800,000 bbls", route: "Ras Tanura → Mumbai", speed: "13.8 kts", flag: "Liberia" },
-      { lat: 15.2, lng: 72.8, name: "PACIFIC VOYAGER", cargo: "Refined Products", capacity: "750,000 bbls", route: "Kuwait → Chennai", speed: "15.1 kts", flag: "Panama" },
+  const loadTankerShips = async (layerGroup: L.LayerGroup) => {
+    try {
+      console.log('Loading real tanker ship data...');
+      const response = await fetch('/api/tanker-ships');
+      const data = await response.json();
+      const ships = data.ships || [];
       
-      // Middle East to Europe Route
-      { lat: 18.5, lng: 42.1, name: "ATLANTIC SPIRIT", cargo: "Crude Oil", capacity: "2,200,000 bbls", route: "Saudi Arabia → Rotterdam", speed: "13.5 kts", flag: "Greece" },
-      { lat: 12.8, lng: 43.3, name: "MEDITERRANEAN STAR", cargo: "LNG", capacity: "173,000 m³", route: "Qatar → Italy", speed: "19.2 kts", flag: "Qatar" },
-      { lat: 29.5, lng: 32.9, name: "SUEZ PRINCESS", cargo: "Refined Products", capacity: "950,000 bbls", route: "UAE → Spain", speed: "14.7 kts", flag: "Cyprus" },
+      console.log(`Loaded ${ships.length} tanker ships from ${data.dataSource || 'unknown'} source`);
       
-      // Americas Routes  
-      { lat: 25.8, lng: -94.2, name: "GULF TRADER", cargo: "Crude Oil", capacity: "1,900,000 bbls", route: "Port Arthur → Corpus Christi", speed: "12.1 kts", flag: "USA" },
-      { lat: 10.2, lng: -75.5, name: "CARIBBEAN QUEEN", cargo: "Refined Products", capacity: "650,000 bbls", route: "Cartagena → Miami", speed: "16.3 kts", flag: "Colombia" },
-      { lat: -22.9, lng: -43.2, name: "SANTOS EXPLORER", cargo: "Crude Oil", capacity: "2,100,000 bbls", route: "Santos → Houston", speed: "13.9 kts", flag: "Brazil" },
-      { lat: 61.2, lng: -149.9, name: "ALASKAN GIANT", cargo: "Crude Oil", capacity: "1,750,000 bbls", route: "Valdez → Long Beach", speed: "14.8 kts", flag: "USA" },
-      
-      // Trans-Pacific Routes
-      { lat: 35.2, lng: 139.4, name: "TOKYO EXPRESS", cargo: "LNG", capacity: "266,000 m³", route: "Australia → Japan", speed: "18.5 kts", flag: "Japan" },
-      { lat: -33.8, lng: 151.2, name: "SOUTHERN CROSS", cargo: "LNG", capacity: "180,000 m³", route: "Darwin → Seoul", speed: "19.8 kts", flag: "Australia" },
-      { lat: 22.3, lng: 114.2, name: "HONG KONG FORTUNE", cargo: "Refined Products", capacity: "850,000 bbls", route: "Singapore → Hong Kong", speed: "15.4 kts", flag: "Hong Kong" },
-      
-      // Africa Routes
-      { lat: -34.4, lng: 18.4, name: "CAPE GUARDIAN", cargo: "Crude Oil", capacity: "2,300,000 bbls", route: "Nigeria → South Africa", speed: "12.8 kts", flag: "South Africa" },
-      { lat: 4.8, lng: 7.0, name: "WEST AFRICA PRIDE", cargo: "Crude Oil", capacity: "1,950,000 bbls", route: "Bonny → Europe", speed: "13.6 kts", flag: "Nigeria" },
-      { lat: -8.8, lng: 13.2, name: "ANGOLA TRADER", cargo: "Crude Oil", capacity: "2,050,000 bbls", route: "Luanda → China", speed: "14.1 kts", flag: "Angola" },
-      
-      // North Sea / Europe Routes
-      { lat: 60.4, lng: 5.3, name: "NORTH SEA VIKING", cargo: "Crude Oil", capacity: "1,600,000 bbls", route: "Stavanger → Rotterdam", speed: "13.2 kts", flag: "Norway" },
-      { lat: 56.1, lng: 3.2, name: "SCOTTISH HIGHLANDER", cargo: "Crude Oil", capacity: "1,400,000 bbls", route: "Aberdeen → Wilhelmshaven", speed: "14.5 kts", flag: "UK" },
-      { lat: 51.9, lng: 4.1, name: "ROTTERDAM RUNNER", cargo: "Refined Products", capacity: "720,000 bbls", route: "Rotterdam → Hamburg", speed: "16.1 kts", flag: "Netherlands" },
-      
-      // Russian Routes
-      { lat: 69.1, lng: 33.4, name: "ARCTIC PIONEER", cargo: "LNG", capacity: "172,000 m³", route: "Yamal → Europe", speed: "17.9 kts", flag: "Russia" },
-      { lat: 43.1, lng: 131.9, name: "FAR EAST ENERGY", cargo: "Crude Oil", capacity: "1,850,000 bbls", route: "Kozmino → China", speed: "13.7 kts", flag: "Russia" },
-      
-      // Southeast Asia Hub
-      { lat: 1.3, lng: 103.8, name: "SINGAPORE JEWEL", cargo: "Refined Products", capacity: "900,000 bbls", route: "Singapore → Philippines", speed: "15.9 kts", flag: "Singapore" },
-      { lat: 3.1, lng: 101.7, name: "MALAYSIA VISION", cargo: "LNG", capacity: "155,000 m³", route: "Bintulu → Japan", speed: "18.7 kts", flag: "Malaysia" },
-      
-      // India Ocean Routes
-      { lat: -20.2, lng: 57.5, name: "INDIAN OCEAN PEARL", cargo: "Crude Oil", capacity: "2,150,000 bbls", route: "Middle East → Mauritius", speed: "14.0 kts", flag: "Mauritius" },
-      { lat: 6.9, lng: 79.8, name: "COLOMBO MERCHANT", cargo: "Refined Products", capacity: "680,000 bbls", route: "Sri Lanka → Maldives", speed: "16.8 kts", flag: "Sri Lanka" }
-    ];
+      ships.forEach((ship: any) => {
+        // All tanker ships use blue compass rose (with navigation indicator)
+        const color = '#3b82f6'; // Blue for all tanker ships
+        
+        const shipIcon = L.divIcon({
+          html: `<div style="
+            width: 18px; 
+            height: 18px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            transform: rotate(${ship.heading || 0}deg);
+          ">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
+              <path d="M12 2v20M2 12h20"/>
+              <path d="M6 6l12 12M18 6L6 18"/>
+              <circle cx="12" cy="12" r="2" fill="${color}"/>
+            </svg>
+          </div>`,
+          className: 'tanker-ship',
+          iconSize: [18, 18],
+          iconAnchor: [9, 9]
+        });
 
-    tankerShips.forEach(ship => {
-      // All tanker ships now use blue compass rose
-      const color = '#3b82f6'; // Blue for all tanker ships
-      
-      const shipIcon = L.divIcon({
-        html: `<div style="
-          width: 18px; 
-          height: 18px; 
-          display: flex; 
-          align-items: center; 
-          justify-content: center;
-        ">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
-            <path d="M12 2v20M2 12h20"/>
-            <path d="M6 6l12 12M18 6L6 18"/>
-            <circle cx="12" cy="12" r="2" fill="${color}"/>
-          </svg>
-        </div>`,
-        className: 'tanker-ship',
-        iconSize: [18, 18],
-        iconAnchor: [9, 9]
-      });
-
-      const marker = L.marker([ship.lat, ship.lng], { icon: shipIcon });
-      
-      const popupContent = `
-        <div style="min-width: 200px;">
-          <h4 style="margin: 0 0 8px 0; color: #3b82f6; font-size: 14px; font-weight: bold;">
-            VESSEL: ${ship.name}
-          </h4>
-          <div style="font-size: 11px; color: #666; line-height: 1.3;">
-            <strong>Cargo:</strong> ${ship.cargo}<br>
-            <strong>Capacity:</strong> ${ship.capacity}<br>
-            <strong>Route:</strong> ${ship.route}<br>
-            <strong>Speed:</strong> ${ship.speed}<br>
-            <strong>Flag:</strong> ${ship.flag}
+        const marker = L.marker([ship.lat, ship.lng], { icon: shipIcon });
+        
+        const popupContent = `
+          <div style="min-width: 220px;">
+            <h4 style="margin: 0 0 8px 0; color: #3b82f6; font-size: 14px; font-weight: bold;">
+              ${ship.name}
+            </h4>
+            <div style="font-size: 11px; color: #666; line-height: 1.3;">
+              <strong>IMO:</strong> ${ship.imo || 'N/A'}<br>
+              <strong>MMSI:</strong> ${ship.mmsi || 'N/A'}<br>
+              <strong>Cargo:</strong> ${ship.cargo}<br>
+              <strong>Capacity:</strong> ${ship.capacity}<br>
+              <strong>DWT:</strong> ${ship.deadweight?.toLocaleString() || 'N/A'} tons<br>
+              <strong>Route:</strong> ${ship.route}<br>
+              <strong>Speed:</strong> ${ship.speed} knots<br>
+              <strong>Heading:</strong> ${ship.heading}°<br>
+              <strong>Flag:</strong> ${ship.flag}<br>
+              <strong>Destination:</strong> ${ship.destination}<br>
+              <strong>Status:</strong> ${ship.status}<br>
+              <strong>Source:</strong> ${ship.source} (${Math.round((ship.confidence || 0.9) * 100)}% confidence)
+            </div>
           </div>
-        </div>
-      `;
+        `;
+        
+        marker.bindPopup(popupContent);
+        layerGroup.addLayer(marker);
+      });
       
-      marker.bindPopup(popupContent);
-      layerGroup.addLayer(marker);
-    });
+    } catch (error) {
+      console.error('Error loading tanker ships:', error);
+      
+      // Fallback to basic error indicator
+      const errorMarker = L.marker([0, 0], {
+        icon: L.divIcon({
+          html: '<div style="color: #ef4444;">⚠️ Tanker data unavailable</div>',
+          className: 'error-marker'
+        })
+      });
+      layerGroup.addLayer(errorMarker);
+    }
   };
 
   return (
