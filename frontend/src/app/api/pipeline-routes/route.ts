@@ -267,7 +267,8 @@ export async function GET() {
       totalRoutes: pipelines.length,
       dataSource: 'static',
       coverage: 'Global major pipeline routes',
-      note: 'Static data of major oil and gas pipeline infrastructure worldwide'
+      note: 'Static data of major oil and gas pipeline infrastructure worldwide',
+      version: '1.0'
     });
     
   } catch (error) {
