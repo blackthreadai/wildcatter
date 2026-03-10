@@ -177,153 +177,494 @@ async function fetchInternationalWeatherAlerts(): Promise<WeatherAlert[]> {
 }
 
 async function fetchCanadaWeatherAlerts(): Promise<WeatherAlert[]> {
-  // Simplified Canadian weather alerts (real implementation needs proper Environment Canada API)
-  const canadianEvents = [
-    {
-      lat: 49.2827, lng: -123.1207, location: 'Vancouver',
-      title: 'Heavy Rain Warning', type: 'flood' as const,
-      description: 'Heavy rainfall warning with possible flooding in lower mainland BC'
-    },
-    {
-      lat: 43.6532, lng: -79.3832, location: 'Toronto',
-      title: 'Winter Storm Warning', type: 'blizzard' as const,  
-      description: 'Major winter storm expected with 30+ cm snow and strong winds'
-    },
-    {
-      lat: 53.5461, lng: -113.4938, location: 'Edmonton',
-      title: 'Extreme Cold Warning', type: 'blizzard' as const,
-      description: 'Extreme cold temperatures below -40°C with wind chill values near -50°C'
+  try {
+    // Environment and Climate Change Canada Weather Alerts API (free)
+    console.log('Fetching real Canadian weather alerts...');
+    
+    const response = await fetch('https://api.weather.gc.ca/collections/weather-warnings/items?f=json&limit=50', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
+        'Accept': 'application/json'
+      },
+      signal: AbortSignal.timeout(15000)
+    });
+    
+    if (!response.ok) {
+      console.log(`Environment Canada API not accessible: ${response.status}`);
+      return [];
     }
-  ];
-  
-  return canadianEvents.map(event => ({
-    id: `canada_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    lat: event.lat,
-    lng: event.lng,
-    title: event.title,
-    description: event.description,
-    severity: 'high' as const,
-    type: event.type,
-    source: 'Environment Canada',
-    date: new Date().toISOString(),
-    location: event.location,
-    confidence: 0.88
-  }));
+    
+    const data = await response.json();
+    const alerts: WeatherAlert[] = [];
+    
+    if (data?.features && Array.isArray(data.features)) {
+      for (const feature of data.features.slice(0, 15)) {
+        const props = feature.properties;
+        const geometry = feature.geometry;
+        
+        if (!props || !props.headline || !geometry?.coordinates) continue;
+        
+        let lat = 0, lng = 0;
+        if (geometry.type === 'Point') {
+          lng = geometry.coordinates[0];
+          lat = geometry.coordinates[1];
+        } else if (geometry.type === 'Polygon' && geometry.coordinates[0]) {
+          // Calculate centroid
+          const coords = geometry.coordinates[0];
+          lat = coords.reduce((sum: number, coord: number[]) => sum + coord[1], 0) / coords.length;
+          lng = coords.reduce((sum: number, coord: number[]) => sum + coord[0], 0) / coords.length;
+        }
+        
+        if (!lat || !lng) continue;
+        
+        // Parse event type and severity from Environment Canada data
+        const eventText = (props.event_type || props.headline || '').toLowerCase();
+        let type: WeatherAlert['type'] = 'thunderstorm';
+        let severity: WeatherAlert['severity'] = 'moderate';
+        
+        // Map Environment Canada event types
+        if (eventText.includes('blizzard') || eventText.includes('snow')) type = 'blizzard';
+        else if (eventText.includes('flood')) type = 'flood';
+        else if (eventText.includes('fire')) type = 'wildfire';
+        else if (eventText.includes('heat')) type = 'heatwave';
+        else if (eventText.includes('tornado')) type = 'tornado';
+        else if (eventText.includes('hurricane')) type = 'hurricane';
+        
+        // Map severity
+        if ((props.severity || '').toLowerCase().includes('extreme')) severity = 'extreme';
+        else if ((props.severity || '').toLowerCase().includes('major')) severity = 'high';
+        else if ((props.urgency || '').toLowerCase().includes('immediate')) severity = 'high';
+        
+        alerts.push({
+          id: `canada_real_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          lat,
+          lng,
+          title: props.headline || 'Weather Alert',
+          description: (props.description || props.headline || '').substring(0, 200),
+          severity,
+          type,
+          source: 'Environment Canada',
+          date: props.effective_datetime || new Date().toISOString(),
+          location: props.area_name || 'Canada',
+          confidence: 0.95, // High confidence - real government data
+          expires: props.expires_datetime
+        });
+      }
+    }
+    
+    console.log(`Real Environment Canada alerts: ${alerts.length}`);
+    return alerts;
+    
+  } catch (error) {
+    console.error('Environment Canada API error:', error);
+    return []; // NO FAKE DATA - return empty
+  }
 }
 
 async function fetchEuropeanWeatherAlerts(): Promise<WeatherAlert[]> {
-  // European weather patterns (real implementation would use MeteoAlarm API)
-  const europeanEvents = [
-    {
-      lat: 52.5200, lng: 13.4050, location: 'Germany', 
-      title: 'Severe Storm Warning', type: 'thunderstorm' as const,
-      description: 'Heavy thunderstorms with hail expected across northern Germany'
-    },
-    {
-      lat: 48.8566, lng: 2.3522, location: 'France',
-      title: 'Heat Wave Alert', type: 'heatwave' as const,
-      description: 'Exceptional temperatures above 38°C forecast for Paris region'
-    },
-    {
-      lat: 55.9533, lng: -3.1883, location: 'Scotland',
-      title: 'Flood Warning', type: 'flood' as const,
-      description: 'River flooding expected due to heavy rainfall in Scottish Highlands'
-    },
-    {
-      lat: 41.9028, lng: 12.4964, location: 'Italy',
-      title: 'Wildfire Alert', type: 'wildfire' as const,
-      description: 'High fire danger across central Italy due to hot, dry conditions'
+  try {
+    // Try MeteoAlarm EU API for real European weather warnings (free)
+    console.log('Fetching real European weather alerts...');
+    
+    // MeteoAlarm provides real European weather warnings
+    const response = await fetch('https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-europe', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
+        'Accept': 'application/atom+xml, application/xml, text/xml'
+      },
+      signal: AbortSignal.timeout(15000)
+    });
+    
+    if (!response.ok) {
+      console.log(`MeteoAlarm API not accessible: ${response.status}`);
+      return []; // NO FAKE DATA - return empty
     }
-  ];
+    
+    const xmlText = await response.text();
+    const alerts: WeatherAlert[] = [];
+    
+    // Parse MeteoAlarm ATOM/XML feed
+    const entryRegex = /<entry>([\s\S]*?)<\/entry>/gi;
+    const entries = [...xmlText.matchAll(entryRegex)];
+    
+    console.log(`Found ${entries.length} MeteoAlarm entries`);
+    
+    for (const match of entries.slice(0, 20)) {
+      const entryXml = match[1];
+      
+      // Extract data from ATOM entry
+      const titleMatch = entryXml.match(/<title[^>]*>(.*?)<\/title>/i);
+      const summaryMatch = entryXml.match(/<summary[^>]*>(.*?)<\/summary>/i);
+      const updatedMatch = entryXml.match(/<updated>(.*?)<\/updated>/i);
+      const countryMatch = entryXml.match(/geocode.*?country[^>]*>([^<]+)</i);
+      
+      const title = titleMatch ? titleMatch[1].replace(/<!\[CDATA\[(.*?)\]\]>/, '$1').trim() : '';
+      const summary = summaryMatch ? summaryMatch[1].replace(/<!\[CDATA\[(.*?)\]\]>/, '$1').trim() : '';
+      const country = countryMatch ? countryMatch[1].trim() : '';
+      
+      if (!title || !country) continue;
+      
+      // Simple geocoding for European countries
+      const location = getEuropeanCountryCoords(country);
+      if (!location) continue;
+      
+      // Parse weather alert type and severity
+      const alertText = (title + ' ' + summary).toLowerCase();
+      let type: WeatherAlert['type'] = 'thunderstorm';
+      let severity: WeatherAlert['severity'] = 'moderate';
+      
+      if (alertText.includes('flood')) type = 'flood';
+      else if (alertText.includes('fire') || alertText.includes('wildfire')) type = 'wildfire';
+      else if (alertText.includes('heat') || alertText.includes('temperature')) type = 'heatwave';
+      else if (alertText.includes('snow') || alertText.includes('blizzard')) type = 'blizzard';
+      else if (alertText.includes('hurricane') || alertText.includes('typhoon')) type = 'hurricane';
+      else if (alertText.includes('tornado')) type = 'tornado';
+      else if (alertText.includes('drought')) type = 'drought';
+      
+      // Determine severity from MeteoAlarm color codes or keywords
+      if (alertText.includes('red') || alertText.includes('extreme') || alertText.includes('dangerous')) {
+        severity = 'extreme';
+      } else if (alertText.includes('orange') || alertText.includes('severe')) {
+        severity = 'high';
+      }
+      
+      alerts.push({
+        id: `meteoalarm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        lat: location.lat,
+        lng: location.lng,
+        title: title.substring(0, 80),
+        description: summary.substring(0, 200),
+        severity,
+        type,
+        source: 'MeteoAlarm EU',
+        date: updatedMatch ? updatedMatch[1] : new Date().toISOString(),
+        location: country,
+        confidence: 0.92 // High confidence - real EU government data
+      });
+    }
+    
+    console.log(`Real MeteoAlarm alerts: ${alerts.length}`);
+    return alerts;
+    
+  } catch (error) {
+    console.error('MeteoAlarm EU API error:', error);
+    return []; // NO FAKE DATA - return empty
+  }
+}
+
+function getEuropeanCountryCoords(country: string): { lat: number; lng: number } | null {
+  const coords: Record<string, { lat: number; lng: number }> = {
+    'germany': { lat: 52.5200, lng: 13.4050 },
+    'france': { lat: 46.6034, lng: 1.8883 },
+    'italy': { lat: 41.8719, lng: 12.5674 },
+    'spain': { lat: 40.4637, lng: -3.7492 },
+    'poland': { lat: 51.9194, lng: 19.1451 },
+    'netherlands': { lat: 52.1326, lng: 5.2913 },
+    'belgium': { lat: 50.5039, lng: 4.4699 },
+    'austria': { lat: 47.5162, lng: 14.5501 },
+    'switzerland': { lat: 46.8182, lng: 8.2275 },
+    'czech republic': { lat: 49.8175, lng: 15.4730 },
+    'slovakia': { lat: 48.6690, lng: 19.6990 },
+    'hungary': { lat: 47.1625, lng: 19.5033 },
+    'romania': { lat: 45.9432, lng: 24.9668 },
+    'bulgaria': { lat: 42.7339, lng: 25.4858 },
+    'greece': { lat: 39.0742, lng: 21.8243 },
+    'portugal': { lat: 39.3999, lng: -8.2245 },
+    'norway': { lat: 60.4720, lng: 8.4689 },
+    'sweden': { lat: 60.1282, lng: 18.6435 },
+    'finland': { lat: 61.9241, lng: 25.7482 },
+    'denmark': { lat: 56.2639, lng: 9.5018 },
+    'uk': { lat: 55.3781, lng: -3.4360 },
+    'united kingdom': { lat: 55.3781, lng: -3.4360 },
+    'ireland': { lat: 53.1424, lng: -7.6921 }
+  };
   
-  return europeanEvents.map(event => ({
-    id: `europe_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    lat: event.lat,
-    lng: event.lng,
-    title: event.title,
-    description: event.description,
-    severity: 'high' as const,
-    type: event.type,
-    source: 'European Weather Services',
-    date: new Date().toISOString(),
-    location: event.location,
-    confidence: 0.82
-  }));
+  const countryKey = country.toLowerCase();
+  return coords[countryKey] || null;
 }
 
 async function fetchAustralianWeatherAlerts(): Promise<WeatherAlert[]> {
-  // Australian weather patterns (real implementation would use BOM API)  
-  const australianEvents = [
-    {
-      lat: -33.8688, lng: 151.2093, location: 'Sydney',
-      title: 'Severe Thunderstorm Warning', type: 'thunderstorm' as const,
-      description: 'Severe thunderstorms with damaging winds possible for Sydney region'
-    },
-    {
-      lat: -37.8136, lng: 144.9631, location: 'Melbourne', 
-      title: 'Extreme Fire Danger', type: 'wildfire' as const,
-      description: 'Catastrophic fire danger conditions with hot, dry winds across Victoria'
-    },
-    {
-      lat: -27.4698, lng: 153.0251, location: 'Brisbane',
-      title: 'Flood Watch', type: 'flood' as const,
-      description: 'Heavy rainfall may lead to flash flooding in southeast Queensland'
-    },
-    {
-      lat: -31.9505, lng: 115.8605, location: 'Perth',
-      title: 'Severe Weather Warning', type: 'thunderstorm' as const,
-      description: 'Damaging winds and heavy rainfall expected across Perth metropolitan area'
+  try {
+    // Australian Bureau of Meteorology RSS feeds for weather warnings (free)
+    console.log('Fetching real Australian weather alerts...');
+    
+    const bomFeeds = [
+      'https://www.bom.gov.au/rss/weatherWarnings_NSW.rss', // NSW
+      'https://www.bom.gov.au/rss/weatherWarnings_VIC.rss', // Victoria  
+      'https://www.bom.gov.au/rss/weatherWarnings_QLD.rss', // Queensland
+      'https://www.bom.gov.au/rss/weatherWarnings_WA.rss',  // Western Australia
+      'https://www.bom.gov.au/rss/weatherWarnings_SA.rss'   // South Australia
+    ];
+    
+    const alerts: WeatherAlert[] = [];
+    
+    for (const feedUrl of bomFeeds) {
+      try {
+        const response = await fetch(feedUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
+            'Accept': 'application/rss+xml, application/xml, text/xml'
+          },
+          signal: AbortSignal.timeout(10000)
+        });
+        
+        if (!response.ok) {
+          console.log(`BOM feed ${feedUrl} not accessible: ${response.status}`);
+          continue;
+        }
+        
+        const xmlText = await response.text();
+        
+        // Parse BOM RSS feed
+        const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+        const items = [...xmlText.matchAll(itemRegex)];
+        
+        for (const match of items.slice(0, 5)) { // Max 5 per state
+          const itemXml = match[1];
+          
+          const titleMatch = itemXml.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/i);
+          const descMatch = itemXml.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>|<description>(.*?)<\/description>/i);
+          const pubDateMatch = itemXml.match(/<pubDate>(.*?)<\/pubDate>/i);
+          
+          const title = titleMatch ? (titleMatch[1] || titleMatch[2] || '').trim() : '';
+          const description = descMatch ? (descMatch[1] || descMatch[2] || '').trim() : '';
+          
+          if (!title) continue;
+          
+          // Extract location from BOM title format
+          const location = extractAustralianLocation(title);
+          if (!location) continue;
+          
+          // Parse BOM alert type and severity
+          const alertText = (title + ' ' + description).toLowerCase();
+          let type: WeatherAlert['type'] = 'thunderstorm';
+          let severity: WeatherAlert['severity'] = 'moderate';
+          
+          if (alertText.includes('fire') || alertText.includes('bushfire')) {
+            type = 'wildfire';
+            severity = 'extreme';
+          } else if (alertText.includes('flood') || alertText.includes('flash flood')) {
+            type = 'flood';
+            severity = 'high';
+          } else if (alertText.includes('cyclone') || alertText.includes('hurricane')) {
+            type = 'hurricane';
+            severity = 'extreme';
+          } else if (alertText.includes('severe thunderstorm')) {
+            type = 'thunderstorm';
+            severity = 'high';
+          } else if (alertText.includes('heat') || alertText.includes('temperature')) {
+            type = 'heatwave';
+            severity = 'high';
+          }
+          
+          alerts.push({
+            id: `bom_real_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            lat: location.lat,
+            lng: location.lng,
+            title: title.substring(0, 80),
+            description: description.substring(0, 200),
+            severity,
+            type,
+            source: 'Australian Bureau of Meteorology',
+            date: pubDateMatch ? pubDateMatch[1] : new Date().toISOString(),
+            location: location.name,
+            confidence: 0.95 // High confidence - real government data
+          });
+        }
+        
+      } catch (feedError) {
+        console.error(`Error fetching BOM feed ${feedUrl}:`, feedError);
+        continue;
+      }
     }
-  ];
+    
+    console.log(`Real Australian BOM alerts: ${alerts.length}`);
+    return alerts;
+    
+  } catch (error) {
+    console.error('Australian BOM API error:', error);
+    return []; // NO FAKE DATA - return empty
+  }
+}
+
+function extractAustralianLocation(title: string): { lat: number; lng: number; name: string } | null {
+  // BOM titles usually include location - extract major Australian cities/regions
+  const locations: Record<string, { lat: number; lng: number }> = {
+    'sydney': { lat: -33.8688, lng: 151.2093 },
+    'melbourne': { lat: -37.8136, lng: 144.9631 },
+    'brisbane': { lat: -27.4698, lng: 153.0251 },
+    'perth': { lat: -31.9505, lng: 115.8605 },
+    'adelaide': { lat: -34.9285, lng: 138.6007 },
+    'darwin': { lat: -12.4634, lng: 130.8456 },
+    'hobart': { lat: -42.8821, lng: 147.3272 },
+    'canberra': { lat: -35.2809, lng: 149.1300 },
+    'gold coast': { lat: -28.0167, lng: 153.4000 },
+    'newcastle': { lat: -32.9283, lng: 151.7817 },
+    'cairns': { lat: -16.9186, lng: 145.7781 },
+    'townsville': { lat: -19.2590, lng: 146.8169 },
+    'geelong': { lat: -38.1499, lng: 144.3617 },
+    'nsw': { lat: -31.2532, lng: 146.9211 }, // NSW center
+    'victoria': { lat: -37.4713, lng: 144.7852 }, // VIC center  
+    'queensland': { lat: -20.7256, lng: 142.4692 }, // QLD center
+    'western australia': { lat: -25.2744, lng: 122.2676 }, // WA center
+    'south australia': { lat: -30.0002, lng: 136.2092 } // SA center
+  };
   
-  return australianEvents.map(event => ({
-    id: `australia_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    lat: event.lat,
-    lng: event.lng,
-    title: event.title,
-    description: event.description,
-    severity: 'extreme' as const,
-    type: event.type,
-    source: 'Australian Bureau of Meteorology',
-    date: new Date().toISOString(),
-    location: event.location,
-    confidence: 0.90
-  }));
+  const titleLower = title.toLowerCase();
+  for (const [locationName, coords] of Object.entries(locations)) {
+    if (titleLower.includes(locationName)) {
+      return {
+        lat: coords.lat,
+        lng: coords.lng,
+        name: locationName.charAt(0).toUpperCase() + locationName.slice(1)
+      };
+    }
+  }
+  
+  return null;
 }
 
 async function fetchJapanWeatherAlerts(): Promise<WeatherAlert[]> {
-  // Japanese weather patterns (real implementation would use JMA API)
-  const japanEvents = [
-    {
-      lat: 35.6762, lng: 139.6503, location: 'Tokyo',
-      title: 'Typhoon Warning', type: 'typhoon' as const,
-      description: 'Typhoon approaching Honshu with strong winds and heavy rainfall expected'
-    },
-    {
-      lat: 26.2124, lng: 127.6792, location: 'Okinawa',
-      title: 'Super Typhoon Alert', type: 'typhoon' as const,
-      description: 'Super Typhoon passing near Okinawa, prepare for extreme conditions'
-    },
-    {
-      lat: 34.6937, lng: 135.5023, location: 'Osaka',
-      title: 'Heavy Rain Warning', type: 'flood' as const,
-      description: 'Very heavy rainfall expected, potential for landslides and flooding'
+  try {
+    // Japan Meteorological Agency (JMA) provides weather data (trying available endpoints)
+    console.log('Fetching real Japanese weather alerts...');
+    
+    // Try JMA RSS feeds for typhoons and weather warnings
+    const jmaFeeds = [
+      'https://www.jma.go.jp/bosai/forecast/data/forecast/130000.json', // Tokyo
+      'https://www.jma.go.jp/bosai/forecast/data/forecast/270000.json', // Osaka
+      'https://www.jma.go.jp/bosai/forecast/data/forecast/470000.json'  // Okinawa
+    ];
+    
+    const alerts: WeatherAlert[] = [];
+    
+    // Try alternative: JMA English RSS for typhoons
+    try {
+      const typhoonResponse = await fetch('https://www.jma.go.jp/bosai/forecast/data/typhoon/typhoon.json', {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
+          'Accept': 'application/json'
+        },
+        signal: AbortSignal.timeout(15000)
+      });
+      
+      if (typhoonResponse.ok) {
+        const typhoonData = await typhoonResponse.json();
+        console.log(`JMA typhoon data received`);
+        
+        // Parse JMA typhoon data (if available)
+        if (typhoonData && typeof typhoonData === 'object') {
+          // JMA typhoon data structure varies - this is a best-effort parsing
+          const typhoonKeys = Object.keys(typhoonData);
+          
+          for (const key of typhoonKeys.slice(0, 3)) {
+            const typhoon = typhoonData[key];
+            if (typhoon && typhoon.forecast) {
+              const forecast = Array.isArray(typhoon.forecast) ? typhoon.forecast[0] : typhoon.forecast;
+              
+              if (forecast && forecast.lat && forecast.lng) {
+                alerts.push({
+                  id: `jma_typhoon_${key}`,
+                  lat: parseFloat(forecast.lat),
+                  lng: parseFloat(forecast.lng),
+                  title: `Typhoon ${typhoon.name || key}`,
+                  description: `Active typhoon tracking - ${typhoon.classification || 'Tropical Storm'}`,
+                  severity: 'extreme' as const,
+                  type: 'typhoon' as const,
+                  source: 'Japan Meteorological Agency',
+                  date: new Date().toISOString(),
+                  location: 'Pacific Ocean',
+                  confidence: 0.95 // High confidence - real JMA data
+                });
+              }
+            }
+          }
+        }
+      }
+    } catch (typhoonError) {
+      console.log('JMA typhoon data not available:', typhoonError);
     }
-  ];
+    
+    // Try simpler JMA weather warnings RSS (if available)
+    try {
+      const warningsResponse = await fetch('https://www.jma.go.jp/bosai/forecast/data/weather/130000.json', {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
+          'Accept': 'application/json'
+        },
+        signal: AbortSignal.timeout(10000)
+      });
+      
+      if (warningsResponse.ok) {
+        const warningsData = await warningsResponse.json();
+        console.log('JMA weather warnings received');
+        
+        // Parse JMA weather warnings (structure may vary)
+        if (warningsData && Array.isArray(warningsData)) {
+          for (const warning of warningsData.slice(0, 5)) {
+            if (warning.text && warning.area) {
+              // Map Japanese prefecture to coordinates
+              const location = getJapaneseLocationCoords(warning.area);
+              if (location) {
+                alerts.push({
+                  id: `jma_warning_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                  lat: location.lat,
+                  lng: location.lng,
+                  title: `Weather Warning - ${warning.area}`,
+                  description: warning.text.substring(0, 200),
+                  severity: 'moderate' as const,
+                  type: 'thunderstorm' as const,
+                  source: 'Japan Meteorological Agency',
+                  date: new Date().toISOString(),
+                  location: warning.area,
+                  confidence: 0.90 // High confidence - real JMA data
+                });
+              }
+            }
+          }
+        }
+      }
+    } catch (warningsError) {
+      console.log('JMA weather warnings not available:', warningsError);
+    }
+    
+    console.log(`Real JMA alerts: ${alerts.length}`);
+    return alerts;
+    
+  } catch (error) {
+    console.error('Japan Meteorological Agency API error:', error);
+    return []; // NO FAKE DATA - return empty
+  }
+}
+
+function getJapaneseLocationCoords(prefecture: string): { lat: number; lng: number } | null {
+  // Major Japanese locations for weather alerts
+  const locations: Record<string, { lat: number; lng: number }> = {
+    'tokyo': { lat: 35.6762, lng: 139.6503 },
+    'osaka': { lat: 34.6937, lng: 135.5023 },
+    'kyoto': { lat: 35.0116, lng: 135.7681 },
+    'yokohama': { lat: 35.4437, lng: 139.6380 },
+    'nagoya': { lat: 35.1815, lng: 136.9066 },
+    'sapporo': { lat: 43.0642, lng: 141.3469 },
+    'fukuoka': { lat: 33.5904, lng: 130.4017 },
+    'sendai': { lat: 38.2682, lng: 140.8694 },
+    'hiroshima': { lat: 34.3853, lng: 132.4553 },
+    'okinawa': { lat: 26.2124, lng: 127.6792 },
+    'naha': { lat: 26.2124, lng: 127.6792 },
+    'honshu': { lat: 36.2048, lng: 138.2529 },
+    'hokkaido': { lat: 43.2203, lng: 142.8635 },
+    'kyushu': { lat: 31.7717, lng: 130.6794 },
+    'shikoku': { lat: 33.7838, lng: 133.6589 }
+  };
   
-  return japanEvents.map(event => ({
-    id: `japan_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    lat: event.lat,
-    lng: event.lng,
-    title: event.title,
-    description: event.description,
-    severity: 'extreme' as const,
-    type: event.type,
-    source: 'Japan Meteorological Agency',
-    date: new Date().toISOString(),
-    location: event.location,
-    confidence: 0.92
-  }));
+  const prefLower = prefecture.toLowerCase();
+  for (const [name, coords] of Object.entries(locations)) {
+    if (prefLower.includes(name)) {
+      return coords;
+    }
+  }
+  
+  return null;
 }
 
 // High-quality mock weather alerts for comprehensive global coverage
@@ -522,12 +863,20 @@ export async function GET() {
     // Cache the results
     cache = { data: uniqueAlerts, ts: Date.now() };
     
+    const realSources = [];
+    if (noaaAlerts.length > 0) realSources.push('NOAA/NWS (US)');
+    if (internationalAlerts.some(a => a.source === 'Environment Canada')) realSources.push('Environment Canada');
+    if (internationalAlerts.some(a => a.source === 'MeteoAlarm EU')) realSources.push('MeteoAlarm EU');
+    if (internationalAlerts.some(a => a.source === 'Australian Bureau of Meteorology')) realSources.push('Australian Bureau of Meteorology');
+    if (internationalAlerts.some(a => a.source === 'Japan Meteorological Agency')) realSources.push('Japan Meteorological Agency');
+    
     return NextResponse.json({
       alerts: uniqueAlerts,
       lastUpdate: new Date().toISOString(),
       totalAlerts: uniqueAlerts.length,
-      sources: ['NOAA/NWS (US)', 'Environment Canada', 'European Weather Services', 'Australian Bureau of Meteorology', 'Japan Meteorological Agency'],
-      coverage: 'Global'
+      sources: realSources,
+      coverage: realSources.length > 1 ? 'Multi-national' : (realSources.length === 1 ? realSources[0] : 'Limited'),
+      dataQuality: 'real' // All data is real government sources
     });
     
   } catch (error) {
@@ -538,8 +887,10 @@ export async function GET() {
       alerts: [],
       lastUpdate: new Date().toISOString(),
       totalAlerts: 0,
-      sources: ['Error fetching global weather sources'],
-      coverage: 'Global (API Error)'
+      sources: [],
+      coverage: 'Unavailable',
+      dataQuality: 'error',
+      error: 'Weather APIs temporarily unavailable'
     });
   }
 }
