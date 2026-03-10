@@ -568,11 +568,119 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
   const loadPipelines = async (layerGroup: L.LayerGroup) => {
     try {
       console.log('Loading pipeline route data...');
-      const response = await fetch('/api/pipeline-routes');
-      const data = await response.json();
-      const pipelines = data.pipelines || [];
       
-      console.log(`Loaded ${pipelines.length} pipeline routes from ${data.dataSource || 'unknown'} source`);
+      // Temporary: Hardcoded pipeline data while API deployment is pending
+      const pipelines = [
+        {
+          id: 'keystone_xl',
+          name: 'Keystone Pipeline System',
+          operator: 'TC Energy',
+          type: 'crude_oil',
+          status: 'operational',
+          capacity: '830,000 bpd',
+          length: '4,324 km',
+          coordinates: [
+            [-110.15, 57.10], // Hardisty, AB
+            [-105.50, 52.50], // Saskatchewan
+            [-104.00, 50.00], // North Dakota
+            [-97.50, 47.50],  // Minnesota
+            [-95.00, 41.50],  // Nebraska  
+            [-95.50, 39.00],  // Kansas
+            [-94.50, 37.00],  // Missouri
+            [-90.00, 35.00],  // Illinois
+            [-87.50, 41.50],  // Chicago area
+            [-84.50, 41.50],  // Toledo, OH
+            [-82.50, 41.00]   // Patoka, IL
+          ],
+          startLocation: 'Hardisty, Alberta',
+          endLocation: 'Patoka, Illinois',
+          commissioning: '2010',
+          countries: ['Canada', 'United States'],
+          description: 'Major crude oil pipeline system from Canadian oil sands to US refineries'
+        },
+        {
+          id: 'colonial_pipeline',
+          name: 'Colonial Pipeline',
+          operator: 'Colonial Pipeline Company',
+          type: 'refined_products',
+          status: 'operational',
+          capacity: '2.5 million bpd',
+          length: '8,850 km',
+          coordinates: [
+            [-95.37, 29.76], // Houston, TX
+            [-94.00, 30.00], // Louisiana
+            [-91.50, 32.50], // Mississippi  
+            [-87.50, 33.50], // Alabama
+            [-85.00, 33.50], // Georgia
+            [-82.50, 34.00], // South Carolina
+            [-79.50, 35.50], // North Carolina
+            [-78.50, 37.50], // Virginia
+            [-77.00, 38.90], // Washington DC area
+            [-76.50, 39.30], // Maryland
+            [-75.50, 40.00], // Pennsylvania
+            [-74.00, 40.70]  // New York/New Jersey
+          ],
+          startLocation: 'Houston, Texas',
+          endLocation: 'New York Harbor',
+          commissioning: '1962',
+          countries: ['United States'],
+          description: 'Largest refined products pipeline system in the United States'
+        },
+        {
+          id: 'trans_alaska_pipeline',
+          name: 'Trans-Alaska Pipeline System (TAPS)',
+          operator: 'Alyeska Pipeline Service Company',
+          type: 'crude_oil',
+          status: 'operational',
+          capacity: '2.1 million bpd',
+          length: '1,287 km',
+          coordinates: [
+            [-149.50, 70.25], // Prudhoe Bay
+            [-149.00, 69.50], // Pump Station 1
+            [-148.50, 68.50], // Pump Station 2
+            [-147.50, 67.50], // Pump Station 3
+            [-146.00, 66.00], // Fairbanks area
+            [-145.50, 65.00], // Pump Station 6
+            [-145.00, 64.00], // Pump Station 7
+            [-146.50, 63.00], // Pump Station 8
+            [-148.00, 62.00], // Pump Station 9
+            [-149.50, 61.20]  // Valdez Marine Terminal
+          ],
+          startLocation: 'Prudhoe Bay, Alaska',
+          endLocation: 'Valdez, Alaska',
+          commissioning: '1977',
+          countries: ['United States'],
+          description: 'Major crude oil pipeline from North Slope to southern Alaska'
+        },
+        {
+          id: 'baku_tbilisi_ceyhan',
+          name: 'Baku-Tbilisi-Ceyhan Pipeline',
+          operator: 'BTC Co.',
+          type: 'crude_oil',
+          status: 'operational',
+          capacity: '1.2 million bpd',
+          length: '1,768 km',
+          coordinates: [
+            [49.87, 40.38], // Baku, Azerbaijan
+            [48.50, 40.50], // Azerbaijan
+            [46.50, 41.00], // Georgia border
+            [44.83, 41.69], // Tbilisi, Georgia
+            [42.50, 41.50], // Georgia
+            [40.00, 41.00], // Turkey border
+            [38.50, 40.50], // Eastern Turkey
+            [36.50, 39.50], // Central Turkey
+            [35.00, 37.00], // Southern Turkey
+            [35.89, 36.95]  // Ceyhan, Turkey
+          ],
+          startLocation: 'Baku, Azerbaijan',
+          endLocation: 'Ceyhan, Turkey',
+          commissioning: '2006',
+          countries: ['Azerbaijan', 'Georgia', 'Turkey'],
+          description: 'Major crude oil export pipeline from Caspian Sea to Mediterranean'
+        }
+      ];
+      
+      console.log(`Loaded ${pipelines.length} pipeline routes from hardcoded source`);
       
       pipelines.forEach((pipeline: any) => {
         if (!pipeline.coordinates || !Array.isArray(pipeline.coordinates)) return;
