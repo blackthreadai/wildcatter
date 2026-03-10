@@ -142,46 +142,103 @@ async function fetchNOAAWeatherAlerts(): Promise<WeatherAlert[]> {
   }
 }
 
-// International weather data sources beyond NOAA
-async function fetchInternationalWeatherAlerts(): Promise<WeatherAlert[]> {
-  const internationalAlerts: WeatherAlert[] = [];
-  
+// Additional weather APIs could be added here in the future
+// Currently supporting: US (NOAA), UK (Met Office), Germany (DWD), Hong Kong (Observatory)
+
+async function fetchUKWeatherAlerts(): Promise<WeatherAlert[]> {
   try {
-    // Canada - Environment and Climate Change Canada
-    console.log('Fetching Canadian weather alerts...');
-    const canadaAlerts = await fetchCanadaWeatherAlerts();
-    internationalAlerts.push(...canadaAlerts);
+    // UK Met Office Weather Warnings RSS Feed (free, working)
+    console.log('Fetching real UK Met Office weather alerts...');
     
-    // Europe - Combined European weather services
-    console.log('Fetching European weather alerts...');
-    const europeAlerts = await fetchEuropeanWeatherAlerts();
-    internationalAlerts.push(...europeAlerts);
+    const response = await fetch('https://www.metoffice.gov.uk/public/data/PWSCache/WarningsRSS/Region/UK', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
+        'Accept': 'application/rss+xml, application/xml, text/xml'
+      },
+      signal: AbortSignal.timeout(15000)
+    });
     
-    // Australia - Bureau of Meteorology
-    console.log('Fetching Australian weather alerts...');
-    const australiaAlerts = await fetchAustralianWeatherAlerts();
-    internationalAlerts.push(...australiaAlerts);
+    if (!response.ok) {
+      console.log(`UK Met Office RSS not accessible: ${response.status}`);
+      return [];
+    }
     
-    // Japan - Meteorological Agency (typhoons)
-    console.log('Fetching Japanese weather alerts...');
-    const japanAlerts = await fetchJapanWeatherAlerts();
-    internationalAlerts.push(...japanAlerts);
+    const xmlText = await response.text();
+    const alerts: WeatherAlert[] = [];
     
-    console.log(`Total international alerts: ${internationalAlerts.length}`);
-    return internationalAlerts;
+    // Parse Met Office RSS XML
+    const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+    const items = [...xmlText.matchAll(itemRegex)];
+    
+    console.log(`Found ${items.length} UK Met Office warnings`);
+    
+    for (const match of items.slice(0, 10)) {
+      const itemXml = match[1];
+      
+      const titleMatch = itemXml.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/i);
+      const descMatch = itemXml.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>|<description>(.*?)<\/description>/i);
+      const pubDateMatch = itemXml.match(/<pubDate>(.*?)<\/pubDate>/i);
+      const guidMatch = itemXml.match(/<guid[^>]*>(.*?)<\/guid>/i);
+      
+      const title = titleMatch ? (titleMatch[1] || titleMatch[2] || '').trim() : '';
+      const description = descMatch ? (descMatch[1] || descMatch[2] || '').trim() : '';
+      
+      if (!title) continue;
+      
+      // Parse Met Office warning types and severity
+      const alertText = (title + ' ' + description).toLowerCase();
+      let type: WeatherAlert['type'] = 'thunderstorm';
+      let severity: WeatherAlert['severity'] = 'moderate';
+      
+      // Map Met Office warning types
+      if (alertText.includes('rain') || alertText.includes('flood')) type = 'flood';
+      else if (alertText.includes('snow') || alertText.includes('ice') || alertText.includes('blizzard')) type = 'blizzard';
+      else if (alertText.includes('wind') || alertText.includes('gale')) type = 'thunderstorm';
+      else if (alertText.includes('heat') || alertText.includes('temperature')) type = 'heatwave';
+      else if (alertText.includes('thunderstorm') || alertText.includes('thunder')) type = 'thunderstorm';
+      
+      // Map Met Office severity colors
+      if (alertText.includes('red') || alertText.includes('dangerous') || alertText.includes('risk to life')) {
+        severity = 'extreme';
+      } else if (alertText.includes('amber') || alertText.includes('orange')) {
+        severity = 'high';
+      } else if (alertText.includes('yellow')) {
+        severity = 'moderate';
+      }
+      
+      // Use UK coordinates (center of UK)
+      const ukCoords = { lat: 54.3781, lng: -3.4360 };
+      
+      alerts.push({
+        id: `uk_metoffice_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        lat: ukCoords.lat,
+        lng: ukCoords.lng,
+        title: title.substring(0, 80),
+        description: description.substring(0, 200),
+        severity,
+        type,
+        source: 'UK Met Office',
+        date: pubDateMatch ? pubDateMatch[1] : new Date().toISOString(),
+        location: 'United Kingdom',
+        confidence: 0.98 // Very high confidence - official UK government data
+      });
+    }
+    
+    console.log(`Real UK Met Office alerts: ${alerts.length}`);
+    return alerts;
     
   } catch (error) {
-    console.error('International weather alerts fetch error:', error);
-    return [];
+    console.error('UK Met Office API error:', error);
+    return []; // NO FAKE DATA - return empty
   }
 }
 
-async function fetchCanadaWeatherAlerts(): Promise<WeatherAlert[]> {
+async function fetchGermanWeatherAlerts(): Promise<WeatherAlert[]> {
   try {
-    // Environment and Climate Change Canada Weather Alerts API (free)
-    console.log('Fetching real Canadian weather alerts...');
+    // German Weather Service (DWD) Warnings JSON API (free, working)
+    console.log('Fetching real German DWD weather alerts...');
     
-    const response = await fetch('https://api.weather.gc.ca/collections/weather-warnings/items?f=json&limit=50', {
+    const response = await fetch('https://www.dwd.de/DWD/warnungen/warnapp/json/warnings.json', {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
         'Accept': 'application/json'
@@ -190,482 +247,288 @@ async function fetchCanadaWeatherAlerts(): Promise<WeatherAlert[]> {
     });
     
     if (!response.ok) {
-      console.log(`Environment Canada API not accessible: ${response.status}`);
+      console.log(`German DWD API not accessible: ${response.status}`);
+      return [];
+    }
+    
+    let jsonText = await response.text();
+    
+    // DWD wraps JSON in a function call - extract the JSON
+    const jsonMatch = jsonText.match(/warnWetter\.loadWarnings\((.*)\);?$/);
+    if (!jsonMatch) {
+      console.log('Could not parse DWD JSON format');
+      return [];
+    }
+    
+    const data = JSON.parse(jsonMatch[1]);
+    const alerts: WeatherAlert[] = [];
+    
+    if (data?.warnings && typeof data.warnings === 'object') {
+      console.log(`Found DWD warnings regions: ${Object.keys(data.warnings).length}`);
+      
+      for (const [regionId, warnings] of Object.entries(data.warnings)) {
+        if (!Array.isArray(warnings)) continue;
+        
+        for (const warning of warnings.slice(0, 3)) { // Max 3 per region
+          if (!warning || typeof warning !== 'object') continue;
+          
+          // Parse DWD warning data
+          const description = warning.description || '';
+          const regionName = warning.regionName || '';
+          const state = warning.state || '';
+          const level = warning.level || 1; // DWD levels 1-4
+          const type = warning.type || 0; // DWD warning types
+          
+          if (!regionName || !description) continue;
+          
+          // Map DWD warning types to our types
+          let alertType: WeatherAlert['type'] = 'thunderstorm';
+          let severity: WeatherAlert['severity'] = 'moderate';
+          
+          // DWD warning type mapping (approximate)
+          if (type === 0 || type === 1) alertType = 'thunderstorm'; // Gewitter/Sturm
+          else if (type === 2) alertType = 'blizzard'; // Schnee/Frost
+          else if (type === 3) alertType = 'heatwave'; // Hitze
+          else if (type === 4) alertType = 'flood'; // Regen/Überschwemmung
+          else if (type === 5) alertType = 'wildfire'; // Nebel/Brand
+          
+          // Map DWD severity levels
+          if (level >= 4) severity = 'extreme'; // Violet warnings
+          else if (level >= 3) severity = 'high'; // Red warnings
+          else if (level >= 2) severity = 'moderate'; // Orange warnings
+          else severity = 'low'; // Yellow warnings
+          
+          // Get approximate coordinates for German states/regions
+          const coords = getGermanRegionCoords(state, regionName);
+          if (!coords) continue;
+          
+          alerts.push({
+            id: `germany_dwd_${regionId}_${Date.now()}`,
+            lat: coords.lat,
+            lng: coords.lng,
+            title: `${regionName} Weather Warning`,
+            description: description.substring(0, 200),
+            severity,
+            type: alertType,
+            source: 'German Weather Service (DWD)',
+            date: warning.start ? new Date(warning.start).toISOString() : new Date().toISOString(),
+            location: `${regionName}, ${state}`,
+            confidence: 0.97, // Very high confidence - official German government data
+            expires: warning.end ? new Date(warning.end).toISOString() : undefined
+          });
+        }
+      }
+    }
+    
+    console.log(`Real German DWD alerts: ${alerts.length}`);
+    return alerts;
+    
+  } catch (error) {
+    console.error('German DWD API error:', error);
+    return []; // NO FAKE DATA - return empty
+  }
+}
+
+function getGermanRegionCoords(state: string, region: string): { lat: number; lng: number } | null {
+  // German states and major regions coordinates
+  const germanLocations: Record<string, { lat: number; lng: number }> = {
+    // States (Länder)
+    'baden-württemberg': { lat: 48.6616, lng: 9.3501 },
+    'bayern': { lat: 48.7904, lng: 11.4979 },
+    'bavaria': { lat: 48.7904, lng: 11.4979 },
+    'berlin': { lat: 52.5200, lng: 13.4050 },
+    'brandenburg': { lat: 52.4125, lng: 12.5316 },
+    'bremen': { lat: 53.0793, lng: 8.8017 },
+    'hamburg': { lat: 53.5511, lng: 9.9937 },
+    'hessen': { lat: 50.6520, lng: 9.1624 },
+    'mecklenburg-vorpommern': { lat: 53.6127, lng: 12.4296 },
+    'niedersachsen': { lat: 52.6367, lng: 9.8451 },
+    'nordrhein-westfalen': { lat: 51.4332, lng: 7.6616 },
+    'rheinland-pfalz': { lat: 49.9129, lng: 7.4530 },
+    'saarland': { lat: 49.3964, lng: 6.8432 },
+    'sachsen': { lat: 51.1045, lng: 13.2017 },
+    'sachsen-anhalt': { lat: 51.9503, lng: 11.6923 },
+    'schleswig-holstein': { lat: 54.2194, lng: 9.6961 },
+    'thüringen': { lat: 50.9848, lng: 11.0299 },
+    
+    // Major cities/regions
+    'münchen': { lat: 48.1351, lng: 11.5820 },
+    'frankfurt': { lat: 50.1109, lng: 8.6821 },
+    'köln': { lat: 50.9375, lng: 6.9603 },
+    'düsseldorf': { lat: 51.2277, lng: 6.7735 },
+    'stuttgart': { lat: 48.7758, lng: 9.1829 },
+    'dortmund': { lat: 51.5136, lng: 7.4653 },
+    'essen': { lat: 51.4556, lng: 7.0116 },
+    'leipzig': { lat: 51.3397, lng: 12.3731 },
+    'dresden': { lat: 51.0504, lng: 13.7373 },
+    'hannover': { lat: 52.3759, lng: 9.7320 }
+  };
+  
+  const stateKey = state.toLowerCase().replace(/\s+/g, '-');
+  const regionKey = region.toLowerCase().replace(/\s+/g, '-');
+  
+  // Try state first, then region
+  return germanLocations[stateKey] || germanLocations[regionKey] || 
+         { lat: 51.1657, lng: 10.4515 }; // Center of Germany fallback
+}
+
+async function fetchHongKongWeatherAlerts(): Promise<WeatherAlert[]> {
+  try {
+    // Hong Kong Observatory Weather Warnings API (free, working)
+    console.log('Fetching real Hong Kong Observatory weather alerts...');
+    
+    const response = await fetch('https://data.weather.gov.hk/weatherAPI/opendata/weather.php?dataType=warningInfo&lang=en', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
+        'Accept': 'application/json'
+      },
+      signal: AbortSignal.timeout(15000)
+    });
+    
+    if (!response.ok) {
+      console.log(`Hong Kong Observatory API not accessible: ${response.status}`);
       return [];
     }
     
     const data = await response.json();
     const alerts: WeatherAlert[] = [];
     
-    if (data?.features && Array.isArray(data.features)) {
-      for (const feature of data.features.slice(0, 15)) {
-        const props = feature.properties;
-        const geometry = feature.geometry;
-        
-        if (!props || !props.headline || !geometry?.coordinates) continue;
-        
-        let lat = 0, lng = 0;
-        if (geometry.type === 'Point') {
-          lng = geometry.coordinates[0];
-          lat = geometry.coordinates[1];
-        } else if (geometry.type === 'Polygon' && geometry.coordinates[0]) {
-          // Calculate centroid
-          const coords = geometry.coordinates[0];
-          lat = coords.reduce((sum: number, coord: number[]) => sum + coord[1], 0) / coords.length;
-          lng = coords.reduce((sum: number, coord: number[]) => sum + coord[0], 0) / coords.length;
+    if (data && typeof data === 'object') {
+      console.log(`Hong Kong Observatory warnings received`);
+      
+      // Hong Kong API returns current warnings as object properties
+      const warningTypes = [
+        'WTCSGNL', 'WFIRE', 'WFROST', 'WHOT', 'WCOLD', 'WMSGNL', 'WL', 'WTMW', 
+        'WTS', 'WRAIN', 'WFNTSA', 'WF', 'WLANDSLIP', 'TSUNAMI-W', 'TSUNAMI-A'
+      ];
+      
+      for (const warningType of warningTypes) {
+        const warning = data[warningType];
+        if (warning && warning.code && warning.code !== 'CANCEL') {
+          
+          // Map HK Observatory warning types
+          let type: WeatherAlert['type'] = 'thunderstorm';
+          let severity: WeatherAlert['severity'] = 'moderate';
+          let title = 'Weather Warning';
+          let description = '';
+          
+          switch (warningType) {
+            case 'WTCSGNL': // Tropical Cyclone
+              type = 'hurricane';
+              severity = getSeverityFromHKSignal(warning.code);
+              title = `Tropical Cyclone Signal ${warning.code}`;
+              description = `Tropical cyclone warning signal ${warning.code} in effect for Hong Kong`;
+              break;
+            case 'WFIRE': // Fire Danger
+              type = 'wildfire';
+              severity = 'high';
+              title = 'Fire Danger Warning';
+              description = 'Fire danger warning due to dry conditions';
+              break;
+            case 'WHOT': // Very Hot Weather
+              type = 'heatwave';
+              severity = 'high';
+              title = 'Very Hot Weather Warning';
+              description = 'Very hot weather expected with high temperatures';
+              break;
+            case 'WRAIN': // Heavy Rain
+              type = 'flood';
+              severity = getSeverityFromHKRain(warning.code);
+              title = `Heavy Rain Warning (${warning.code})`;
+              description = `Heavy rain warning ${warning.code} - flooding possible`;
+              break;
+            case 'WTS': // Thunderstorm
+              type = 'thunderstorm';
+              severity = 'moderate';
+              title = 'Thunderstorm Warning';
+              description = 'Thunderstorm warning in effect';
+              break;
+            case 'WLANDSLIP': // Landslip
+              type = 'flood';
+              severity = 'high';
+              title = 'Landslip Warning';
+              description = 'Landslip warning due to heavy rain';
+              break;
+            case 'TSUNAMI-W': // Tsunami
+              type = 'hurricane';
+              severity = 'extreme';
+              title = 'Tsunami Warning';
+              description = 'Tsunami warning issued';
+              break;
+          }
+          
+          // Hong Kong coordinates
+          const hkCoords = { lat: 22.3193, lng: 114.1694 };
+          
+          alerts.push({
+            id: `hk_observatory_${warningType}_${Date.now()}`,
+            lat: hkCoords.lat,
+            lng: hkCoords.lng,
+            title,
+            description,
+            severity,
+            type,
+            source: 'Hong Kong Observatory',
+            date: warning.issueTime || new Date().toISOString(),
+            location: 'Hong Kong',
+            confidence: 0.99, // Highest confidence - official HK government data
+            expires: warning.expireTime
+          });
         }
-        
-        if (!lat || !lng) continue;
-        
-        // Parse event type and severity from Environment Canada data
-        const eventText = (props.event_type || props.headline || '').toLowerCase();
-        let type: WeatherAlert['type'] = 'thunderstorm';
-        let severity: WeatherAlert['severity'] = 'moderate';
-        
-        // Map Environment Canada event types
-        if (eventText.includes('blizzard') || eventText.includes('snow')) type = 'blizzard';
-        else if (eventText.includes('flood')) type = 'flood';
-        else if (eventText.includes('fire')) type = 'wildfire';
-        else if (eventText.includes('heat')) type = 'heatwave';
-        else if (eventText.includes('tornado')) type = 'tornado';
-        else if (eventText.includes('hurricane')) type = 'hurricane';
-        
-        // Map severity
-        if ((props.severity || '').toLowerCase().includes('extreme')) severity = 'extreme';
-        else if ((props.severity || '').toLowerCase().includes('major')) severity = 'high';
-        else if ((props.urgency || '').toLowerCase().includes('immediate')) severity = 'high';
-        
-        alerts.push({
-          id: `canada_real_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          lat,
-          lng,
-          title: props.headline || 'Weather Alert',
-          description: (props.description || props.headline || '').substring(0, 200),
-          severity,
-          type,
-          source: 'Environment Canada',
-          date: props.effective_datetime || new Date().toISOString(),
-          location: props.area_name || 'Canada',
-          confidence: 0.95, // High confidence - real government data
-          expires: props.expires_datetime
-        });
       }
     }
     
-    console.log(`Real Environment Canada alerts: ${alerts.length}`);
+    console.log(`Real Hong Kong Observatory alerts: ${alerts.length}`);
     return alerts;
     
   } catch (error) {
-    console.error('Environment Canada API error:', error);
+    console.error('Hong Kong Observatory API error:', error);
     return []; // NO FAKE DATA - return empty
   }
+}
+
+function getSeverityFromHKSignal(signal: string): WeatherAlert['severity'] {
+  // Hong Kong Tropical Cyclone Warning Signals
+  const signalNum = parseInt(signal) || 0;
+  if (signalNum >= 9) return 'extreme'; // Hurricane force
+  if (signalNum >= 8) return 'high'; // Gale force  
+  if (signalNum >= 3) return 'moderate'; // Strong wind
+  return 'low';
+}
+
+function getSeverityFromHKRain(code: string): WeatherAlert['severity'] {
+  // Hong Kong Rainstorm Warning Signals
+  if (code === 'RED' || code === 'BLACK') return 'extreme';
+  if (code === 'AMBER') return 'high';
+  return 'moderate';
 }
 
 async function fetchEuropeanWeatherAlerts(): Promise<WeatherAlert[]> {
+  // Combine UK and German alerts for European coverage
+  const alerts: WeatherAlert[] = [];
+  
   try {
-    // Try MeteoAlarm EU API for real European weather warnings (free)
-    console.log('Fetching real European weather alerts...');
+    console.log('Fetching European weather alerts (UK + Germany)...');
     
-    // MeteoAlarm provides real European weather warnings
-    const response = await fetch('https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-europe', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
-        'Accept': 'application/atom+xml, application/xml, text/xml'
-      },
-      signal: AbortSignal.timeout(15000)
-    });
+    // Get UK Met Office alerts
+    const ukAlerts = await fetchUKWeatherAlerts();
+    alerts.push(...ukAlerts);
     
-    if (!response.ok) {
-      console.log(`MeteoAlarm API not accessible: ${response.status}`);
-      return []; // NO FAKE DATA - return empty
-    }
+    // Get German DWD alerts  
+    const germanAlerts = await fetchGermanWeatherAlerts();
+    alerts.push(...germanAlerts);
     
-    const xmlText = await response.text();
-    const alerts: WeatherAlert[] = [];
-    
-    // Parse MeteoAlarm ATOM/XML feed
-    const entryRegex = /<entry>([\s\S]*?)<\/entry>/gi;
-    const entries = [...xmlText.matchAll(entryRegex)];
-    
-    console.log(`Found ${entries.length} MeteoAlarm entries`);
-    
-    for (const match of entries.slice(0, 20)) {
-      const entryXml = match[1];
-      
-      // Extract data from ATOM entry
-      const titleMatch = entryXml.match(/<title[^>]*>(.*?)<\/title>/i);
-      const summaryMatch = entryXml.match(/<summary[^>]*>(.*?)<\/summary>/i);
-      const updatedMatch = entryXml.match(/<updated>(.*?)<\/updated>/i);
-      const countryMatch = entryXml.match(/geocode.*?country[^>]*>([^<]+)</i);
-      
-      const title = titleMatch ? titleMatch[1].replace(/<!\[CDATA\[(.*?)\]\]>/, '$1').trim() : '';
-      const summary = summaryMatch ? summaryMatch[1].replace(/<!\[CDATA\[(.*?)\]\]>/, '$1').trim() : '';
-      const country = countryMatch ? countryMatch[1].trim() : '';
-      
-      if (!title || !country) continue;
-      
-      // Simple geocoding for European countries
-      const location = getEuropeanCountryCoords(country);
-      if (!location) continue;
-      
-      // Parse weather alert type and severity
-      const alertText = (title + ' ' + summary).toLowerCase();
-      let type: WeatherAlert['type'] = 'thunderstorm';
-      let severity: WeatherAlert['severity'] = 'moderate';
-      
-      if (alertText.includes('flood')) type = 'flood';
-      else if (alertText.includes('fire') || alertText.includes('wildfire')) type = 'wildfire';
-      else if (alertText.includes('heat') || alertText.includes('temperature')) type = 'heatwave';
-      else if (alertText.includes('snow') || alertText.includes('blizzard')) type = 'blizzard';
-      else if (alertText.includes('hurricane') || alertText.includes('typhoon')) type = 'hurricane';
-      else if (alertText.includes('tornado')) type = 'tornado';
-      else if (alertText.includes('drought')) type = 'drought';
-      
-      // Determine severity from MeteoAlarm color codes or keywords
-      if (alertText.includes('red') || alertText.includes('extreme') || alertText.includes('dangerous')) {
-        severity = 'extreme';
-      } else if (alertText.includes('orange') || alertText.includes('severe')) {
-        severity = 'high';
-      }
-      
-      alerts.push({
-        id: `meteoalarm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        lat: location.lat,
-        lng: location.lng,
-        title: title.substring(0, 80),
-        description: summary.substring(0, 200),
-        severity,
-        type,
-        source: 'MeteoAlarm EU',
-        date: updatedMatch ? updatedMatch[1] : new Date().toISOString(),
-        location: country,
-        confidence: 0.92 // High confidence - real EU government data
-      });
-    }
-    
-    console.log(`Real MeteoAlarm alerts: ${alerts.length}`);
+    console.log(`Total European alerts: ${alerts.length} (UK: ${ukAlerts.length}, Germany: ${germanAlerts.length})`);
     return alerts;
     
   } catch (error) {
-    console.error('MeteoAlarm EU API error:', error);
+    console.error('European weather alerts error:', error);
     return []; // NO FAKE DATA - return empty
   }
 }
 
-function getEuropeanCountryCoords(country: string): { lat: number; lng: number } | null {
-  const coords: Record<string, { lat: number; lng: number }> = {
-    'germany': { lat: 52.5200, lng: 13.4050 },
-    'france': { lat: 46.6034, lng: 1.8883 },
-    'italy': { lat: 41.8719, lng: 12.5674 },
-    'spain': { lat: 40.4637, lng: -3.7492 },
-    'poland': { lat: 51.9194, lng: 19.1451 },
-    'netherlands': { lat: 52.1326, lng: 5.2913 },
-    'belgium': { lat: 50.5039, lng: 4.4699 },
-    'austria': { lat: 47.5162, lng: 14.5501 },
-    'switzerland': { lat: 46.8182, lng: 8.2275 },
-    'czech republic': { lat: 49.8175, lng: 15.4730 },
-    'slovakia': { lat: 48.6690, lng: 19.6990 },
-    'hungary': { lat: 47.1625, lng: 19.5033 },
-    'romania': { lat: 45.9432, lng: 24.9668 },
-    'bulgaria': { lat: 42.7339, lng: 25.4858 },
-    'greece': { lat: 39.0742, lng: 21.8243 },
-    'portugal': { lat: 39.3999, lng: -8.2245 },
-    'norway': { lat: 60.4720, lng: 8.4689 },
-    'sweden': { lat: 60.1282, lng: 18.6435 },
-    'finland': { lat: 61.9241, lng: 25.7482 },
-    'denmark': { lat: 56.2639, lng: 9.5018 },
-    'uk': { lat: 55.3781, lng: -3.4360 },
-    'united kingdom': { lat: 55.3781, lng: -3.4360 },
-    'ireland': { lat: 53.1424, lng: -7.6921 }
-  };
-  
-  const countryKey = country.toLowerCase();
-  return coords[countryKey] || null;
-}
-
-async function fetchAustralianWeatherAlerts(): Promise<WeatherAlert[]> {
-  try {
-    // Australian Bureau of Meteorology RSS feeds for weather warnings (free)
-    console.log('Fetching real Australian weather alerts...');
-    
-    const bomFeeds = [
-      'https://www.bom.gov.au/rss/weatherWarnings_NSW.rss', // NSW
-      'https://www.bom.gov.au/rss/weatherWarnings_VIC.rss', // Victoria  
-      'https://www.bom.gov.au/rss/weatherWarnings_QLD.rss', // Queensland
-      'https://www.bom.gov.au/rss/weatherWarnings_WA.rss',  // Western Australia
-      'https://www.bom.gov.au/rss/weatherWarnings_SA.rss'   // South Australia
-    ];
-    
-    const alerts: WeatherAlert[] = [];
-    
-    for (const feedUrl of bomFeeds) {
-      try {
-        const response = await fetch(feedUrl, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
-            'Accept': 'application/rss+xml, application/xml, text/xml'
-          },
-          signal: AbortSignal.timeout(10000)
-        });
-        
-        if (!response.ok) {
-          console.log(`BOM feed ${feedUrl} not accessible: ${response.status}`);
-          continue;
-        }
-        
-        const xmlText = await response.text();
-        
-        // Parse BOM RSS feed
-        const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
-        const items = [...xmlText.matchAll(itemRegex)];
-        
-        for (const match of items.slice(0, 5)) { // Max 5 per state
-          const itemXml = match[1];
-          
-          const titleMatch = itemXml.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/i);
-          const descMatch = itemXml.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>|<description>(.*?)<\/description>/i);
-          const pubDateMatch = itemXml.match(/<pubDate>(.*?)<\/pubDate>/i);
-          
-          const title = titleMatch ? (titleMatch[1] || titleMatch[2] || '').trim() : '';
-          const description = descMatch ? (descMatch[1] || descMatch[2] || '').trim() : '';
-          
-          if (!title) continue;
-          
-          // Extract location from BOM title format
-          const location = extractAustralianLocation(title);
-          if (!location) continue;
-          
-          // Parse BOM alert type and severity
-          const alertText = (title + ' ' + description).toLowerCase();
-          let type: WeatherAlert['type'] = 'thunderstorm';
-          let severity: WeatherAlert['severity'] = 'moderate';
-          
-          if (alertText.includes('fire') || alertText.includes('bushfire')) {
-            type = 'wildfire';
-            severity = 'extreme';
-          } else if (alertText.includes('flood') || alertText.includes('flash flood')) {
-            type = 'flood';
-            severity = 'high';
-          } else if (alertText.includes('cyclone') || alertText.includes('hurricane')) {
-            type = 'hurricane';
-            severity = 'extreme';
-          } else if (alertText.includes('severe thunderstorm')) {
-            type = 'thunderstorm';
-            severity = 'high';
-          } else if (alertText.includes('heat') || alertText.includes('temperature')) {
-            type = 'heatwave';
-            severity = 'high';
-          }
-          
-          alerts.push({
-            id: `bom_real_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            lat: location.lat,
-            lng: location.lng,
-            title: title.substring(0, 80),
-            description: description.substring(0, 200),
-            severity,
-            type,
-            source: 'Australian Bureau of Meteorology',
-            date: pubDateMatch ? pubDateMatch[1] : new Date().toISOString(),
-            location: location.name,
-            confidence: 0.95 // High confidence - real government data
-          });
-        }
-        
-      } catch (feedError) {
-        console.error(`Error fetching BOM feed ${feedUrl}:`, feedError);
-        continue;
-      }
-    }
-    
-    console.log(`Real Australian BOM alerts: ${alerts.length}`);
-    return alerts;
-    
-  } catch (error) {
-    console.error('Australian BOM API error:', error);
-    return []; // NO FAKE DATA - return empty
-  }
-}
-
-function extractAustralianLocation(title: string): { lat: number; lng: number; name: string } | null {
-  // BOM titles usually include location - extract major Australian cities/regions
-  const locations: Record<string, { lat: number; lng: number }> = {
-    'sydney': { lat: -33.8688, lng: 151.2093 },
-    'melbourne': { lat: -37.8136, lng: 144.9631 },
-    'brisbane': { lat: -27.4698, lng: 153.0251 },
-    'perth': { lat: -31.9505, lng: 115.8605 },
-    'adelaide': { lat: -34.9285, lng: 138.6007 },
-    'darwin': { lat: -12.4634, lng: 130.8456 },
-    'hobart': { lat: -42.8821, lng: 147.3272 },
-    'canberra': { lat: -35.2809, lng: 149.1300 },
-    'gold coast': { lat: -28.0167, lng: 153.4000 },
-    'newcastle': { lat: -32.9283, lng: 151.7817 },
-    'cairns': { lat: -16.9186, lng: 145.7781 },
-    'townsville': { lat: -19.2590, lng: 146.8169 },
-    'geelong': { lat: -38.1499, lng: 144.3617 },
-    'nsw': { lat: -31.2532, lng: 146.9211 }, // NSW center
-    'victoria': { lat: -37.4713, lng: 144.7852 }, // VIC center  
-    'queensland': { lat: -20.7256, lng: 142.4692 }, // QLD center
-    'western australia': { lat: -25.2744, lng: 122.2676 }, // WA center
-    'south australia': { lat: -30.0002, lng: 136.2092 } // SA center
-  };
-  
-  const titleLower = title.toLowerCase();
-  for (const [locationName, coords] of Object.entries(locations)) {
-    if (titleLower.includes(locationName)) {
-      return {
-        lat: coords.lat,
-        lng: coords.lng,
-        name: locationName.charAt(0).toUpperCase() + locationName.slice(1)
-      };
-    }
-  }
-  
-  return null;
-}
-
-async function fetchJapanWeatherAlerts(): Promise<WeatherAlert[]> {
-  try {
-    // Japan Meteorological Agency (JMA) provides weather data (trying available endpoints)
-    console.log('Fetching real Japanese weather alerts...');
-    
-    // Try JMA RSS feeds for typhoons and weather warnings
-    const jmaFeeds = [
-      'https://www.jma.go.jp/bosai/forecast/data/forecast/130000.json', // Tokyo
-      'https://www.jma.go.jp/bosai/forecast/data/forecast/270000.json', // Osaka
-      'https://www.jma.go.jp/bosai/forecast/data/forecast/470000.json'  // Okinawa
-    ];
-    
-    const alerts: WeatherAlert[] = [];
-    
-    // Try alternative: JMA English RSS for typhoons
-    try {
-      const typhoonResponse = await fetch('https://www.jma.go.jp/bosai/forecast/data/typhoon/typhoon.json', {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
-          'Accept': 'application/json'
-        },
-        signal: AbortSignal.timeout(15000)
-      });
-      
-      if (typhoonResponse.ok) {
-        const typhoonData = await typhoonResponse.json();
-        console.log(`JMA typhoon data received`);
-        
-        // Parse JMA typhoon data (if available)
-        if (typhoonData && typeof typhoonData === 'object') {
-          // JMA typhoon data structure varies - this is a best-effort parsing
-          const typhoonKeys = Object.keys(typhoonData);
-          
-          for (const key of typhoonKeys.slice(0, 3)) {
-            const typhoon = typhoonData[key];
-            if (typhoon && typhoon.forecast) {
-              const forecast = Array.isArray(typhoon.forecast) ? typhoon.forecast[0] : typhoon.forecast;
-              
-              if (forecast && forecast.lat && forecast.lng) {
-                alerts.push({
-                  id: `jma_typhoon_${key}`,
-                  lat: parseFloat(forecast.lat),
-                  lng: parseFloat(forecast.lng),
-                  title: `Typhoon ${typhoon.name || key}`,
-                  description: `Active typhoon tracking - ${typhoon.classification || 'Tropical Storm'}`,
-                  severity: 'extreme' as const,
-                  type: 'typhoon' as const,
-                  source: 'Japan Meteorological Agency',
-                  date: new Date().toISOString(),
-                  location: 'Pacific Ocean',
-                  confidence: 0.95 // High confidence - real JMA data
-                });
-              }
-            }
-          }
-        }
-      }
-    } catch (typhoonError) {
-      console.log('JMA typhoon data not available:', typhoonError);
-    }
-    
-    // Try simpler JMA weather warnings RSS (if available)
-    try {
-      const warningsResponse = await fetch('https://www.jma.go.jp/bosai/forecast/data/weather/130000.json', {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
-          'Accept': 'application/json'
-        },
-        signal: AbortSignal.timeout(10000)
-      });
-      
-      if (warningsResponse.ok) {
-        const warningsData = await warningsResponse.json();
-        console.log('JMA weather warnings received');
-        
-        // Parse JMA weather warnings (structure may vary)
-        if (warningsData && Array.isArray(warningsData)) {
-          for (const warning of warningsData.slice(0, 5)) {
-            if (warning.text && warning.area) {
-              // Map Japanese prefecture to coordinates
-              const location = getJapaneseLocationCoords(warning.area);
-              if (location) {
-                alerts.push({
-                  id: `jma_warning_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                  lat: location.lat,
-                  lng: location.lng,
-                  title: `Weather Warning - ${warning.area}`,
-                  description: warning.text.substring(0, 200),
-                  severity: 'moderate' as const,
-                  type: 'thunderstorm' as const,
-                  source: 'Japan Meteorological Agency',
-                  date: new Date().toISOString(),
-                  location: warning.area,
-                  confidence: 0.90 // High confidence - real JMA data
-                });
-              }
-            }
-          }
-        }
-      }
-    } catch (warningsError) {
-      console.log('JMA weather warnings not available:', warningsError);
-    }
-    
-    console.log(`Real JMA alerts: ${alerts.length}`);
-    return alerts;
-    
-  } catch (error) {
-    console.error('Japan Meteorological Agency API error:', error);
-    return []; // NO FAKE DATA - return empty
-  }
-}
-
-function getJapaneseLocationCoords(prefecture: string): { lat: number; lng: number } | null {
-  // Major Japanese locations for weather alerts
-  const locations: Record<string, { lat: number; lng: number }> = {
-    'tokyo': { lat: 35.6762, lng: 139.6503 },
-    'osaka': { lat: 34.6937, lng: 135.5023 },
-    'kyoto': { lat: 35.0116, lng: 135.7681 },
-    'yokohama': { lat: 35.4437, lng: 139.6380 },
-    'nagoya': { lat: 35.1815, lng: 136.9066 },
-    'sapporo': { lat: 43.0642, lng: 141.3469 },
-    'fukuoka': { lat: 33.5904, lng: 130.4017 },
-    'sendai': { lat: 38.2682, lng: 140.8694 },
-    'hiroshima': { lat: 34.3853, lng: 132.4553 },
-    'okinawa': { lat: 26.2124, lng: 127.6792 },
-    'naha': { lat: 26.2124, lng: 127.6792 },
-    'honshu': { lat: 36.2048, lng: 138.2529 },
-    'hokkaido': { lat: 43.2203, lng: 142.8635 },
-    'kyushu': { lat: 31.7717, lng: 130.6794 },
-    'shikoku': { lat: 33.7838, lng: 133.6589 }
-  };
-  
-  const prefLower = prefecture.toLowerCase();
-  for (const [name, coords] of Object.entries(locations)) {
-    if (prefLower.includes(name)) {
-      return coords;
-    }
-  }
-  
-  return null;
-}
+// Note: Australian BOM and Japanese JMA APIs either block automation or don't have public endpoints
+// Future implementations could add more regional weather services as they become available
 
 // High-quality mock weather alerts for comprehensive global coverage
 function getMockWeatherAlerts(): WeatherAlert[] {
@@ -821,16 +684,19 @@ export async function GET() {
       });
     }
 
-    // Fetch from NOAA (US) and international sources
+    // Fetch from multiple real weather APIs worldwide
     console.log('Fetching NOAA weather alerts...');
     const noaaAlerts = await fetchNOAAWeatherAlerts();
     
-    console.log('Fetching international weather alerts...');
-    const internationalAlerts = await fetchInternationalWeatherAlerts();
+    console.log('Fetching European weather alerts...');  
+    const europeanAlerts = await fetchEuropeanWeatherAlerts();
+    
+    console.log('Fetching Hong Kong Observatory alerts...');
+    const hongkongAlerts = await fetchHongKongWeatherAlerts();
     
     // Combine all real weather alerts
-    let alerts = [...noaaAlerts, ...internationalAlerts];
-    console.log(`Total alerts: ${noaaAlerts.length} NOAA + ${internationalAlerts.length} international = ${alerts.length}`);
+    let alerts = [...noaaAlerts, ...europeanAlerts, ...hongkongAlerts];
+    console.log(`Total alerts: ${noaaAlerts.length} NOAA + ${europeanAlerts.length} EU + ${hongkongAlerts.length} HK = ${alerts.length}`);
     
     // Only use real data - no fake weather events
     if (alerts.length === 0) {
@@ -865,10 +731,9 @@ export async function GET() {
     
     const realSources = [];
     if (noaaAlerts.length > 0) realSources.push('NOAA/NWS (US)');
-    if (internationalAlerts.some(a => a.source === 'Environment Canada')) realSources.push('Environment Canada');
-    if (internationalAlerts.some(a => a.source === 'MeteoAlarm EU')) realSources.push('MeteoAlarm EU');
-    if (internationalAlerts.some(a => a.source === 'Australian Bureau of Meteorology')) realSources.push('Australian Bureau of Meteorology');
-    if (internationalAlerts.some(a => a.source === 'Japan Meteorological Agency')) realSources.push('Japan Meteorological Agency');
+    if (europeanAlerts.some(a => a.source === 'UK Met Office')) realSources.push('UK Met Office');
+    if (europeanAlerts.some(a => a.source === 'German Weather Service (DWD)')) realSources.push('German Weather Service (DWD)');
+    if (hongkongAlerts.length > 0) realSources.push('Hong Kong Observatory');
     
     return NextResponse.json({
       alerts: uniqueAlerts,
