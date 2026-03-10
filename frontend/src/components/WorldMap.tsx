@@ -109,7 +109,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         loadDrillingRigs(layerGroup);
         break;
       case 'pipelines':
-        loadPipelines(layerGroup);
+        await loadPipelines(layerGroup);
         break;
       case 'tanker-ships':
         await loadTankerShips(layerGroup);
@@ -565,7 +565,100 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
     });
   };
 
-  const loadPipelines = (layerGroup: L.LayerGroup) => {};
+  const loadPipelines = async (layerGroup: L.LayerGroup) => {
+    try {
+      console.log('Loading pipeline route data...');
+      const response = await fetch('/api/pipeline-routes');
+      const data = await response.json();
+      const pipelines = data.pipelines || [];
+      
+      console.log(`Loaded ${pipelines.length} pipeline routes from ${data.dataSource || 'unknown'} source`);
+      
+      pipelines.forEach((pipeline: any) => {
+        if (!pipeline.coordinates || !Array.isArray(pipeline.coordinates)) return;
+        
+        // Convert coordinates from [lng, lat] to [lat, lng] for Leaflet
+        const latLngCoords = pipeline.coordinates.map((coord: [number, number]) => [coord[1], coord[0]]);
+        
+        // Determine pipeline color by type
+        let color = '#666666'; // Default gray
+        switch (pipeline.type) {
+          case 'crude_oil':
+            color = '#8B4513'; // Brown for crude oil
+            break;
+          case 'natural_gas':
+            color = '#32CD32'; // Green for natural gas  
+            break;
+          case 'refined_products':
+            color = '#FF6347'; // Red for refined products
+            break;
+          case 'lng':
+            color = '#00CED1'; // Cyan for LNG
+            break;
+          case 'co2':
+            color = '#A9A9A9'; // Dark gray for CO2
+            break;
+        }
+        
+        // Determine line style by status
+        let dashArray = undefined;
+        let opacity = 0.8;
+        if (pipeline.status === 'under_construction') {
+          dashArray = '5, 5'; // Dashed line
+          opacity = 0.6;
+        } else if (pipeline.status === 'planned') {
+          dashArray = '2, 8'; // Dotted line
+          opacity = 0.4;
+        } else if (pipeline.status === 'decommissioned') {
+          opacity = 0.3;
+          color = '#808080'; // Gray out decommissioned
+        }
+        
+        // Create polyline for the pipeline route
+        const polyline = L.polyline(latLngCoords, {
+          color: color,
+          weight: 3,
+          opacity: opacity,
+          dashArray: dashArray
+        });
+        
+        // Add popup with pipeline information
+        const popupContent = `
+          <div style="min-width: 250px;">
+            <h4 style="margin: 0 0 8px 0; color: ${color}; font-size: 14px; font-weight: bold;">
+              ${pipeline.name}
+            </h4>
+            <div style="font-size: 11px; color: #666; line-height: 1.3;">
+              <strong>Operator:</strong> ${pipeline.operator}<br>
+              <strong>Type:</strong> ${pipeline.type.replace('_', ' ').toUpperCase()}<br>
+              <strong>Status:</strong> ${pipeline.status.replace('_', ' ').toUpperCase()}<br>
+              <strong>Capacity:</strong> ${pipeline.capacity}<br>
+              <strong>Length:</strong> ${pipeline.length}<br>
+              <strong>Route:</strong> ${pipeline.startLocation} → ${pipeline.endLocation}<br>
+              <strong>Commissioned:</strong> ${pipeline.commissioning}<br>
+              <strong>Countries:</strong> ${pipeline.countries.join(', ')}<br>
+              <strong>Description:</strong> ${pipeline.description}
+            </div>
+          </div>
+        `;
+        
+        polyline.bindPopup(popupContent);
+        layerGroup.addLayer(polyline);
+      });
+      
+    } catch (error) {
+      console.error('Error loading pipeline routes:', error);
+      
+      // Error indicator
+      const errorMarker = L.marker([0, 0], {
+        icon: L.divIcon({
+          html: '<div style="color: #ef4444;">⚠️ Pipeline data unavailable</div>',
+          className: 'error-marker'
+        })
+      });
+      layerGroup.addLayer(errorMarker);
+    }
+  };
   const loadTankerShips = async (layerGroup: L.LayerGroup) => {
     try {
       console.log('Loading real tanker ship data...');
