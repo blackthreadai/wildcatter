@@ -202,7 +202,7 @@ async function fetchMarketWatchRSS() {
     console.log(`📰 Found ${items.length} items in MarketWatch RSS`);
     
     const articles = [];
-    for (const item of items.slice(0, 8)) {
+    for (const item of items.slice(0, 12)) {
       const titleMatch = item.match(/<title>(.*?)<\/title>/);
       const linkMatch = item.match(/<link>(.*?)<\/link>/);
       const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
@@ -274,8 +274,8 @@ export async function GET() {
       return NextResponse.json([]);
     }
     
-    // Return top 8 articles from all sources combined
-    return NextResponse.json(allArticles.slice(0, 8));
+    // Return top 10 articles from all sources combined (widget will take 6)
+    return NextResponse.json(allArticles.slice(0, 10));
     
   } catch (error) {
     console.error('🚨 Real news API error:', error);
