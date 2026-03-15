@@ -802,8 +802,9 @@ export default function TerminalPage() {
               style={{ fontStretch: 'condensed' }}
             >
               <span>Get</span>
-              <img src="/w-icon.svg" alt="W" className="w-3 h-3" />
-              <span>Energy Intelligence™ on iOS</span>
+              <img src="/w-icon.svg" alt="W" className="w-6 h-6" />
+              <span className="text-[#DAA520]">Energy Intelligence™</span>
+              <span>on iOS</span>
             </a>
           </div>
         </div>
