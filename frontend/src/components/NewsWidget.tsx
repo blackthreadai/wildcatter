@@ -52,9 +52,12 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
           articleCount = 2;
         }
         
+        console.log(`🚀 FETCHING NEWS FROM: ${apiEndpoint}`);
         const response = await fetch(apiEndpoint);
+        console.log(`📡 RESPONSE STATUS: ${response.status}`);
         const data = await response.json();
         console.log('🗞️ NEWS DATA RECEIVED:', data.slice(0, 2)); // Debug first 2 articles
+        console.log(`📊 TOTAL ARTICLES: ${data.length}`);
         setArticles(data.slice(0, articleCount));
         setLoading(false);
       } catch (error) {
