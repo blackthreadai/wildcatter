@@ -188,10 +188,10 @@ async function fetchCNBCRSS() {
   }
 }
 
-async function fetchReutersRSS() {
+async function fetchAPNewsRSS() {
   try {
-    console.log('🔍 Fetching Reuters RSS...');
-    const response = await fetch('https://feeds.reuters.com/reuters/businessNews', {
+    console.log('🔍 Fetching AP News RSS...');
+    const response = await fetch('https://feeds.apnews.com/rss/business.xml', {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal)' },
       signal: AbortSignal.timeout(10000)
     });
@@ -200,7 +200,7 @@ async function fetchReutersRSS() {
     
     const xmlText = await response.text();
     const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
-    console.log(`📰 Found ${items.length} items in Reuters RSS`);
+    console.log(`📰 Found ${items.length} items in AP News RSS`);
     
     const articles = [];
     for (const item of items.slice(0, 10)) {
@@ -221,18 +221,18 @@ async function fetchReutersRSS() {
             title,
             url: linkMatch[1].trim(),
             publishedAt: new Date(pubDateMatch[1]).toISOString(),
-            source: 'Reuters',
-            summary: 'Reuters business news'
+            source: 'AP News',
+            summary: 'Associated Press business news'
           });
         }
       }
     }
     
-    console.log(`✅ Reuters: ${articles.length} articles extracted`);
+    console.log(`✅ AP News: ${articles.length} articles extracted`);
     return articles;
     
   } catch (error) {
-    console.error('❌ Reuters RSS failed:', error);
+    console.error('❌ AP News RSS failed:', error);
     return [];
   }
 }
@@ -295,7 +295,7 @@ export async function GET() {
       fetchBloombergRSS(),
       fetchOilPriceRSS(),
       fetchCNBCRSS(),
-      fetchReutersRSS(),
+      fetchAPNewsRSS(),
       fetchMarketWatchRSS(),
       fetchEnergyGovRSS()
     ]);
@@ -304,7 +304,7 @@ export async function GET() {
     
     // Combine all successful results with detailed logging
     results.forEach((result, index) => {
-      const sources = ['Bloomberg', 'OilPrice.com', 'CNBC', 'Reuters', 'MarketWatch', 'Energy.gov'];
+      const sources = ['Bloomberg', 'OilPrice.com', 'CNBC', 'AP News', 'MarketWatch', 'Energy.gov'];
       if (result.status === 'fulfilled') {
         console.log(`✅ ${sources[index]}: ${result.value.length} articles`);
         result.value.forEach((article: any, i: number) => {
