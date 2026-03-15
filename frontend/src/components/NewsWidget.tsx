@@ -27,7 +27,7 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
         let articleCount;
         
         if (region === 'US') {
-          apiEndpoint = '/api/energy-news';
+          apiEndpoint = '/api/us-news';
           articleCount = 5;
         } else if (region === 'ASIAN') {
           apiEndpoint = '/api/asian-energy-news';
