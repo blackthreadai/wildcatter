@@ -9,6 +9,7 @@ interface WorldMapProps {
 }
 
 export default function WorldMap({ activeLayers }: WorldMapProps) {
+  console.log('🦝 WORLDMAP COMPONENT LOADED - VERSION 3.0 - ' + new Date().toISOString());
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const layerGroupsRef = useRef<Record<string, L.LayerGroup>>({});
@@ -1079,4 +1080,4 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       style={{ backgroundColor: '#374151' }}
     />
   );
-}
+}// Force rebuild Sun Mar 15 13:04:48 CDT 2026
