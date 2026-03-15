@@ -61,7 +61,7 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
         setArticles(data.slice(0, articleCount));
         setLoading(false);
       } catch (error) {
-        console.error('Failed to fetch news:', error);
+        console.error('🚨 WIDGET ERROR: Failed to fetch news:', error);
         // NO FALLBACK DATA - SHOW EMPTY STATE IF REAL DATA FAILS
         setArticles([]);
         setLoading(false);
