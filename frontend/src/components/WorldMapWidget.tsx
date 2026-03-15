@@ -26,6 +26,8 @@ interface WorldMapWidgetProps {
 
 export default function WorldMapWidget({ initialLayers = ['geopolitical'] }: WorldMapWidgetProps) {
   const [activeLayers, setActiveLayers] = useState<string[]>(initialLayers);
+  
+  console.log('🗺️ WorldMapWidget rendering with activeLayers:', activeLayers);
 
   const layers = [
     { id: 'geopolitical', label: 'GEOPOLITICAL ALERTS', color: '#ef4444' },
@@ -46,21 +48,22 @@ export default function WorldMapWidget({ initialLayers = ['geopolitical'] }: Wor
   };
 
   return (
-    <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
+    <div className="w-full flex flex-col bg-black border border-gray-700 h-[400px]">
       <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-semibold tracking-wider">GLOBAL ENERGY MAP</h3>
       </div>
       
-      <div className="flex-1 relative min-h-0">
-        {/* World Map */}
+      <div className="flex-1 relative overflow-hidden"
+           style={{ height: 'calc(100% - 40px)' }}>
+        {/* World Map Container - Full Size */}
         <WorldMap activeLayers={activeLayers} />
 
-        {/* Layer Control Panel - Left Side */}
+        {/* Layer Control Panel - Overlay */}
         <div 
           className="absolute top-0 left-0 w-64 border-r flex flex-col"
           style={{ 
             zIndex: 1000,
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
             borderColor: '#333333',
             height: '100%'
           }}
