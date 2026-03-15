@@ -339,18 +339,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
 
   // STATIC LAYER LOADERS (simplified)
   const loadShippingLanes = (layerGroup: L.LayerGroup) => {
-    console.log('🚢🚢🚢 SHIPPING LOADER CALLED - NEW VERSION 2.0 🚢🚢🚢');
-    alert('SHIPPING LANES LOADING - CHECK CONSOLE');
-    
-    // TEST MARKER - Should show in Atlantic Ocean regardless of shipping data  
-    const testMarker = L.marker([30.0, -30.0], {
-      icon: L.divIcon({
-        html: '<div style="background: blue; color: white; padding: 4px; font-weight: bold;">SHIPPING TEST MARKER</div>',
-        className: 'test-marker'
-      })
-    });
-    layerGroup.addLayer(testMarker);
-    console.log('✅ Added TEST MARKER for shipping at [30.0, -30.0]');
+    console.log('🚢 LOADING MAJOR GLOBAL SHIPPING LANES...');
     
     // COMPREHENSIVE GLOBAL SHIPPING ROUTES - Major Maritime Trade Corridors
     const shippingRoutes = [
@@ -798,18 +787,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
   };
 
   const loadPipelines = (layerGroup: L.LayerGroup) => {
-    console.log('🛡️🛡️🛡️ PIPELINE LOADER CALLED - NEW VERSION 2.0 🛡️🛡️🛡️');
-    alert('PIPELINE LAYER LOADING - CHECK CONSOLE');
-    
-    // TEST MARKER - Should show in Middle East regardless of pipeline data
-    const testMarker = L.marker([29.0, 42.0], {
-      icon: L.divIcon({
-        html: '<div style="background: red; color: white; padding: 4px; font-weight: bold;">PIPELINE TEST MARKER</div>',
-        className: 'test-marker'
-      })
-    });
-    layerGroup.addLayer(testMarker);
-    console.log('✅ Added TEST MARKER for pipelines at [29.0, 42.0]');
+    console.log('🛡️ LOADING MAJOR GLOBAL PIPELINE ROUTES...');
     
     // COMPREHENSIVE GLOBAL PIPELINE NETWORK - Major Energy Infrastructure
     const pipelines = [
