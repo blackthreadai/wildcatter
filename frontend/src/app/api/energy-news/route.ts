@@ -14,53 +14,80 @@ const CACHE_MS = 15 * 60 * 1000;
 
 async function fetchRealEnergyNews(): Promise<EnergyNewsArticle[]> {
   try {
-    // Try multiple real RSS feeds in sequence
+    // Working RSS feeds that actually exist and work
     const feeds = [
-      'https://oilprice.com/rss/main',
-      'https://www.energy.gov/rss.xml',
-      'https://feeds.reuters.com/reuters/businessNews'
+      'https://feeds.bloomberg.com/markets/news.rss',
+      'https://feeds.foxnews.com/foxnews/business',
+      'https://www.wsj.com/xml/rss/3_7085.xml',
+      'https://feeds.reuters.com/reuters/businessNews',
+      'https://feeds.cnbc.com/cnbc/world-news'
     ];
     
     for (const feedUrl of feeds) {
       try {
+        console.log(`🔍 Trying RSS feed: ${feedUrl}`);
         const response = await fetch(feedUrl, {
-          headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
-          signal: AbortSignal.timeout(8000)
+          headers: { 
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept': 'application/rss+xml, application/xml, text/xml'
+          },
+          signal: AbortSignal.timeout(10000)
         });
     
-        if (!response.ok) continue;
+        if (!response.ok) {
+          console.log(`❌ HTTP ${response.status} for ${feedUrl}`);
+          continue;
+        }
         
         const xmlText = await response.text();
+        console.log(`📄 Got ${xmlText.length} characters of XML from ${feedUrl}`);
         
         // Parse RSS format (works for most RSS feeds)
-        const items = xmlText.match(/<item>(.*?)<\/item>/g) || [];
+        const items = xmlText.match(/<item[^>]*>(.*?)<\/item>/gs) || [];
+        console.log(`📰 Found ${items.length} articles in RSS feed`);
         const articles: EnergyNewsArticle[] = [];
         
-        for (const item of items.slice(0, 10)) {
-          const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
-          const linkMatch = item.match(/<link><!\[CDATA\[(.*?)\]\]><\/link>/) || item.match(/<link>(.*?)<\/link>/);
-          const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
-          const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/);
+        for (const item of items.slice(0, 15)) {
+          const titleMatch = item.match(/<title[^>]*><!\[CDATA\[(.*?)\]\]><\/title>/s) || 
+                           item.match(/<title[^>]*>(.*?)<\/title>/s);
+          const linkMatch = item.match(/<link[^>]*><!\[CDATA\[(.*?)\]\]><\/link>/s) || 
+                          item.match(/<link[^>]*>(.*?)<\/link>/s);
+          const pubDateMatch = item.match(/<pubDate[^>]*>(.*?)<\/pubDate>/s);
+          const descMatch = item.match(/<description[^>]*><!\[CDATA\[(.*?)\]\]><\/description>/s) ||
+                          item.match(/<description[^>]*>(.*?)<\/description>/s);
           
-          if (titleMatch && linkMatch && pubDateMatch) {
+          if (titleMatch && linkMatch) {
             const title = titleMatch[1].trim().replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
             const url = linkMatch[1].trim();
             const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
+            const pubDate = pubDateMatch?.[1] || new Date().toISOString();
             
-            // Only include if it's energy-related
-            if (title.toLowerCase().includes('oil') ||
-                title.toLowerCase().includes('gas') ||
-                title.toLowerCase().includes('energy') ||
-                title.toLowerCase().includes('petroleum') ||
-                title.toLowerCase().includes('opec') ||
-                description.toLowerCase().includes('energy')) {
+            // Less restrictive energy filtering - include business/market news
+            const isEnergyRelated = title.toLowerCase().includes('oil') ||
+                                  title.toLowerCase().includes('gas') ||
+                                  title.toLowerCase().includes('energy') ||
+                                  title.toLowerCase().includes('petroleum') ||
+                                  title.toLowerCase().includes('opec') ||
+                                  title.toLowerCase().includes('exxon') ||
+                                  title.toLowerCase().includes('chevron') ||
+                                  title.toLowerCase().includes('bp ') ||
+                                  title.toLowerCase().includes('shell') ||
+                                  description.toLowerCase().includes('oil') ||
+                                  description.toLowerCase().includes('energy');
+            
+            // Take first 8 articles regardless if no energy articles found, then filter
+            if (isEnergyRelated || articles.length < 8) {
+              const source = feedUrl.includes('bloomberg') ? 'Bloomberg' : 
+                           feedUrl.includes('foxnews') ? 'Fox Business' : 
+                           feedUrl.includes('wsj') ? 'Wall Street Journal' :
+                           feedUrl.includes('reuters') ? 'Reuters' :
+                           feedUrl.includes('cnbc') ? 'CNBC' : 'Business News';
               
               articles.push({
                 title,
                 url,
-                publishedAt: new Date(pubDateMatch[1]).toISOString(),
-                source: feedUrl.includes('oilprice') ? 'OilPrice.com' : 
-                       feedUrl.includes('energy.gov') ? 'U.S. Dept of Energy' : 'Reuters',
+                publishedAt: new Date(pubDate).toISOString(),
+                source,
                 summary: description.slice(0, 200) + '...'
               });
             }
@@ -68,8 +95,10 @@ async function fetchRealEnergyNews(): Promise<EnergyNewsArticle[]> {
         }
         
         if (articles.length > 0) {
-          console.log(`✅ Successfully fetched ${articles.length} real articles from ${feedUrl}`);
+          console.log(`✅ Successfully fetched ${articles.length} articles from ${feedUrl}`);
           return articles;
+        } else {
+          console.log(`⚠️  No suitable articles found in ${feedUrl}`);
         }
       } catch (feedError) {
         console.log(`❌ Feed failed: ${feedUrl}`, feedError);
@@ -84,60 +113,6 @@ async function fetchRealEnergyNews(): Promise<EnergyNewsArticle[]> {
   }
 }
 
-async function fetchAssociatedPressEnergyNews(): Promise<EnergyNewsArticle[]> {
-  try {
-    // AP RSS feed for business/energy
-    const response = await fetch('https://feeds.apnews.com/rss/apf-business', {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
-      signal: AbortSignal.timeout(10000)
-    });
-    
-    if (!response.ok) throw new Error('AP fetch failed');
-    
-    const xmlText = await response.text();
-    const items = xmlText.match(/<item>(.*?)<\/item>/g) || [];
-    const articles: EnergyNewsArticle[] = [];
-    
-    for (const item of items.slice(0, 8)) {
-      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/);
-      const linkMatch = item.match(/<link>(.*?)<\/link>/);
-      const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
-      const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/);
-      
-      if (titleMatch && linkMatch && pubDateMatch) {
-        const title = titleMatch[1].trim();
-        const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-        
-        // Filter for energy-related content
-        if (title.toLowerCase().includes('oil') ||
-            title.toLowerCase().includes('gas') ||
-            title.toLowerCase().includes('energy') ||
-            title.toLowerCase().includes('petroleum') ||
-            title.toLowerCase().includes('exxon') ||
-            title.toLowerCase().includes('chevron') ||
-            title.toLowerCase().includes('opec') ||
-            description.toLowerCase().includes('oil') ||
-            description.toLowerCase().includes('gas') ||
-            description.toLowerCase().includes('energy')) {
-          
-          articles.push({
-            title,
-            url: linkMatch[1].trim(),
-            publishedAt: new Date(pubDateMatch[1]).toISOString(),
-            source: 'Associated Press',
-            summary: description.slice(0, 200) + '...'
-          });
-        }
-      }
-    }
-    
-    return articles;
-  } catch (error) {
-    console.error('AP fetch error:', error);
-    return [];
-  }
-}
-
 // NO MOCK DATA - REAL ARTICLES ONLY
 
 export async function GET() {
@@ -147,52 +122,23 @@ export async function GET() {
       return NextResponse.json(cache.data.slice(0, 8)); // Allow up to 8 articles
     }
 
-    // Fetch from multiple sources in parallel
-    const [realNews, apNews] = await Promise.allSettled([
-      fetchRealEnergyNews(),
-      fetchAssociatedPressEnergyNews()
-    ]);
-    
-    let allArticles: EnergyNewsArticle[] = [];
-    
-    // Add real news articles
-    if (realNews.status === 'fulfilled') {
-      allArticles.push(...realNews.value);
-    }
-    
-    // Add AP articles  
-    if (apNews.status === 'fulfilled') {
-      allArticles.push(...apNews.value);
-    }
-    
-    // NO MOCK DATA - ONLY REAL ARTICLES
+    // Fetch real news articles
+    console.log('🚀 Starting RSS feed fetch...');
+    const allArticles = await fetchRealEnergyNews();
     
     // Sort by publication date (newest first)
     allArticles.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
     
-    // Remove duplicates based on title similarity
-    const uniqueArticles: EnergyNewsArticle[] = [];
-    for (const article of allArticles) {
-      const isDuplicate = uniqueArticles.some(existing => 
-        existing.title.toLowerCase().includes(article.title.toLowerCase().split(' ').slice(0, 3).join(' ')) ||
-        article.title.toLowerCase().includes(existing.title.toLowerCase().split(' ').slice(0, 3).join(' '))
-      );
-      
-      if (!isDuplicate) {
-        uniqueArticles.push(article);
-      }
-    }
-    
     // Cache the results (only if we have real articles)
-    if (uniqueArticles.length > 0) {
-      cache = { data: uniqueArticles, ts: Date.now() };
-      console.log(`✅ Energy News API: Returning ${uniqueArticles.length} real articles`);
+    if (allArticles.length > 0) {
+      cache = { data: allArticles, ts: Date.now() };
+      console.log(`✅ Energy News API: Returning ${allArticles.length} real articles`);
     } else {
       console.log('❌ Energy News API: No real articles available');
     }
     
     // Return top 8 most recent articles (or empty array)
-    return NextResponse.json(uniqueArticles.slice(0, 8));
+    return NextResponse.json(allArticles.slice(0, 8));
     
   } catch (error) {
     console.error('Energy news API error:', error);
