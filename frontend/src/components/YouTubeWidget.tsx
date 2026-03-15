@@ -9,10 +9,7 @@ export default function YouTubeWidget() {
     { id: 'aljazeera', name: 'ALJAZEERA', url: 'https://youtu.be/gCNeDWCI0vo' },
     { id: 'bloomberg', name: 'BLOOMBERG', url: 'https://youtu.be/iEpJwprxDdk' },
     { id: 'cnbc', name: 'CNBC', url: 'https://youtu.be/9NyxcX3rhQs' },
-    { id: 'skynews', name: 'SKYNEWS', url: 'https://youtu.be/9Auq9mYxFEE' },
     { id: 'euronews', name: 'EURONEWS', url: 'https://youtu.be/pykpO5kQJ98' },
-    { id: 'dw', name: 'DW', url: 'https://youtu.be/NvK0oL42BL0' },
-    { id: 'france24', name: 'FRANCE24', url: 'https://youtu.be/tkDUSbvSosA' },
   ];
 
   return (

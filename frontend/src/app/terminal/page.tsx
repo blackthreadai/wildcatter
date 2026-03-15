@@ -72,7 +72,7 @@ const WIDGET_VERSION = '16.0-MODULAR-WORLD-MAP';
 
 const defaultWidgets: Widget[] = [
   // NEW DEFAULT ORDER - Rendr's priority layout
-  { id: 'world-map', type: 'world-map', title: 'GLOBAL ENERGY MAP', span: { col: 3, row: 1 }, activeLayers: ['geopolitical'] },
+  { id: 'world-map', type: 'world-map', title: 'GLOBAL ENERGY MAP', span: { col: 3, row: 1 }, activeLayers: [] },
   { id: 'youtube', type: 'youtube', title: 'LIVE NEWS', span: { col: 2, row: 1 } },
   { id: 'us-news', type: 'news', title: 'US NEWS', region: 'US' },
   { id: 'us-markets', type: 'stock', title: 'US ENERGY MARKETS' },

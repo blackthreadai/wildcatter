@@ -24,7 +24,7 @@ interface WorldMapWidgetProps {
   initialLayers?: string[];
 }
 
-export default function WorldMapWidget({ initialLayers = ['geopolitical'] }: WorldMapWidgetProps) {
+export default function WorldMapWidget({ initialLayers = [] }: WorldMapWidgetProps) {
   const [activeLayers, setActiveLayers] = useState<string[]>(initialLayers);
   
   console.log('🗺️ WorldMapWidget rendering with activeLayers:', activeLayers);
