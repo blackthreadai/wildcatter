@@ -54,7 +54,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
             ">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="#DAA520" stroke="#B8860B" stroke-width="1">
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-                <circle cx="12" cy="9" r="2.5" fill="white"/>
+                <circle cx="12" cy="9" r="2.5" fill="black"/>
               </svg>
             </div>`,
             className: 'current-location-pin',
