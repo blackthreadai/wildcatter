@@ -792,6 +792,19 @@ export default function TerminalPage() {
             >
               <span>DEFCON {defconStatus.level}</span>
             </div>
+            
+            {/* iOS App Promotion Link */}
+            <a 
+              href="https://apps.apple.com/app/wildcatter-energy-intelligence/id123456789" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-xs text-gray-400 hover:text-[#DAA520] transition-colors cursor-pointer"
+              style={{ fontStretch: 'condensed' }}
+            >
+              <span>Get</span>
+              <img src="/w-icon.svg" alt="W" className="w-3 h-3" />
+              <span>Energy Intelligence™ on iOS</span>
+            </a>
           </div>
         </div>
 
