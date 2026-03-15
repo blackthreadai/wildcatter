@@ -41,7 +41,46 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         (position) => {
           const { latitude, longitude } = position.coords;
           map.setView([latitude, longitude], 8); // Zoom to user's location
-          console.log(`📍 Map centered on user location: ${latitude}, ${longitude}`);
+          
+          // Add gold star marker for current location
+          const goldStarIcon = L.divIcon({
+            html: `<div style="
+              width: 24px; 
+              height: 24px; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center;
+              filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+            ">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#FFD700" stroke="#B8860B" stroke-width="1">
+                <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+              </svg>
+            </div>`,
+            className: 'current-location-star',
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+          });
+
+          const currentLocationMarker = L.marker([latitude, longitude], { icon: goldStarIcon });
+          
+          const popupContent = `
+            <div style="min-width: 200px;">
+              <h4 style="margin: 0 0 8px 0; color: #FFD700; font-size: 14px; font-weight: bold;">
+                ⭐ YOUR CURRENT LOCATION
+              </h4>
+              <div style="font-size: 11px; color: #666; line-height: 1.3;">
+                <strong>Latitude:</strong> ${latitude.toFixed(6)}°<br>
+                <strong>Longitude:</strong> ${longitude.toFixed(6)}°<br>
+                <strong>Accuracy:</strong> ±${position.coords.accuracy?.toFixed(0) || 'Unknown'}m<br>
+                <strong>Updated:</strong> ${new Date().toLocaleTimeString()}
+              </div>
+            </div>
+          `;
+          
+          currentLocationMarker.bindPopup(popupContent);
+          currentLocationMarker.addTo(map);
+          
+          console.log(`⭐ Added gold star marker at user location: ${latitude}, ${longitude}`);
         },
         (error) => {
           console.warn('⚠️ Geolocation failed, using default location:', error);
