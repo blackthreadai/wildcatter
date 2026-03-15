@@ -33,20 +33,8 @@ export default function StockWidget() {
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch stock data:', error);
-        
-        // Fallback to mock data
-        const fallbackStocks: Stock[] = [
-          { symbol: 'XOM', name: 'Exxon Mobil', price: 118.45, change: 2.3 },
-          { symbol: 'CVX', name: 'Chevron Corp', price: 162.87, change: 1.8 },
-          { symbol: 'COP', name: 'ConocoPhillips', price: 134.22, change: -0.5 },
-          { symbol: 'EOG', name: 'EOG Resources', price: 145.67, change: 1.2 },
-          { symbol: 'SLB', name: 'Schlumberger', price: 63.91, change: 3.2 },
-          { symbol: 'PXD', name: 'Pioneer Natural', price: 267.89, change: 0.8 },
-          { symbol: 'KMI', name: 'Kinder Morgan', price: 18.43, change: -0.3 },
-          { symbol: 'WMB', name: 'Williams Cos', price: 41.26, change: 1.5 }
-        ];
-        
-        setStocks(fallbackStocks);
+        // No fallback - let API handle its own fallbacks
+        setStocks([]);
         setLoading(false);
       }
     };
@@ -76,12 +64,22 @@ export default function StockWidget() {
       </div>
       
       <div className="flex-1 bg-black px-3 py-1">
-        {stocks.map((stock, i) => (
+        {stocks.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-gray-500 text-xs">Real-time data temporarily unavailable</div>
+          </div>
+        ) : (
+          stocks.map((stock, i) => (
           <div key={stock.symbol} className="flex items-center justify-between py-1 border-b border-gray-700 last:border-b-0">
-            <div className="min-w-0 flex-1">
-              <div className="text-[#DAA520] text-xs font-semibold">{stock.symbol}</div>
-              <div className="text-gray-400 text-xs truncate">{stock.name}</div>
-            </div>
+            <a 
+              href={`https://finance.yahoo.com/chart/${stock.symbol}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="min-w-0 flex-1 hover:opacity-75 transition-opacity cursor-pointer"
+            >
+              <div className="text-[#DAA520] text-xs font-semibold hover:underline">{stock.symbol}</div>
+              <div className="text-gray-400 text-xs truncate hover:text-gray-300">{stock.name}</div>
+            </a>
             <div className="text-right ml-1">
               <div className="text-white text-xs font-mono">${stock.price.toFixed(2)}</div>
               <div className={`text-xs ${stock.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
@@ -89,7 +87,8 @@ export default function StockWidget() {
               </div>
             </div>
           </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
