@@ -18,10 +18,10 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
-    // Initialize map
+    // Initialize map with default center (will be updated by geolocation)
     const map = L.map(mapRef.current, {
-      center: [29.0, 42.0], 
-      zoom: 4,
+      center: [40.0, -95.0], // Default to US center as fallback
+      zoom: 6, // Regional view instead of global
       zoomControl: false,
       attributionControl: false,
     });
@@ -34,6 +34,26 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
 
     // Add zoom control
     L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    // Try to get user's current location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          map.setView([latitude, longitude], 8); // Zoom to user's location
+          console.log(`📍 Map centered on user location: ${latitude}, ${longitude}`);
+        },
+        (error) => {
+          console.warn('⚠️ Geolocation failed, using default location:', error);
+          // Keep default center if geolocation fails
+        },
+        {
+          timeout: 10000,
+          maximumAge: 300000, // Cache location for 5 minutes
+          enableHighAccuracy: false
+        }
+      );
+    }
 
     mapInstanceRef.current = map;
 
@@ -341,11 +361,11 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
   const loadShippingLanes = (layerGroup: L.LayerGroup) => {
     console.log('🚢 LOADING MAJOR GLOBAL SHIPPING LANES...');
     
-    // MAJOR GLOBAL SHIPPING ROUTES - Following realistic maritime corridors
+    // MAJOR GLOBAL SHIPPING ROUTES - Following realistic maritime corridors (ocean only)
     const shippingRoutes = [
-      // TRANS-PACIFIC ROUTES (following great circle routes)
+      // TRANS-PACIFIC ROUTES (following great circle routes over Pacific Ocean)
       {
-        name: 'Asia-North America Main',
+        name: 'Japan-US West Coast',
         coordinates: [[35.68, 139.69], [40.0, 150.0], [45.0, 170.0], [50.0, -170.0], [45.0, -140.0], [37.77, -122.42]],
         color: '#4ade80', traffic: 'Very High', cargo: 'Containers, Electronics'
       },
@@ -354,8 +374,13 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         coordinates: [[31.23, 121.47], [35.0, 135.0], [40.0, 155.0], [45.0, -165.0], [40.0, -130.0], [33.74, -118.26]],
         color: '#4ade80', traffic: 'Very High', cargo: 'Containers, Consumer Goods'
       },
+      {
+        name: 'Singapore-Australia',
+        coordinates: [[1.29, 103.85], [5.0, 110.0], [15.0, 120.0], [25.0, 140.0], [-33.87, 151.21]],
+        color: '#4ade80', traffic: 'High', cargo: 'Raw Materials, Containers'
+      },
       
-      // TRANS-ATLANTIC ROUTES (following shipping lanes)
+      // TRANS-ATLANTIC ROUTES (following shipping lanes over Atlantic Ocean)
       {
         name: 'Europe-North America',
         coordinates: [[51.50, -0.13], [52.0, -10.0], [50.0, -20.0], [45.0, -30.0], [42.0, -45.0], [40.71, -74.01]],
@@ -366,84 +391,99 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         coordinates: [[43.30, 5.37], [40.0, 0.0], [35.0, -10.0], [30.0, -20.0], [28.0, -40.0], [25.76, -80.19]],
         color: '#3b82f6', traffic: 'High', cargo: 'Containers, Automobiles'
       },
+      {
+        name: 'Europe-Brazil',
+        coordinates: [[51.50, -0.13], [45.0, -5.0], [35.0, -15.0], [25.0, -25.0], [10.0, -35.0], [-5.0, -35.0], [-22.91, -43.17]],
+        color: '#3b82f6', traffic: 'High', cargo: 'Manufactured Goods'
+      },
       
       // SUEZ CANAL ROUTES (following Red Sea and Mediterranean)
       {
-        name: 'Europe-Asia via Suez',
-        coordinates: [[43.30, 5.37], [36.0, 15.0], [31.0, 25.0], [30.04, 31.25], [25.0, 35.0], [20.0, 40.0], [15.0, 45.0], [10.0, 55.0], [1.29, 103.85]],
+        name: 'Mediterranean-Red Sea',
+        coordinates: [[43.30, 5.37], [36.0, 15.0], [33.0, 27.0], [30.04, 31.25]],
         color: '#f59e0b', traffic: 'Critical', cargo: 'All Cargo Types'
       },
       {
-        name: 'Suez-Persian Gulf',
-        coordinates: [[30.04, 31.25], [28.0, 35.0], [26.22, 50.59]],
+        name: 'Red Sea-Arabian Sea',
+        coordinates: [[30.04, 31.25], [27.0, 34.0], [24.0, 37.0], [20.0, 40.0], [15.0, 43.0], [12.78, 45.04]],
         color: '#f59e0b', traffic: 'Critical', cargo: 'Crude Oil, LNG'
       },
       
-      // PERSIAN GULF TO ASIA (around Arabian Peninsula)
+      // PERSIAN GULF TO ASIA (around Arabian Peninsula via Arabian Sea)
       {
-        name: 'Persian Gulf-Asia',
-        coordinates: [[26.22, 50.59], [25.0, 58.0], [20.0, 65.0], [15.0, 70.0], [10.0, 75.0], [5.0, 85.0], [1.29, 103.85]],
+        name: 'Persian Gulf-India',
+        coordinates: [[26.22, 50.59], [24.0, 57.0], [20.0, 62.0], [18.0, 68.0], [19.08, 72.88]],
         color: '#dc2626', traffic: 'Critical', cargo: 'Crude Oil, LNG'
       },
       {
-        name: 'Kuwait-Japan',
-        coordinates: [[29.37, 47.98], [25.0, 55.0], [20.0, 65.0], [15.0, 80.0], [10.0, 100.0], [15.0, 120.0], [25.0, 130.0], [35.68, 139.69]],
+        name: 'Persian Gulf-Singapore',
+        coordinates: [[26.22, 50.59], [22.0, 58.0], [15.0, 65.0], [10.0, 75.0], [5.0, 85.0], [2.0, 95.0], [1.29, 103.85]],
+        color: '#dc2626', traffic: 'Critical', cargo: 'Crude Oil, LNG'
+      },
+      {
+        name: 'Persian Gulf-Japan',
+        coordinates: [[26.22, 50.59], [20.0, 62.0], [12.0, 75.0], [5.0, 90.0], [1.29, 103.85], [10.0, 115.0], [20.0, 125.0], [30.0, 135.0], [35.68, 139.69]],
         color: '#dc2626', traffic: 'High', cargo: 'Crude Oil'
       },
       
-      // STRAIT OF MALACCA (regional routes)
+      // STRAIT OF MALACCA (regional routes in Southeast Asia)
       {
-        name: 'Malacca Strait Transit',
+        name: 'Malacca Strait',
         coordinates: [[1.29, 103.85], [2.0, 102.0], [3.14, 101.69], [4.0, 101.0], [5.42, 100.34]],
         color: '#8b5cf6', traffic: 'Critical', cargo: 'All Cargo Types'
       },
       {
-        name: 'Singapore-India',
-        coordinates: [[1.29, 103.85], [5.0, 95.0], [10.0, 85.0], [15.0, 75.0], [19.08, 72.88]],
+        name: 'Singapore-Hong Kong',
+        coordinates: [[1.29, 103.85], [8.0, 108.0], [15.0, 112.0], [22.32, 114.17]],
         color: '#8b5cf6', traffic: 'Very High', cargo: 'Containers, Fuel'
       },
       
-      // PANAMA CANAL ROUTES (following Central American coast)
-      {
-        name: 'Asia-US East Coast via Panama',
-        coordinates: [[1.29, 103.85], [-5.0, 100.0], [-15.0, -90.0], [-10.0, -85.0], [0.0, -80.0], [8.54, -79.37], [15.0, -75.0], [25.0, -70.0], [35.0, -70.0], [40.71, -74.01]],
-        color: '#06b6d4', traffic: 'High', cargo: 'Containers'
-      },
+      // PANAMA CANAL ROUTES (entirely in Caribbean/Pacific waters)
       {
         name: 'Panama Canal Transit',
         coordinates: [[8.54, -79.37], [8.8, -79.5], [9.08, -79.68]],
         color: '#06b6d4', traffic: 'Critical', cargo: 'Containers, Bulk'
       },
-      
-      // CAPE OF GOOD HOPE ROUTES (around Africa)
       {
-        name: 'South Africa-Asia',
-        coordinates: [[-33.92, 18.42], [-30.0, 30.0], [-25.0, 35.0], [-20.0, 40.0], [-10.0, 45.0], [0.0, 50.0], [10.0, 70.0], [1.29, 103.85]],
+        name: 'Caribbean-US East Coast',
+        coordinates: [[18.47, -69.89], [22.0, -68.0], [26.0, -70.0], [30.0, -75.0], [35.0, -76.0], [40.71, -74.01]],
+        color: '#06b6d4', traffic: 'High', cargo: 'Containers'
+      },
+      
+      // CAPE OF GOOD HOPE ROUTES (around southern tip of Africa)
+      {
+        name: 'Cape Route Transit',
+        coordinates: [[-33.92, 18.42], [-35.0, 20.0], [-36.0, 22.0], [-34.36, 18.47]],
         color: '#10b981', traffic: 'Medium', cargo: 'Raw Materials'
       },
       {
-        name: 'Europe-Asia via Cape',
-        coordinates: [[51.50, -0.13], [45.0, 10.0], [30.0, 15.0], [10.0, 15.0], [-10.0, 10.0], [-33.92, 18.42], [-30.0, 30.0], [0.0, 50.0], [1.29, 103.85]],
+        name: 'South Africa-Europe',
+        coordinates: [[-33.92, 18.42], [-25.0, 5.0], [-10.0, 0.0], [10.0, 0.0], [25.0, 0.0], [35.0, 5.0], [45.0, 10.0], [51.50, -0.13]],
         color: '#10b981', traffic: 'Medium', cargo: 'Bulk Cargo'
       },
       
-      // NORTHERN SEA ROUTE (Arctic - following coastline)
+      // NORTHERN SEA ROUTE (Arctic - following Russian coastline)
       {
-        name: 'Northern Sea Route',
-        coordinates: [[68.97, 33.07], [70.0, 50.0], [75.0, 80.0], [77.50, 104.30], [75.0, 130.0], [70.0, 150.0], [66.89, -162.92]],
+        name: 'Northern Sea Route East',
+        coordinates: [[68.97, 33.07], [70.0, 50.0], [72.0, 70.0], [74.0, 90.0], [75.0, 110.0], [77.50, 104.30]],
+        color: '#ef4444', traffic: 'Seasonal', cargo: 'LNG, Containers'
+      },
+      {
+        name: 'Northern Sea Route West', 
+        coordinates: [[77.50, 104.30], [75.0, 130.0], [72.0, 150.0], [68.0, 170.0], [66.89, -162.92]],
         color: '#ef4444', traffic: 'Seasonal', cargo: 'LNG, Containers'
       },
       
-      // COASTAL ROUTES (following coastlines)
+      // COASTAL ROUTES (following actual coastlines)
       {
-        name: 'West Africa-Europe',
-        coordinates: [[5.56, -0.20], [10.0, -5.0], [20.0, -10.0], [35.0, -5.0], [40.0, 0.0], [45.0, 5.0], [51.50, -0.13]],
-        color: '#84cc16', traffic: 'High', cargo: 'Oil, Commodities'
+        name: 'US East-West Coast',
+        coordinates: [[40.71, -74.01], [35.0, -80.0], [25.0, -85.0], [20.0, -88.0], [8.54, -79.37], [5.0, -82.0], [10.0, -110.0], [20.0, -115.0], [33.74, -118.26]],
+        color: '#84cc16', traffic: 'High', cargo: 'Intermodal'
       },
       {
-        name: 'Caribbean-Europe',
-        coordinates: [[18.47, -69.89], [25.0, -60.0], [30.0, -50.0], [35.0, -40.0], [40.0, -30.0], [45.0, -20.0], [50.0, -10.0], [51.50, -0.13]],
-        color: '#f97316', traffic: 'Medium', cargo: 'Cruise, Cargo'
+        name: 'North Sea Route',
+        coordinates: [[51.50, -0.13], [54.0, 3.0], [57.0, 6.0], [60.0, 8.0], [63.0, 10.0], [68.97, 33.07]],
+        color: '#f97316', traffic: 'Medium', cargo: 'North Sea Oil'
       }
     ];
     
