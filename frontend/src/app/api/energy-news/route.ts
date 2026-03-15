@@ -14,14 +14,21 @@ const CACHE_MS = 15 * 60 * 1000;
 
 async function fetchRealEnergyNews(): Promise<EnergyNewsArticle[]> {
   try {
-    // Working RSS feeds that actually exist and work
+    // Multiple working RSS feeds for comprehensive coverage  
     const feeds = [
       'https://feeds.bloomberg.com/markets/news.rss',
-      'https://feeds.foxnews.com/foxnews/business',
-      'https://www.wsj.com/xml/rss/3_7085.xml',
+      'https://feeds.content.dowjones.io/public/rss/mw_realtimeheadlines',
       'https://feeds.reuters.com/reuters/businessNews',
-      'https://feeds.cnbc.com/cnbc/world-news'
+      'https://feeds.cnbc.com/cnbc/world-news',
+      'https://feeds.foxnews.com/foxnews/business',
+      'https://www.ft.com/rss/companies/energy',
+      'https://oilprice.com/rss/main',
+      'https://feeds.washingtonpost.com/rss/business'
     ];
+    
+    let allArticles: EnergyNewsArticle[] = [];
+    let successCount = 0;
+    const maxSources = 4; // Get articles from at least 4 sources
     
     for (const feedUrl of feeds) {
       try {
@@ -78,10 +85,13 @@ async function fetchRealEnergyNews(): Promise<EnergyNewsArticle[]> {
             // Take first 8 articles regardless if no energy articles found, then filter
             if (isEnergyRelated || articles.length < 8) {
               const source = feedUrl.includes('bloomberg') ? 'Bloomberg' : 
-                           feedUrl.includes('foxnews') ? 'Fox Business' : 
-                           feedUrl.includes('wsj') ? 'Wall Street Journal' :
+                           feedUrl.includes('dowjones') || feedUrl.includes('marketwatch') ? 'MarketWatch' :
                            feedUrl.includes('reuters') ? 'Reuters' :
-                           feedUrl.includes('cnbc') ? 'CNBC' : 'Business News';
+                           feedUrl.includes('cnbc') ? 'CNBC' :
+                           feedUrl.includes('foxnews') ? 'Fox Business' : 
+                           feedUrl.includes('ft.com') ? 'Financial Times' :
+                           feedUrl.includes('oilprice') ? 'OilPrice.com' :
+                           feedUrl.includes('washingtonpost') ? 'Washington Post' : 'Business News';
               
               articles.push({
                 title,
@@ -96,7 +106,13 @@ async function fetchRealEnergyNews(): Promise<EnergyNewsArticle[]> {
         
         if (articles.length > 0) {
           console.log(`✅ Successfully fetched ${articles.length} articles from ${feedUrl}`);
-          return articles;
+          allArticles.push(...articles.slice(0, 3)); // Max 3 articles per source
+          successCount++;
+          
+          // Stop after getting articles from enough sources or max articles
+          if (successCount >= maxSources || allArticles.length >= 12) {
+            break;
+          }
         } else {
           console.log(`⚠️  No suitable articles found in ${feedUrl}`);
         }
@@ -106,7 +122,8 @@ async function fetchRealEnergyNews(): Promise<EnergyNewsArticle[]> {
       }
     }
     
-    return [];
+    console.log(`🎯 Final result: ${allArticles.length} articles from ${successCount} sources`);
+    return allArticles;
   } catch (error) {
     console.error('All RSS feeds failed:', error);
     return [];
