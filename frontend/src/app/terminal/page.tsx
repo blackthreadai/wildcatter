@@ -32,6 +32,7 @@ import PositionMonitorWidget from '@/components/PositionMonitorWidget';
 import AIPriceForecastWidget from '@/components/AIPriceForecastWidget';
 import EventCalendarWidget from '@/components/EventCalendarWidget';
 import TradeSignalsWidget from '@/components/TradeSignalsWidget';
+import WorldMapWidget from '@/components/WorldMapWidget';
 
 // Drag and drop imports
 import {
@@ -54,37 +55,24 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-// Dynamically import the map to avoid SSR issues
-const WorldMap = dynamic(() => import('@/components/WorldMap'), {
-  ssr: false,
-  loading: () => (
-    <div className="h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
-      <div className="text-center">
-        <div className="w-16 h-16 mx-auto mb-4 bg-gray-600 rounded-lg flex items-center justify-center">
-          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <p className="text-gray-400 text-sm">Loading World Map...</p>
-      </div>
-    </div>
-  )
-});
+// WorldMap is now a modular widget component
 
 // Widget configuration - defines all widgets in the grid
 type Widget = {
   id: string;
-  type: 'news' | 'youtube' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'economic-indicators' | 'climate-extremes' | 'global-oil-tracker' | 'opec' | 'natural-gas' | 'oil-rig-tracker' | 'power-grid-stress' | 'refinery-outages' | 'sanctions' | 'energy-futures' | 'crack-spread' | 'global-lng' | 'carbon-credit' | 'global-fuel-demand' | 'position-monitor' | 'ai-price-forecast' | 'event-calendar' | 'trade-signals';
+  type: 'news' | 'youtube' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'economic-indicators' | 'climate-extremes' | 'global-oil-tracker' | 'opec' | 'natural-gas' | 'oil-rig-tracker' | 'power-grid-stress' | 'refinery-outages' | 'sanctions' | 'energy-futures' | 'crack-spread' | 'global-lng' | 'carbon-credit' | 'global-fuel-demand' | 'position-monitor' | 'ai-price-forecast' | 'event-calendar' | 'trade-signals' | 'world-map';
   title: string;
   span?: { col: number; row: number };
   region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS' | 'STRATEGIC RESERVE';
+  activeLayers?: string[]; // For world map widget
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '15.4-REMOVE-TRADE-SIGNALS-WIDGET';
+const WIDGET_VERSION = '16.0-MODULAR-WORLD-MAP';
 
 const defaultWidgets: Widget[] = [
   // NEW DEFAULT ORDER - Rendr's priority layout
+  { id: 'world-map', type: 'world-map', title: 'GLOBAL ENERGY MAP', span: { col: 3, row: 1 }, activeLayers: ['geopolitical'] },
   { id: 'youtube', type: 'youtube', title: 'LIVE NEWS', span: { col: 2, row: 1 } },
   { id: 'us-news', type: 'news', title: 'US NEWS', region: 'US' },
   { id: 'us-markets', type: 'stock', title: 'US ENERGY MARKETS' },
@@ -212,6 +200,8 @@ function DraggableWidget({
         return <EventCalendarWidget />;
       case 'trade-signals':
         return <TradeSignalsWidget />;
+      case 'world-map':
+        return <WorldMapWidget initialLayers={widget.activeLayers || ['geopolitical']} />;
       default:
         return <NewsWidget region="US" title="US NEWS" />;
     }
@@ -328,7 +318,6 @@ export default function TerminalPage() {
   const [selectedRegion, setSelectedRegion] = useState('global');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [activeLayers, setActiveLayers] = useState<string[]>(['geopolitical']); // Default active
   const [marketData, setMarketData] = useState<{label: string; value: string; change: number}[]>([]);
   const [defconStatus, setDefconStatus] = useState<{level: number; description: string; color: string}>({
     level: 4,
@@ -457,25 +446,7 @@ export default function TerminalPage() {
     showHidden || !hiddenWidgets.includes(widget.id)
   );
 
-  const regions = [
-    { value: 'global', label: 'GLOBAL' },
-    { value: 'middle-east', label: 'MIDDLE EAST' },
-    { value: 'americas', label: 'AMERICAS' },
-    { value: 'europe', label: 'EUROPE' },
-    { value: 'asia', label: 'ASIA' },
-    { value: 'oceania', label: 'OCEANIA' },
-    { value: 'africa', label: 'AFRICA' },
-  ];
-
-  const layers = [
-    { id: 'geopolitical', label: 'GEOPOLITICAL ALERTS', color: '#ef4444' },
-    { id: 'weather', label: 'WEATHER ALERTS', color: '#ef4444' },
-    { id: 'seismic-activity', label: 'SEISMIC ACTIVITY', color: '#ef4444' },
-    { id: 'drilling-rigs', label: 'ACTIVE DRILLING RIGS', color: '#4ade80' },
-    { id: 'pipelines', label: 'PIPELINE ROUTES', color: '#ef4444' },
-    { id: 'tanker-ships', label: 'TANKER SHIPS', color: '#3b82f6' },
-    { id: 'shipping-lanes', label: 'SHIPPING LANES', color: '#4ade80' },
-  ];
+  // Removed regions and layers arrays - now handled per widget instance
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -525,17 +496,7 @@ export default function TerminalPage() {
     };
   }, []);
 
-  const toggleLayer = (layerId: string) => {
-    setActiveLayers(prev => 
-      prev.includes(layerId) 
-        ? prev.filter(id => id !== layerId)
-        : [...prev, layerId]
-    );
-  };
-
-  // No longer need scrolling variables - showing all layers with scroll container
-
-  // Scroll functions removed - using native scroll container now
+  // Layer control moved to individual map widget instances
 
   const formatDateTime = (date: Date) => {
     return date.toLocaleDateString('en-US', {
@@ -810,7 +771,7 @@ export default function TerminalPage() {
 
       {/* Main Content */}
       <div className="h-[calc(100vh-73px)] relative">
-        {/* Map Header with Date/Time and DEFCON Status */}
+        {/* Status Bar with Date/Time and DEFCON Status */}
         <div className="bg-gray-800 border-b border-gray-700 py-2 px-6 pb-3">
           <div className="flex items-center justify-center gap-8">
             <span className="text-white text-sm font-thin tracking-[0.1em] uppercase" style={{ fontStretch: 'condensed' }}>
@@ -830,144 +791,7 @@ export default function TerminalPage() {
           </div>
         </div>
 
-        {/* Map Container - Half Height */}
-        <div 
-          className="h-[50vh] bg-gray-800 relative border"
-          style={{
-            borderColor: '#333333',
-            boxShadow: '0 0 10px rgba(218, 165, 32, 0.2), 0 0 20px rgba(218, 165, 32, 0.1)'
-          }}
-        >
-          <WorldMap activeLayers={activeLayers} />
-
-          {/* Static Layers Panel - Left Side Full Height */}
-          <div 
-            className="absolute top-0 left-0 w-72 border-r flex flex-col"
-            style={{ 
-              zIndex: 1000,
-              backgroundColor: 'rgba(0, 0, 0, 0.6)',
-              borderColor: '#333333',
-              height: '100%'
-            }}
-          >
-            {/* Scrollable Layers List - Full Height */}
-            <div className="h-full overflow-y-auto scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600">
-              <div className="p-4 space-y-3">
-                {layers.map(layer => (
-                  <label
-                    key={layer.id}
-                    className="flex items-center gap-3 p-2 rounded cursor-pointer hover:bg-gray-800 hover:bg-opacity-50 transition-all"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={activeLayers.includes(layer.id)}
-                      onChange={() => toggleLayer(layer.id)}
-                      className="sr-only"
-                    />
-                    <div className={`w-4 h-4 border-2 rounded flex items-center justify-center transition-all ${
-                      activeLayers.includes(layer.id) 
-                        ? 'border-yellow-500 bg-yellow-500' 
-                        : 'border-gray-500'
-                    }`} style={{
-                      borderColor: activeLayers.includes(layer.id) ? '#DAA520' : undefined,
-                      backgroundColor: activeLayers.includes(layer.id) ? '#DAA520' : undefined
-                    }}>
-                      {activeLayers.includes(layer.id) && (
-                        <svg className="w-2.5 h-2.5 text-black" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                    </div>
-                    {layer.id === 'active-wells' ? (
-                      <div className="w-3 h-3 flex items-center justify-center">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={layer.color} strokeWidth="2">
-                          <path d="M12 3v18"/>
-                          <path d="M9 3l6 0"/>
-                          <path d="M10 8l4 0"/>
-                          <path d="M9 3l-2 18"/>
-                          <path d="M15 3l2 18"/>
-                          <path d="M7 21l10 0"/>
-                          <rect x="11" y="4" width="2" height="2" fill={layer.color}/>
-                        </svg>
-                      </div>
-                    ) : layer.id === 'drilling-rigs' ? (
-                      <div className="w-3 h-3 flex items-center justify-center">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={layer.color} strokeWidth="2">
-                          <path d="M12 3v18"/>
-                          <path d="M9 3l6 0"/>
-                          <path d="M10 8l4 0"/>
-                          <path d="M9 3l-2 18"/>
-                          <path d="M15 3l2 18"/>
-                          <path d="M7 21l10 0"/>
-                          <rect x="11" y="4" width="2" height="3" fill={layer.color}/>
-                          <circle cx="12" cy="15" r="1" fill={layer.color}/>
-                        </svg>
-                      </div>
-                    ) : layer.id === 'seismic-activity' ? (
-                      <div className="w-3 h-3 flex items-center justify-center">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                          <path d="M2 12l4 0 4-6 4 12 4-6 4 0" 
-                                stroke={layer.color} 
-                                strokeWidth="2" 
-                                strokeLinecap="round" 
-                                strokeLinejoin="round"/>
-                        </svg>
-                      </div>
-                    ) : layer.id === 'weather' ? (
-                      <div className="w-4 h-4 flex items-center justify-center">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill={layer.color}>
-                          <path d="M12 16l-6-8h12l-6 8z"/>
-                        </svg>
-                      </div>
-                    ) : layer.id === 'refineries' ? (
-                      <div className="w-3 h-3 flex items-center justify-center">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill={layer.color}>
-                          <rect x="4" y="10" width="16" height="12" rx="1"/>
-                          <rect x="6" y="4" width="3" height="8" rx="0.5"/>
-                          <rect x="10" y="6" width="3" height="6" rx="0.5"/>
-                          <rect x="14" y="3" width="3" height="9" rx="0.5"/>
-                          <circle cx="7.5" cy="3" r="0.8" fill="white"/>
-                          <circle cx="11.5" cy="5" r="0.8" fill="white"/>
-                          <circle cx="15.5" cy="2" r="0.8" fill="white"/>
-                        </svg>
-                      </div>
-                    ) : layer.id === 'pipelines' ? (
-                      <div className="w-3 h-3 flex items-center justify-center">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                          <path d="M2 12l20 0" stroke={layer.color} strokeWidth="3" strokeLinecap="round"/>
-                        </svg>
-                      </div>
-                    ) : layer.id === 'tanker-ships' ? (
-                      <div className="w-3 h-3 flex items-center justify-center">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={layer.color} strokeWidth="2">
-                          <path d="M12 2v20M2 12h20"/>
-                          <path d="M6 6l12 12M18 6L6 18"/>
-                          <circle cx="12" cy="12" r="2" fill={layer.color}/>
-                        </svg>
-                      </div>
-                    ) : layer.id === 'shipping-lanes' ? (
-                      <div className="w-3 h-3 flex items-center justify-center">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                          <path d="M2 12l20 0" stroke={layer.color} strokeWidth="3" strokeLinecap="round"/>
-                        </svg>
-                      </div>
-                    ) : (
-                      <div 
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: layer.color }}
-                      />
-                    )}
-                    <span className="text-xs tracking-wider text-gray-300" style={{ fontStretch: 'condensed' }}>
-                      {layer.label}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom Area - Draggable Widget Grid */}
+        {/* Full Height - Draggable Widget Grid */}
         <div className="flex-1 bg-black p-2 min-h-0">
           <DndContext 
             sensors={sensors}
