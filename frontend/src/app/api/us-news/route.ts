@@ -223,8 +223,12 @@ async function fetchReutersAlternativeRSS() {
 
 // Simple text extraction helper
 function extractText(xml: string, tag: string): string {
-  const match = xml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`)) ||
-                xml.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]></${tag}>`));
+  // Try CDATA first
+  const cdataMatch = xml.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]></${tag}>`));
+  if (cdataMatch) return cdataMatch[1];
+  
+  // Fallback to regular content
+  const match = xml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`));
   return match ? match[1] : '';
 }
 
