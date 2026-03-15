@@ -50,9 +50,9 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
               display: flex; 
               align-items: center; 
               justify-content: center;
-              filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+              filter: drop-shadow(0 0 8px rgba(218, 165, 32, 0.8));
             ">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="#FFD700" stroke="#B8860B" stroke-width="1">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#DAA520" stroke="#B8860B" stroke-width="1">
                 <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
               </svg>
             </div>`,
@@ -65,7 +65,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
           
           const popupContent = `
             <div style="min-width: 200px;">
-              <h4 style="margin: 0 0 8px 0; color: #FFD700; font-size: 14px; font-weight: bold;">
+              <h4 style="margin: 0 0 8px 0; color: #DAA520; font-size: 14px; font-weight: bold;">
                 ⭐ YOUR CURRENT LOCATION
               </h4>
               <div style="font-size: 11px; color: #666; line-height: 1.3;">
