@@ -798,13 +798,13 @@ export default function TerminalPage() {
               href="https://apps.apple.com/app/wildcatter-energy-intelligence/id123456789" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-xs text-gray-400 hover:text-[#DAA520] transition-colors cursor-pointer"
+              className="flex items-center gap-2 text-xs text-gray-400 hover:text-[#DAA520] transition-colors cursor-pointer uppercase"
               style={{ fontStretch: 'condensed' }}
             >
-              <span>Get</span>
+              <span>GET</span>
               <img src="/w-icon.svg" alt="W" className="w-6 h-6" />
-              <span className="text-[#DAA520]">Energy Intelligence™</span>
-              <span>on iOS</span>
+              <span className="text-[#DAA520]">ENERGY INTELLIGENCE™</span>
+              <span>ON iOS</span>
             </a>
           </div>
         </div>
