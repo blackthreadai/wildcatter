@@ -19,29 +19,23 @@ interface WeatherAlert {
 let cache: { data: WeatherAlert[]; ts: number } | null = null;
 const CACHE_MS = 15 * 60 * 1000;
 
-// Global weather alert sources
+// Global weather alert sources (real APIs only)
 async function fetchGlobalWeatherAlerts(): Promise<WeatherAlert[]> {
   const allAlerts: WeatherAlert[] = [];
   
-  // 1. NOAA (United States)
+  // 1. NOAA (United States) - working
   const noaaAlerts = await fetchNOAAWeatherAlerts();
   allAlerts.push(...noaaAlerts);
   
-  // 2. Environment Canada (Canada)
-  const canadaAlerts = await fetchCanadaWeatherAlerts();
-  allAlerts.push(...canadaAlerts);
-  
-  // 3. European weather alerts (EU)
+  // 2. European weather alerts (UK + Germany) - working  
   const europeAlerts = await fetchEuropeanWeatherAlerts();
   allAlerts.push(...europeAlerts);
   
-  // 4. Australian Bureau of Meteorology
-  const australiaAlerts = await fetchAustralianWeatherAlerts();
-  allAlerts.push(...australiaAlerts);
+  // 3. Hong Kong Observatory - working
+  const hongkongAlerts = await fetchHongKongWeatherAlerts();
+  allAlerts.push(...hongkongAlerts);
   
-  // 5. Japan Meteorological Agency (typhoons)
-  const japanAlerts = await fetchJapanWeatherAlerts();
-  allAlerts.push(...japanAlerts);
+  // Note: Canada, Australia, Japan APIs either block automation or lack public endpoints
   
   console.log(`Total global weather alerts collected: ${allAlerts.length}`);
   return allAlerts;
@@ -684,7 +678,7 @@ export async function GET() {
       });
     }
 
-    // Fetch from multiple real weather APIs worldwide
+    // Fetch from working real weather APIs only
     console.log('Fetching NOAA weather alerts...');
     const noaaAlerts = await fetchNOAAWeatherAlerts();
     

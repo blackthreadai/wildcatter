@@ -521,7 +521,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       if (!route.coordinates || route.coordinates.length < 2) return;
       
       // Create shipping lane polyline
-      const polyline = L.polyline(route.coordinates, {
+      const polyline = L.polyline(route.coordinates as L.LatLngExpression[], {
         color: route.color,
         weight: 3,
         opacity: 0.8,
@@ -535,7 +535,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         const endPoint = route.coordinates[route.coordinates.length - 1];
         
         // Start marker
-        const startMarker = L.circle(startPoint, {
+        const startMarker = L.circle(startPoint as L.LatLngExpression, {
           color: route.color,
           fillColor: route.color,
           fillOpacity: 0.8,
@@ -544,7 +544,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
         });
         
         // End marker  
-        const endMarker = L.circle(endPoint, {
+        const endMarker = L.circle(endPoint as L.LatLngExpression, {
           color: route.color,
           fillColor: route.color,
           fillOpacity: 0.8,
@@ -940,7 +940,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       }
       
       // Create thick, visible polyline for each pipeline
-      const polyline = L.polyline(pipeline.coordinates, {
+      const polyline = L.polyline(pipeline.coordinates as L.LatLngExpression[], {
         color: pipeline.color,
         weight: 6, // Made even thicker
         opacity: 1.0, // Full opacity
