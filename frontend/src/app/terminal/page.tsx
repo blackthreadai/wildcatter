@@ -131,7 +131,11 @@ function DraggableWidget({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: widget.id });
+  } = useSortable({ 
+    id: widget.id,
+    // Only allow dragging from the drag handle, not the entire widget
+    disabled: false
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -224,7 +228,6 @@ function DraggableWidget({
       className={`relative group ${getSpanClasses()}`}
       style={{
         ...style,
-        cursor: isDragging ? 'grabbing' : 'grab',
         opacity: isHidden ? 0.5 : 1,
         height: '400px', // All widgets now single-row height
         filter: isDragging 
@@ -234,7 +237,6 @@ function DraggableWidget({
             : 'drop-shadow(0 0 10px rgba(218, 165, 32, 0.2))'
       }}
       {...attributes}
-      {...listeners}
     >
       {/* Control buttons in top-right */}
       <div className="absolute top-1 right-1 z-50 flex items-center gap-1 bg-black/80 rounded px-1 opacity-60 group-hover:opacity-100 transition-opacity">
@@ -273,8 +275,10 @@ function DraggableWidget({
           className="relative"
           onMouseEnter={() => setWidgetTooltip('drag')}
           onMouseLeave={() => setWidgetTooltip(null)}
+          {...listeners}
+          style={{cursor: isDragging ? 'grabbing' : 'grab'}}
         >
-          <div className="pointer-events-none cursor-move p-1">
+          <div className="cursor-move p-1">
             <svg 
               className="w-3 h-3 text-[#DAA520]" 
               fill="none" 
