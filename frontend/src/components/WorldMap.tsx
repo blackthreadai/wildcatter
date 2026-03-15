@@ -338,7 +338,18 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
 
   // STATIC LAYER LOADERS (simplified)
   const loadShippingLanes = (layerGroup: L.LayerGroup) => {
-    console.log('🚢 LOADING MAJOR GLOBAL SHIPPING LANES...');
+    console.log('🚢🚢🚢 SHIPPING LOADER CALLED - NEW VERSION 2.0 🚢🚢🚢');
+    alert('SHIPPING LANES LOADING - CHECK CONSOLE');
+    
+    // TEST MARKER - Should show in Atlantic Ocean regardless of shipping data  
+    const testMarker = L.marker([30.0, -30.0], {
+      icon: L.divIcon({
+        html: '<div style="background: blue; color: white; padding: 4px; font-weight: bold;">SHIPPING TEST MARKER</div>',
+        className: 'test-marker'
+      })
+    });
+    layerGroup.addLayer(testMarker);
+    console.log('✅ Added TEST MARKER for shipping at [30.0, -30.0]');
     
     // COMPREHENSIVE GLOBAL SHIPPING ROUTES - Major Maritime Trade Corridors
     const shippingRoutes = [
@@ -786,7 +797,18 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
   };
 
   const loadPipelines = (layerGroup: L.LayerGroup) => {
-    console.log('🛡️ LOADING MAJOR GLOBAL PIPELINE ROUTES...');
+    console.log('🛡️🛡️🛡️ PIPELINE LOADER CALLED - NEW VERSION 2.0 🛡️🛡️🛡️');
+    alert('PIPELINE LAYER LOADING - CHECK CONSOLE');
+    
+    // TEST MARKER - Should show in Middle East regardless of pipeline data
+    const testMarker = L.marker([29.0, 42.0], {
+      icon: L.divIcon({
+        html: '<div style="background: red; color: white; padding: 4px; font-weight: bold;">PIPELINE TEST MARKER</div>',
+        className: 'test-marker'
+      })
+    });
+    layerGroup.addLayer(testMarker);
+    console.log('✅ Added TEST MARKER for pipelines at [29.0, 42.0]');
     
     // COMPREHENSIVE GLOBAL PIPELINE NETWORK - Major Energy Infrastructure
     const pipelines = [
@@ -906,15 +928,25 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
     console.log(`🛡️ Rendering ${pipelines.length} major global pipeline routes`);
     
     pipelines.forEach((pipeline, index) => {
-      if (!pipeline.coordinates || pipeline.coordinates.length < 2) return;
+      console.log(`🛡️ Processing pipeline: ${pipeline.name}`);
+      console.log(`🛡️ Coordinates count: ${pipeline.coordinates?.length || 'NONE'}`);
+      console.log(`🛡️ First coordinate: ${pipeline.coordinates?.[0]}`);
+      console.log(`🛡️ Last coordinate: ${pipeline.coordinates?.[pipeline.coordinates.length - 1]}`);
+      
+      if (!pipeline.coordinates || pipeline.coordinates.length < 2) {
+        console.error(`❌ Pipeline ${pipeline.name} has invalid coordinates!`);
+        return;
+      }
       
       // Create thick, visible polyline for each pipeline
       const polyline = L.polyline(pipeline.coordinates, {
         color: pipeline.color,
-        weight: 4,
-        opacity: 0.9,
+        weight: 6, // Made even thicker
+        opacity: 1.0, // Full opacity
         className: 'pipeline-route'
       });
+      
+      console.log(`✅ Created polyline for ${pipeline.name} with ${pipeline.coordinates.length} points`);
       
       // Rich popup with pipeline details
       const popupContent = `
