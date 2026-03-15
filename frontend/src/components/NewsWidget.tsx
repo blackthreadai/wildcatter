@@ -63,19 +63,19 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
           'US': [
             {
               title: "Oil Prices Rise on Supply Concerns",
-              url: "#",
+              url: "https://www.reuters.com/business/energy/",
               publishedAt: "2026-02-21T12:00:00Z",
               source: "Reuters"
             },
             {
               title: "Natural Gas Demand Peaks in Winter",
-              url: "#",
+              url: "https://www.bloomberg.com/news/energy",
               publishedAt: "2026-02-21T11:30:00Z", 
               source: "Bloomberg"
             },
             {
               title: "Shale Production Reaches Record Highs",
-              url: "#",
+              url: "https://www.wsj.com/news/business/energy",
               publishedAt: "2026-02-21T10:45:00Z",
               source: "Energy Intelligence"
             }
@@ -83,13 +83,13 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
           'RUSSIAN': [
             {
               title: "Gazprom Expands Arctic Gas Fields",
-              url: "#",
+              url: "https://www.reuters.com/business/energy/",
               publishedAt: "2026-02-21T10:00:00Z",
               source: "Moscow Times"
             },
             {
               title: "Lukoil Reports Record Quarterly Profits",
-              url: "#",
+              url: "https://www.bloomberg.com/news/energy",
               publishedAt: "2026-02-21T09:30:00Z",
               source: "RT Energy"
             }
@@ -131,19 +131,19 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
           'ASIAN': [
             {
               title: "Japan Increases Nuclear Power Capacity",
-              url: "#",
+              url: "https://www.reuters.com/business/energy/",
               publishedAt: "2026-02-21T16:00:00Z",
               source: "Nikkei Energy"
             },
             {
               title: "India Approves New Solar Farm Projects", 
-              url: "#",
+              url: "https://www.bloomberg.com/news/energy",
               publishedAt: "2026-02-21T11:45:00Z",
               source: "Energy India"
             },
             {
               title: "Indonesia Coal Exports Hit Record High",
-              url: "#",
+              url: "https://www.wsj.com/news/business/energy",
               publishedAt: "2026-02-21T14:20:00Z",
               source: "Asian Coal Report"
             }
@@ -318,15 +318,7 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
               href={article.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="block group"
-              onClick={(e) => {
-                // Ensure the link works and add debugging
-                console.log('Opening article:', article.title, article.url);
-                if (article.url === '#' || !article.url || article.url.startsWith('#')) {
-                  e.preventDefault();
-                  console.log('Invalid URL, prevented navigation');
-                }
-              }}
+              className="block group hover:opacity-80 transition-opacity"
             >
               <h4 className="text-[#DAA520] text-xs leading-tight mb-1 line-clamp-2 cursor-pointer">
                 {article.title}
@@ -334,7 +326,7 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
             </a>
             <div className="flex items-center justify-between">
               <span className="text-gray-400 text-xs">{article.source}</span>
-              <span className="text-gray-500 text-xs">{formatTime(article.publishedAt)}</span>
+              <span className="text-green-400 text-xs">{formatTime(article.publishedAt)}</span>
             </div>
           </div>
         ))}
