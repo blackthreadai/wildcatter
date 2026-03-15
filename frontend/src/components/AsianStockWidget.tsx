@@ -40,16 +40,8 @@ export default function AsianStockWidget() {
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch Asian stock data:', error);
-        
-        // Fallback to mock data
-        const fallbackStocks: Stock[] = [
-          { symbol: 'PTR', name: 'PetroChina', price: 45.23, change: 1.7 },
-          { symbol: 'SNP', name: 'Sinopec', price: 52.18, change: -0.8 },
-          { symbol: 'CEO', name: 'CNOOC Ltd', price: 38.91, change: 2.4 },
-          { symbol: 'RIL', name: 'Reliance Ind', price: 78.45, change: 0.9 }
-        ];
-        
-        setStocks(fallbackStocks);
+        // No fallback - let API handle its own fallbacks
+        setStocks([]);
         setLoading(false);
       }
     };
@@ -79,12 +71,22 @@ export default function AsianStockWidget() {
       </div>
       
       <div className="flex-1 bg-black px-3 py-1">
-        {stocks.map((stock, i) => (
+        {stocks.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-gray-500 text-xs">Real-time data temporarily unavailable</div>
+          </div>
+        ) : (
+          stocks.map((stock, i) => (
           <div key={stock.symbol} className="flex items-center justify-between py-1 border-b border-gray-700 last:border-b-0">
-            <div className="min-w-0 flex-1">
-              <div className="text-[#DAA520] text-xs font-semibold">{stock.symbol}</div>
-              <div className="text-gray-400 text-xs truncate">{stock.name}</div>
-            </div>
+            <a 
+              href={`https://finance.yahoo.com/chart/${stock.symbol}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="min-w-0 flex-1 hover:opacity-75 transition-opacity cursor-pointer"
+            >
+              <div className="text-[#DAA520] text-xs font-semibold hover:underline">{stock.symbol}</div>
+              <div className="text-gray-400 text-xs truncate hover:text-gray-300">{stock.name}</div>
+            </a>
             <div className="text-right ml-1">
               <div className="text-white text-xs font-mono">{formatPrice(stock.price, stock.currency)}</div>
               <div className={`text-xs ${stock.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
@@ -92,7 +94,8 @@ export default function AsianStockWidget() {
               </div>
             </div>
           </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
