@@ -59,211 +59,8 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch news:', error);
-        // Fallback to dummy data based on region
-        const fallbackData = {
-          'US': [
-            {
-              title: "Oil Prices Rise on Supply Concerns",
-              url: "https://www.reuters.com/business/energy/",
-              publishedAt: "2026-02-21T12:00:00Z",
-              source: "Reuters"
-            },
-            {
-              title: "Natural Gas Demand Peaks in Winter",
-              url: "https://www.bloomberg.com/news/energy",
-              publishedAt: "2026-02-21T11:30:00Z", 
-              source: "Bloomberg"
-            },
-            {
-              title: "Shale Production Reaches Record Highs",
-              url: "https://www.wsj.com/news/business/energy",
-              publishedAt: "2026-02-21T10:45:00Z",
-              source: "Energy Intelligence"
-            }
-          ],
-          'RUSSIAN': [
-            {
-              title: "Gazprom Expands Arctic Gas Fields",
-              url: "https://www.reuters.com/business/energy/",
-              publishedAt: "2026-02-21T10:00:00Z",
-              source: "Moscow Times"
-            },
-            {
-              title: "Lukoil Reports Record Quarterly Profits",
-              url: "https://www.bloomberg.com/news/energy",
-              publishedAt: "2026-02-21T09:30:00Z",
-              source: "RT Energy"
-            }
-          ],
-          'SOUTH AMERICAN': [
-            {
-              title: "Brazil's Petrobras Discovers New Offshore Oil",
-              url: "#",
-              publishedAt: "2026-02-21T11:00:00Z",
-              source: "Latin Oil"
-            },
-            {
-              title: "Argentina Boosts Vaca Muerta Shale Production",
-              url: "#",
-              publishedAt: "2026-02-21T08:45:00Z",
-              source: "Energy SA"
-            }
-          ],
-          'AFRICAN': [
-            {
-              title: "Nigeria's NNPC Announces New Gas Pipeline",
-              url: "#",
-              publishedAt: "2026-02-21T13:15:00Z",
-              source: "Africa Energy"
-            },
-            {
-              title: "Algeria Increases LNG Exports to Europe",
-              url: "#",
-              publishedAt: "2026-02-21T09:20:00Z",
-              source: "North Africa Oil"
-            },
-            {
-              title: "Angola Plans Offshore Wind Energy Projects",
-              url: "#",
-              publishedAt: "2026-02-21T15:30:00Z",
-              source: "African Power"
-            }
-          ],
-          'ASIAN': [
-            {
-              title: "Japan Increases Nuclear Power Capacity",
-              url: "https://www.reuters.com/business/energy/",
-              publishedAt: "2026-02-21T16:00:00Z",
-              source: "Nikkei Energy"
-            },
-            {
-              title: "India Approves New Solar Farm Projects", 
-              url: "https://www.bloomberg.com/news/energy",
-              publishedAt: "2026-02-21T11:45:00Z",
-              source: "Energy India"
-            },
-            {
-              title: "Indonesia Coal Exports Hit Record High",
-              url: "https://www.wsj.com/news/business/energy",
-              publishedAt: "2026-02-21T14:20:00Z",
-              source: "Asian Coal Report"
-            }
-          ],
-          'CLIMATE EXTREMES': [
-            {
-              title: "Record Heat Wave Impacts Global Energy Demand",
-              url: "#",
-              publishedAt: "2026-02-21T14:00:00Z",
-              source: "Climate Central"
-            },
-            {
-              title: "Extreme Weather Forces Pipeline Shutdowns",
-              url: "#",
-              publishedAt: "2026-02-21T12:15:00Z",
-              source: "Environmental News"
-            }
-          ],
-          'EUROPEAN ENERGY': [
-            {
-              title: "EU Approves New Renewable Energy Targets",
-              url: "#",
-              publishedAt: "2026-02-21T13:30:00Z",
-              source: "EurActiv"
-            },
-            {
-              title: "Norway Increases Gas Exports to Europe",
-              url: "#",
-              publishedAt: "2026-02-21T11:45:00Z",
-              source: "Energy Monitor"
-            }
-          ],
-          'MIDDLE EAST ENERGY': [
-            {
-              title: "Saudi Aramco Reports Record Quarterly Profits",
-              url: "#",
-              publishedAt: "2026-02-21T15:20:00Z",
-              source: "Middle East Economic Survey"
-            },
-            {
-              title: "UAE Launches Major Solar Energy Project",
-              url: "#",
-              publishedAt: "2026-02-21T10:30:00Z",
-              source: "Gulf Business"
-            }
-          ],
-          'PRECIOUS METALS': [
-            {
-              title: "Gold Prices Surge Amid Energy Market Volatility",
-              url: "#",
-              publishedAt: "2026-02-21T16:10:00Z",
-              source: "Metals Focus"
-            },
-            {
-              title: "Platinum Demand Rises in Green Energy Sector",
-              url: "#",
-              publishedAt: "2026-02-21T12:00:00Z",
-              source: "Mining Weekly"
-            }
-          ],
-          'ECONOMIC INDICATORS': [
-            {
-              title: "Federal Reserve Signals Interest Rate Changes Impact Energy",
-              url: "#",
-              publishedAt: "2026-02-21T15:45:00Z",
-              source: "Federal Reserve Economic Data"
-            },
-            {
-              title: "Inflation Data Shows Energy Price Pressures Persist",
-              url: "#",
-              publishedAt: "2026-02-21T13:20:00Z",
-              source: "Bureau of Labor Statistics"
-            }
-          ],
-          'CRYPTOCURRENCY': [
-            {
-              title: "Bitcoin Mining Energy Consumption Hits New Records",
-              url: "#",
-              publishedAt: "2026-02-21T14:30:00Z",
-              source: "CoinDesk"
-            },
-            {
-              title: "Crypto Markets React to Energy Cost Fluctuations",
-              url: "#",
-              publishedAt: "2026-02-21T11:15:00Z",
-              source: "CryptoNews"
-            }
-          ],
-          'EUROPEAN ENERGY MARKETS': [
-            {
-              title: "European Gas Prices Rise on Supply Chain Concerns",
-              url: "#",
-              publishedAt: "2026-02-21T16:45:00Z",
-              source: "S&P Global Platts"
-            },
-            {
-              title: "EU Carbon Credits Hit Multi-Year Highs",
-              url: "#",
-              publishedAt: "2026-02-21T12:30:00Z",
-              source: "ICE Futures Europe"
-            }
-          ],
-          'STRATEGIC RESERVE': [
-            {
-              title: "US Strategic Petroleum Reserve Releases 50M Barrels",
-              url: "#",
-              publishedAt: "2026-02-21T17:30:00Z",
-              source: "Department of Energy"
-            },
-            {
-              title: "Emergency Oil Stockpiles Hit 15-Year Low Amid Geopolitical Tensions",
-              url: "#",
-              publishedAt: "2026-02-21T14:45:00Z",
-              source: "Energy Information Administration"
-            }
-          ]
-        };
-        const fallbackArticles = fallbackData[region] || [];
-        setArticles(region === 'US' ? fallbackArticles : fallbackArticles.slice(0, 2));
+        // NO FALLBACK DATA - SHOW EMPTY STATE IF REAL DATA FAILS
+        setArticles([]);
         setLoading(false);
       }
     };
@@ -312,26 +109,35 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>{title || `${region} ENERGY`}</h3>
       </div>
       <div className="flex-1 p-2 overflow-y-auto bg-black min-h-0">
-        <div className="space-y-2">
-        {articles.map((article, i) => (
-          <div key={i} className="border-b border-gray-700 pb-1 last:border-b-0">
-            <a 
-              href={article.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block group hover:opacity-80 transition-opacity"
-            >
-              <h4 className="text-[#DAA520] text-xs leading-tight mb-1 line-clamp-2 cursor-pointer">
-                {article.title}
-              </h4>
-            </a>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400 text-xs">{article.source}</span>
-              <span className="text-green-400 text-xs">{formatTime(article.publishedAt)}</span>
+        {articles.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <div className="text-gray-500 text-xs">No real news available</div>
+              <div className="text-gray-600 text-xs mt-1">RSS feeds temporarily unavailable</div>
             </div>
           </div>
-        ))}
-        </div>
+        ) : (
+          <div className="space-y-2">
+            {articles.map((article, i) => (
+              <div key={i} className="border-b border-gray-700 pb-1 last:border-b-0">
+                <a 
+                  href={article.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block group hover:opacity-80 transition-opacity"
+                >
+                  <h4 className="text-[#DAA520] text-xs leading-tight mb-1 line-clamp-2 cursor-pointer">
+                    {article.title}
+                  </h4>
+                </a>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400 text-xs">{article.source}</span>
+                  <span className="text-green-400 text-xs">{formatTime(article.publishedAt)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
