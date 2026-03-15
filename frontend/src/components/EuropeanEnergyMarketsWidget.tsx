@@ -18,7 +18,30 @@ export default function EuropeanEnergyMarketsWidget() {
     if (currency === 'EUR') {
       return `€${price.toFixed(2)}`;
     }
+    if (currency === 'DKK') {
+      return `kr${price.toFixed(2)}`; // Danish Kroner
+    }
     return `$${price.toFixed(2)}`;
+  };
+
+  const getFinancialLink = (symbol: string) => {
+    // Spanish stocks (BME Madrid) - TradingView for better accessibility
+    if (symbol === 'REPSOL') {
+      return `https://www.tradingview.com/symbols/BME-REP/`;
+    }
+    
+    // Danish stocks (Copenhagen) - TradingView
+    if (symbol === 'ORSTED') {
+      return `https://www.tradingview.com/symbols/CPH-ORSTED/`;
+    }
+    
+    // Portuguese stocks (Euronext Lisbon) - TradingView
+    if (symbol === 'GALP') {
+      return `https://www.tradingview.com/symbols/ELI-GALP/`;
+    }
+    
+    // Default: NYSE ADRs - Yahoo Finance US
+    return `https://finance.yahoo.com/chart/${symbol}`;
   };
 
   useEffect(() => {
@@ -79,7 +102,7 @@ export default function EuropeanEnergyMarketsWidget() {
           stocks.map((stock, i) => (
           <div key={stock.symbol} className="flex items-center justify-between py-1 border-b border-gray-700 last:border-b-0">
             <a 
-              href={`https://finance.yahoo.com/chart/${stock.symbol}`}
+              href={getFinancialLink(stock.symbol)}
               target="_blank"
               rel="noopener noreferrer"
               className="min-w-0 flex-1 hover:opacity-75 transition-opacity cursor-pointer"

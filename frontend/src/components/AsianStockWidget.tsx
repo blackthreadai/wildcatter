@@ -18,7 +18,36 @@ export default function AsianStockWidget() {
     if (currency === 'INR') {
       return `₹${price.toFixed(0)}`; // INR without decimals
     }
+    if (currency === 'JPY') {
+      return `¥${price.toFixed(0)}`; // JPY without decimals
+    }
+    if (currency === 'MYR') {
+      return `RM${price.toFixed(2)}`; // Malaysian Ringgit
+    }
     return `$${price.toFixed(2)}`; // USD with decimals
+  };
+
+  const getFinancialLink = (symbol: string) => {
+    // Indian NSE stocks (.NS suffix) - Yahoo Finance India
+    if (symbol.endsWith('.NS')) {
+      return `https://in.finance.yahoo.com/quote/${symbol}`;
+    }
+    
+    // Japanese stocks (TSE) - Use TradingView for better accessibility
+    if (symbol === 'INPEX') {
+      return `https://www.tradingview.com/symbols/TSE-1605/`; // INPEX on TradingView
+    }
+    if (symbol === 'ENEOS') {
+      return `https://www.tradingview.com/symbols/TSE-5020/`; // ENEOS on TradingView  
+    }
+    
+    // Malaysian stocks - Bursa Malaysia or Yahoo
+    if (symbol === 'PETRONAS') {
+      return `https://www.bursamalaysia.com/trade/trading_resources/listing_directory/company-announcements/5347`;
+    }
+    
+    // Default: NYSE/NASDAQ stocks - Yahoo Finance US
+    return `https://finance.yahoo.com/chart/${symbol}`;
   };
 
   useEffect(() => {
@@ -79,7 +108,7 @@ export default function AsianStockWidget() {
           stocks.map((stock, i) => (
           <div key={stock.symbol} className="flex items-center justify-between py-1 border-b border-gray-700 last:border-b-0">
             <a 
-              href={`https://finance.yahoo.com/chart/${stock.symbol}`}
+              href={getFinancialLink(stock.symbol)}
               target="_blank"
               rel="noopener noreferrer"
               className="min-w-0 flex-1 hover:opacity-75 transition-opacity cursor-pointer"
