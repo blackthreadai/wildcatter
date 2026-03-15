@@ -25,22 +25,22 @@ export default function EuropeanEnergyMarketsWidget() {
   };
 
   const getFinancialLink = (symbol: string) => {
-    // Spanish stocks (BME Madrid) - TradingView for better accessibility
+    // Spanish stocks (BME Madrid) - Use Investing.com for reliability
     if (symbol === 'REPSOL') {
-      return `https://www.tradingview.com/symbols/BME-REP/`;
+      return `https://www.investing.com/equities/repsol-ypf`;
     }
     
-    // Danish stocks (Copenhagen) - TradingView
+    // Danish stocks (Copenhagen) - Use Investing.com  
     if (symbol === 'ORSTED') {
-      return `https://www.tradingview.com/symbols/CPH-ORSTED/`;
+      return `https://www.investing.com/equities/orsted-a-s`;
     }
     
-    // Portuguese stocks (Euronext Lisbon) - TradingView
+    // Portuguese stocks (Euronext Lisbon) - Use Investing.com
     if (symbol === 'GALP') {
-      return `https://www.tradingview.com/symbols/ELI-GALP/`;
+      return `https://www.investing.com/equities/galp-energia-sgps`;
     }
     
-    // Default: NYSE ADRs - Yahoo Finance US
+    // Default: NYSE ADRs - Yahoo Finance US (these work perfectly)
     return `https://finance.yahoo.com/chart/${symbol}`;
   };
 

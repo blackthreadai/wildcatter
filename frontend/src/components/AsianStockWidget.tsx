@@ -28,25 +28,32 @@ export default function AsianStockWidget() {
   };
 
   const getFinancialLink = (symbol: string) => {
-    // Indian NSE stocks (.NS suffix) - Yahoo Finance India
+    // Indian NSE stocks (.NS suffix) - Use Investing.com for reliable data
     if (symbol.endsWith('.NS')) {
-      return `https://in.finance.yahoo.com/quote/${symbol}`;
+      if (symbol === 'RELIANCE.NS') {
+        return `https://www.investing.com/equities/reliance-industries`;
+      }
+      if (symbol === 'ONGC.NS') {
+        return `https://www.investing.com/equities/oil-natural-gas-corp`;
+      }
+      // Fallback for other .NS stocks
+      return `https://www.google.com/finance/quote/${symbol.replace('.NS', '')}:NSE`;
     }
     
-    // Japanese stocks (TSE) - Use TradingView for better accessibility
+    // Japanese stocks (TSE) - Use Investing.com for reliable access
     if (symbol === 'INPEX') {
-      return `https://www.tradingview.com/symbols/TSE-1605/`; // INPEX on TradingView
+      return `https://www.investing.com/equities/inpex-corp`;
     }
     if (symbol === 'ENEOS') {
-      return `https://www.tradingview.com/symbols/TSE-5020/`; // ENEOS on TradingView  
+      return `https://www.investing.com/equities/eneos-holdings`;
     }
     
-    // Malaysian stocks - Bursa Malaysia or Yahoo
+    // Malaysian stocks - Use Investing.com for international accessibility
     if (symbol === 'PETRONAS') {
-      return `https://www.bursamalaysia.com/trade/trading_resources/listing_directory/company-announcements/5347`;
+      return `https://www.investing.com/equities/petroliam-nasional-bhd`;
     }
     
-    // Default: NYSE/NASDAQ stocks - Yahoo Finance US
+    // Default: NYSE/NASDAQ stocks - Yahoo Finance US (these work well)
     return `https://finance.yahoo.com/chart/${symbol}`;
   };
 
