@@ -42,31 +42,32 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
           const { latitude, longitude } = position.coords;
           map.setView([latitude, longitude], 8); // Zoom to user's location
           
-          // Add gold star marker for current location
-          const goldStarIcon = L.divIcon({
+          // Add location pin marker for current location
+          const locationPinIcon = L.divIcon({
             html: `<div style="
-              width: 24px; 
-              height: 24px; 
+              width: 28px; 
+              height: 28px; 
               display: flex; 
               align-items: center; 
               justify-content: center;
-              filter: drop-shadow(0 0 8px rgba(218, 165, 32, 0.8));
+              filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
             ">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="#DAA520" stroke="#B8860B" stroke-width="1">
-                <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#DAA520" stroke="#B8860B" stroke-width="1">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                <circle cx="12" cy="9" r="2.5" fill="white"/>
               </svg>
             </div>`,
-            className: 'current-location-star',
-            iconSize: [24, 24],
-            iconAnchor: [12, 12]
+            className: 'current-location-pin',
+            iconSize: [28, 28],
+            iconAnchor: [14, 26]  // Pin tip at bottom center
           });
 
-          const currentLocationMarker = L.marker([latitude, longitude], { icon: goldStarIcon });
+          const currentLocationMarker = L.marker([latitude, longitude], { icon: locationPinIcon });
           
           const popupContent = `
             <div style="min-width: 200px;">
               <h4 style="margin: 0 0 8px 0; color: #DAA520; font-size: 14px; font-weight: bold;">
-                ⭐ YOUR CURRENT LOCATION
+                📍 YOUR CURRENT LOCATION
               </h4>
               <div style="font-size: 11px; color: #666; line-height: 1.3;">
                 <strong>Latitude:</strong> ${latitude.toFixed(6)}°<br>
@@ -80,7 +81,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
           currentLocationMarker.bindPopup(popupContent);
           currentLocationMarker.addTo(map);
           
-          console.log(`⭐ Added gold star marker at user location: ${latitude}, ${longitude}`);
+          console.log(`📍 Added location pin marker at user location: ${latitude}, ${longitude}`);
         },
         (error) => {
           console.warn('⚠️ Geolocation failed, using default location:', error);
