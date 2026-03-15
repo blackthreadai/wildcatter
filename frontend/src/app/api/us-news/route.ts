@@ -51,20 +51,37 @@ async function fetchBloombergRSS() {
     const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
     
     const articles = [];
-    for (const item of items.slice(0, 4)) {
+    const energyTerms = [
+      'oil', 'gas', 'energy', 'crude', 'petroleum', 'lng', 'pipeline', 'refinery', 'drilling',
+      'iran', 'opec', 'exxon', 'chevron', 'shell', 'bp', 'hormuz', 'strait', 'brent', 'wti',
+      'electric', 'solar', 'wind', 'nuclear', 'coal', 'natural gas', 'fracking', 'shale',
+      'gasoline', 'diesel', 'utility', 'power', 'grid', 'renewable', 'carbon', 'climate'
+    ];
+    
+    for (const item of items.slice(0, 8)) { // Check more items to find energy ones
       const title = extractText(item, 'title');
       const link = extractText(item, 'link');
       const pubDate = extractText(item, 'pubDate');
       const description = extractText(item, 'description');
       
       if (title && link && pubDate) {
-        articles.push({
-          title: cleanText(title),
-          url: link.trim(),
-          publishedAt: new Date(pubDate).toISOString(),
-          source: 'Bloomberg',
-          summary: cleanText(description).slice(0, 150) + '...'
-        });
+        const titleLower = title.toLowerCase();
+        const descLower = description.toLowerCase();
+        
+        // Check if article is energy-related
+        const isEnergyRelated = energyTerms.some(term => 
+          titleLower.includes(term) || descLower.includes(term)
+        );
+        
+        if (isEnergyRelated && articles.length < 4) {
+          articles.push({
+            title: cleanText(title),
+            url: link.trim(),
+            publishedAt: new Date(pubDate).toISOString(),
+            source: 'Bloomberg',
+            summary: cleanText(description).slice(0, 150) + '...'
+          });
+        }
       }
     }
     
@@ -125,19 +142,37 @@ async function fetchCNBCRSS() {
     const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
     
     const articles = [];
-    for (const item of items.slice(0, 4)) {
+    const energyTerms = [
+      'oil', 'gas', 'energy', 'crude', 'petroleum', 'lng', 'pipeline', 'refinery', 'drilling',
+      'iran', 'opec', 'exxon', 'chevron', 'shell', 'bp', 'hormuz', 'strait', 'brent', 'wti',
+      'electric', 'solar', 'wind', 'nuclear', 'coal', 'natural gas', 'fracking', 'shale',
+      'gasoline', 'diesel', 'utility', 'power', 'grid', 'renewable'
+    ];
+    
+    for (const item of items.slice(0, 10)) { // Check more items to find energy ones
       const title = extractText(item, 'title');
       const link = extractText(item, 'link');
       const pubDate = extractText(item, 'pubDate');
+      const description = extractText(item, 'description');
       
       if (title && link && pubDate) {
-        articles.push({
-          title: cleanText(title),
-          url: link.trim(),
-          publishedAt: new Date(pubDate).toISOString(),
-          source: 'CNBC',
-          summary: 'CNBC business news'
-        });
+        const titleLower = title.toLowerCase();
+        const descLower = description.toLowerCase();
+        
+        // Check if article is energy-related
+        const isEnergyRelated = energyTerms.some(term => 
+          titleLower.includes(term) || descLower.includes(term)
+        );
+        
+        if (isEnergyRelated && articles.length < 4) {
+          articles.push({
+            title: cleanText(title),
+            url: link.trim(),
+            publishedAt: new Date(pubDate).toISOString(),
+            source: 'CNBC',
+            summary: 'CNBC energy news'
+          });
+        }
       }
     }
     
@@ -161,19 +196,56 @@ async function fetchFoxBusinessRSS() {
     const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
     
     const articles = [];
-    for (const item of items.slice(0, 4)) {
+    const energyTerms = [
+      'oil', 'gas', 'energy', 'crude', 'petroleum', 'lng', 'pipeline', 'refinery', 'drilling',
+      'iran', 'opec', 'exxon', 'chevron', 'shell', 'bp', 'hormuz', 'strait', 'brent', 'wti',
+      'electric', 'solar', 'wind', 'nuclear', 'coal', 'natural gas', 'fracking', 'shale',
+      'gasoline', 'diesel', 'utility', 'power', 'grid', 'renewable'
+    ];
+    
+    for (const item of items.slice(0, 12)) { // Check more items to find energy ones
       const title = extractText(item, 'title');
       const link = extractText(item, 'link');
       const pubDate = extractText(item, 'pubDate');
+      const description = extractText(item, 'description');
       
       if (title && link && pubDate) {
-        articles.push({
-          title: cleanText(title),
-          url: link.trim(),
-          publishedAt: new Date(pubDate).toISOString(),
-          source: 'Fox Business',
-          summary: 'Fox Business news'
-        });
+        const titleLower = title.toLowerCase();
+        const descLower = description.toLowerCase();
+        
+        // Check if article is energy-related
+        const isEnergyRelated = energyTerms.some(term => 
+          titleLower.includes(term) || descLower.includes(term)
+        );
+        
+        if (isEnergyRelated && articles.length < 4) {
+          articles.push({
+            title: cleanText(title),
+            url: link.trim(),
+            publishedAt: new Date(pubDate).toISOString(),
+            source: 'Fox Business',
+            summary: 'Fox Business energy news'
+          });
+        }
+      }
+    }
+    
+    // If no energy articles found, take top 2 general business articles as fallback
+    if (articles.length === 0) {
+      for (const item of items.slice(0, 2)) {
+        const title = extractText(item, 'title');
+        const link = extractText(item, 'link');
+        const pubDate = extractText(item, 'pubDate');
+        
+        if (title && link && pubDate) {
+          articles.push({
+            title: cleanText(title),
+            url: link.trim(),
+            publishedAt: new Date(pubDate).toISOString(),
+            source: 'Fox Business',
+            summary: 'Fox Business news'
+          });
+        }
       }
     }
     
@@ -198,19 +270,37 @@ async function fetchReutersAlternativeRSS() {
     const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
     
     const articles = [];
-    for (const item of items.slice(0, 4)) {
+    const energyTerms = [
+      'oil', 'gas', 'energy', 'crude', 'petroleum', 'lng', 'pipeline', 'refinery', 'drilling',
+      'iran', 'opec', 'exxon', 'chevron', 'shell', 'bp', 'hormuz', 'strait', 'brent', 'wti',
+      'electric', 'solar', 'wind', 'nuclear', 'coal', 'natural gas', 'fracking', 'shale',
+      'gasoline', 'diesel', 'utility', 'power', 'grid', 'renewable'
+    ];
+    
+    for (const item of items.slice(0, 10)) { // Check more items to find energy ones
       const title = extractText(item, 'title');
       const link = extractText(item, 'link');
       const pubDate = extractText(item, 'pubDate');
+      const description = extractText(item, 'description');
       
       if (title && link && pubDate) {
-        articles.push({
-          title: cleanText(title),
-          url: link.trim(),
-          publishedAt: new Date(pubDate).toISOString(),
-          source: 'WSJ',
-          summary: 'Wall Street Journal news'
-        });
+        const titleLower = title.toLowerCase();
+        const descLower = description.toLowerCase();
+        
+        // Check if article is energy-related
+        const isEnergyRelated = energyTerms.some(term => 
+          titleLower.includes(term) || descLower.includes(term)
+        );
+        
+        if (isEnergyRelated && articles.length < 4) {
+          articles.push({
+            title: cleanText(title),
+            url: link.trim(),
+            publishedAt: new Date(pubDate).toISOString(),
+            source: 'WSJ',
+            summary: 'Wall Street Journal energy news'
+          });
+        }
       }
     }
     
