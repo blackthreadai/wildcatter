@@ -188,10 +188,10 @@ async function fetchCNBCRSS() {
   }
 }
 
-async function fetchYahooFinanceRSS() {
+async function fetchReutersRSS() {
   try {
-    console.log('🔍 Fetching Yahoo Finance RSS...');
-    const response = await fetch('https://feeds.finance.yahoo.com/rss/2.0/headline', {
+    console.log('🔍 Fetching Reuters RSS...');
+    const response = await fetch('https://feeds.reuters.com/reuters/businessNews', {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal)' },
       signal: AbortSignal.timeout(10000)
     });
@@ -200,7 +200,7 @@ async function fetchYahooFinanceRSS() {
     
     const xmlText = await response.text();
     const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
-    console.log(`📰 Found ${items.length} items in Yahoo Finance RSS`);
+    console.log(`📰 Found ${items.length} items in Reuters RSS`);
     
     const articles = [];
     for (const item of items.slice(0, 10)) {
@@ -221,26 +221,26 @@ async function fetchYahooFinanceRSS() {
             title,
             url: linkMatch[1].trim(),
             publishedAt: new Date(pubDateMatch[1]).toISOString(),
-            source: 'Yahoo Finance',
-            summary: 'Yahoo Finance market news'
+            source: 'Reuters',
+            summary: 'Reuters business news'
           });
         }
       }
     }
     
-    console.log(`✅ Yahoo Finance: ${articles.length} articles extracted`);
+    console.log(`✅ Reuters: ${articles.length} articles extracted`);
     return articles;
     
   } catch (error) {
-    console.error('❌ Yahoo Finance RSS failed:', error);
+    console.error('❌ Reuters RSS failed:', error);
     return [];
   }
 }
 
-async function fetchFoxBusinessRSS() {
+async function fetchMarketWatchRSS() {
   try {
-    console.log('🔍 Fetching Fox Business RSS...');
-    const response = await fetch('https://moxie.foxnews.com/feedburner/business.xml', {
+    console.log('🔍 Fetching MarketWatch RSS...');
+    const response = await fetch('https://feeds.content.dowjones.io/public/rss/mw_realtimeheadlines', {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal)' },
       signal: AbortSignal.timeout(10000)
     });
@@ -249,7 +249,7 @@ async function fetchFoxBusinessRSS() {
     
     const xmlText = await response.text();
     const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
-    console.log(`📰 Found ${items.length} items in Fox Business RSS`);
+    console.log(`📰 Found ${items.length} items in MarketWatch RSS`);
     
     const articles = [];
     for (const item of items.slice(0, 10)) {
@@ -270,18 +270,18 @@ async function fetchFoxBusinessRSS() {
             title,
             url: linkMatch[1].trim(),
             publishedAt: new Date(pubDateMatch[1]).toISOString(),
-            source: 'Fox Business',
-            summary: 'Fox Business news'
+            source: 'MarketWatch',
+            summary: 'MarketWatch financial news'
           });
         }
       }
     }
     
-    console.log(`✅ Fox Business: ${articles.length} articles extracted`);
+    console.log(`✅ MarketWatch: ${articles.length} articles extracted`);
     return articles;
     
   } catch (error) {
-    console.error('❌ Fox Business RSS failed:', error);
+    console.error('❌ MarketWatch RSS failed:', error);
     return [];
   }
 }
@@ -295,8 +295,8 @@ export async function GET() {
       fetchBloombergRSS(),
       fetchOilPriceRSS(),
       fetchCNBCRSS(),
-      fetchYahooFinanceRSS(),
-      fetchFoxBusinessRSS(),
+      fetchReutersRSS(),
+      fetchMarketWatchRSS(),
       fetchEnergyGovRSS()
     ]);
     
@@ -304,7 +304,7 @@ export async function GET() {
     
     // Combine all successful results with detailed logging
     results.forEach((result, index) => {
-      const sources = ['Bloomberg', 'OilPrice.com', 'CNBC', 'Yahoo Finance', 'Fox Business', 'Energy.gov'];
+      const sources = ['Bloomberg', 'OilPrice.com', 'CNBC', 'Reuters', 'MarketWatch', 'Energy.gov'];
       if (result.status === 'fulfilled') {
         console.log(`✅ ${sources[index]}: ${result.value.length} articles`);
         result.value.forEach((article: any, i: number) => {
