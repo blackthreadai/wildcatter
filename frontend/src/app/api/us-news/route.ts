@@ -87,56 +87,6 @@ async function fetchEnergyGovRSS() {
   }
 }
 
-async function fetchReutersRSS() {
-  try {
-    console.log('🔍 Fetching Reuters RSS...');
-    const response = await fetch('https://feeds.reuters.com/reuters/businessNews', {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal)' },
-      signal: AbortSignal.timeout(10000)
-    });
-    
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    
-    const xmlText = await response.text();
-    const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
-    console.log(`📰 Found ${items.length} items in Reuters RSS`);
-    
-    const articles = [];
-    for (const item of items.slice(0, 8)) {
-      const titleMatch = item.match(/<title>(.*?)<\/title>/);
-      const linkMatch = item.match(/<link>(.*?)<\/link>/);
-      const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
-      const descMatch = item.match(/<description>(.*?)<\/description>/);
-      
-      if (titleMatch && linkMatch && pubDateMatch) {
-        const title = titleMatch[1].trim().replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&#039;/g, "'");
-        const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&#039;/g, "'").trim() || '';
-        
-        // Filter for energy-related content
-        if (title.toLowerCase().includes('oil') || title.toLowerCase().includes('gas') || 
-            title.toLowerCase().includes('energy') || title.toLowerCase().includes('petroleum') ||
-            title.toLowerCase().includes('opec') || description.toLowerCase().includes('energy')) {
-          
-          articles.push({
-            title,
-            url: linkMatch[1].trim(),
-            publishedAt: new Date(pubDateMatch[1]).toISOString(),
-            source: 'Reuters',
-            summary: description.slice(0, 200) + '...'
-          });
-        }
-      }
-    }
-    
-    console.log(`✅ Reuters: ${articles.length} energy articles extracted`);
-    return articles;
-    
-  } catch (error) {
-    console.error('❌ Reuters RSS failed:', error);
-    return [];
-  }
-}
-
 async function fetchBloombergRSS() {
   try {
     console.log('🔍 Fetching Bloomberg RSS...');
@@ -162,10 +112,12 @@ async function fetchBloombergRSS() {
         const title = titleMatch[1].trim().replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&#039;/g, "'");
         const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&#039;/g, "'").trim() || '';
         
-        // Filter for energy/market-related content
+        // Filter for energy/market-related content - more permissive
         if (title.toLowerCase().includes('oil') || title.toLowerCase().includes('gas') || 
             title.toLowerCase().includes('energy') || title.toLowerCase().includes('opec') ||
-            title.toLowerCase().includes('market') || description.toLowerCase().includes('energy')) {
+            title.toLowerCase().includes('market') || title.toLowerCase().includes('iran') ||
+            title.toLowerCase().includes('crude') || description.toLowerCase().includes('energy') ||
+            articles.length < 3) {
           
           articles.push({
             title,
@@ -187,10 +139,10 @@ async function fetchBloombergRSS() {
   }
 }
 
-async function fetchMarketWatchRSS() {
+async function fetchCNBCRSS() {
   try {
-    console.log('🔍 Fetching MarketWatch RSS...');
-    const response = await fetch('https://feeds.content.dowjones.io/public/rss/mw_realtimeheadlines', {
+    console.log('🔍 Fetching CNBC RSS...');
+    const response = await fetch('https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=10000664', {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal)' },
       signal: AbortSignal.timeout(10000)
     });
@@ -199,41 +151,133 @@ async function fetchMarketWatchRSS() {
     
     const xmlText = await response.text();
     const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
-    console.log(`📰 Found ${items.length} items in MarketWatch RSS`);
+    console.log(`📰 Found ${items.length} items in CNBC RSS`);
     
     const articles = [];
-    for (const item of items.slice(0, 12)) {
+    for (const item of items.slice(0, 10)) {
       const titleMatch = item.match(/<title>(.*?)<\/title>/);
       const linkMatch = item.match(/<link>(.*?)<\/link>/);
       const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
-      const descMatch = item.match(/<description>(.*?)<\/description>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
-        const title = titleMatch[1].trim().replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&#039;/g, "'").replace(/&apos;/g, "'");
-        const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&#039;/g, "'").trim() || '';
+        const title = titleMatch[1].trim().replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&#039;/g, "'");
         
-        // Filter for energy/market-related content
+        // Take energy-related or general business news
         if (title.toLowerCase().includes('oil') || title.toLowerCase().includes('gas') || 
-            title.toLowerCase().includes('energy') || title.toLowerCase().includes('petroleum') ||
-            title.toLowerCase().includes('exxon') || title.toLowerCase().includes('chevron') ||
-            description.toLowerCase().includes('energy')) {
+            title.toLowerCase().includes('energy') || articles.length < 3) {
           
           articles.push({
             title,
             url: linkMatch[1].trim(),
             publishedAt: new Date(pubDateMatch[1]).toISOString(),
-            source: 'MarketWatch',
-            summary: description.slice(0, 200) + '...'
+            source: 'CNBC',
+            summary: 'CNBC business and energy news'
           });
         }
       }
     }
     
-    console.log(`✅ MarketWatch: ${articles.length} energy articles extracted`);
+    console.log(`✅ CNBC: ${articles.length} articles extracted`);
     return articles;
     
   } catch (error) {
-    console.error('❌ MarketWatch RSS failed:', error);
+    console.error('❌ CNBC RSS failed:', error);
+    return [];
+  }
+}
+
+async function fetchYahooFinanceRSS() {
+  try {
+    console.log('🔍 Fetching Yahoo Finance RSS...');
+    const response = await fetch('https://feeds.finance.yahoo.com/rss/2.0/headline', {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal)' },
+      signal: AbortSignal.timeout(10000)
+    });
+    
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    
+    const xmlText = await response.text();
+    const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
+    console.log(`📰 Found ${items.length} items in Yahoo Finance RSS`);
+    
+    const articles = [];
+    for (const item of items.slice(0, 10)) {
+      const titleMatch = item.match(/<title>(.*?)<\/title>/);
+      const linkMatch = item.match(/<link>(.*?)<\/link>/);
+      const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
+      
+      if (titleMatch && linkMatch && pubDateMatch) {
+        const title = titleMatch[1].trim().replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&#039;/g, "'");
+        
+        // Take energy-related or market news
+        if (title.toLowerCase().includes('oil') || title.toLowerCase().includes('gas') || 
+            title.toLowerCase().includes('energy') || title.toLowerCase().includes('market') ||
+            articles.length < 3) {
+          
+          articles.push({
+            title,
+            url: linkMatch[1].trim(),
+            publishedAt: new Date(pubDateMatch[1]).toISOString(),
+            source: 'Yahoo Finance',
+            summary: 'Yahoo Finance market news'
+          });
+        }
+      }
+    }
+    
+    console.log(`✅ Yahoo Finance: ${articles.length} articles extracted`);
+    return articles;
+    
+  } catch (error) {
+    console.error('❌ Yahoo Finance RSS failed:', error);
+    return [];
+  }
+}
+
+async function fetchFoxBusinessRSS() {
+  try {
+    console.log('🔍 Fetching Fox Business RSS...');
+    const response = await fetch('https://moxie.foxnews.com/feedburner/business.xml', {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal)' },
+      signal: AbortSignal.timeout(10000)
+    });
+    
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    
+    const xmlText = await response.text();
+    const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
+    console.log(`📰 Found ${items.length} items in Fox Business RSS`);
+    
+    const articles = [];
+    for (const item of items.slice(0, 10)) {
+      const titleMatch = item.match(/<title>(.*?)<\/title>/);
+      const linkMatch = item.match(/<link>(.*?)<\/link>/);
+      const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
+      
+      if (titleMatch && linkMatch && pubDateMatch) {
+        const title = titleMatch[1].trim().replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&#039;/g, "'");
+        
+        // Take energy-related or business news
+        if (title.toLowerCase().includes('oil') || title.toLowerCase().includes('gas') || 
+            title.toLowerCase().includes('energy') || title.toLowerCase().includes('market') ||
+            articles.length < 3) {
+          
+          articles.push({
+            title,
+            url: linkMatch[1].trim(),
+            publishedAt: new Date(pubDateMatch[1]).toISOString(),
+            source: 'Fox Business',
+            summary: 'Fox Business news'
+          });
+        }
+      }
+    }
+    
+    console.log(`✅ Fox Business: ${articles.length} articles extracted`);
+    return articles;
+    
+  } catch (error) {
+    console.error('❌ Fox Business RSS failed:', error);
     return [];
   }
 }
@@ -242,12 +286,13 @@ export async function GET() {
   try {
     console.log('🚀 Fetching REAL energy news from ALL major sources...');
     
-    // Fetch from ALL major sources in parallel
+    // Fetch from 6 major sources in parallel
     const results = await Promise.allSettled([
       fetchBloombergRSS(),
-      fetchReutersRSS(), 
-      fetchMarketWatchRSS(),
       fetchOilPriceRSS(),
+      fetchCNBCRSS(),
+      fetchYahooFinanceRSS(),
+      fetchFoxBusinessRSS(),
       fetchEnergyGovRSS()
     ]);
     
@@ -255,7 +300,7 @@ export async function GET() {
     
     // Combine all successful results
     results.forEach((result, index) => {
-      const sources = ['Bloomberg', 'Reuters', 'MarketWatch', 'OilPrice.com', 'Energy.gov'];
+      const sources = ['Bloomberg', 'OilPrice.com', 'CNBC', 'Yahoo Finance', 'Fox Business', 'Energy.gov'];
       if (result.status === 'fulfilled') {
         console.log(`✅ ${sources[index]}: ${result.value.length} articles`);
         allArticles.push(...result.value);
