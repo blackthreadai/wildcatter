@@ -162,9 +162,11 @@ async function fetchCNBCRSS() {
       if (titleMatch && linkMatch && pubDateMatch) {
         const title = titleMatch[1].trim().replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&#039;/g, "'");
         
-        // Take energy-related or general business news
-        if (title.toLowerCase().includes('oil') || title.toLowerCase().includes('gas') || 
-            title.toLowerCase().includes('energy') || articles.length < 3) {
+        // Broader energy and market-related filtering
+        const energyTerms = ['oil', 'gas', 'energy', 'crude', 'petroleum', 'lng', 'pipeline', 'refinery', 'drilling', 'iran', 'opec', 'exxon', 'chevron', 'shell', 'bp', 'hormuz', 'strait', 'brent', 'wti'];
+        const hasEnergyTerm = energyTerms.some(term => title.toLowerCase().includes(term));
+        
+        if (hasEnergyTerm || articles.length < 2) {
           
           articles.push({
             title,
@@ -209,10 +211,11 @@ async function fetchYahooFinanceRSS() {
       if (titleMatch && linkMatch && pubDateMatch) {
         const title = titleMatch[1].trim().replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&#039;/g, "'");
         
-        // Take energy-related or market news
-        if (title.toLowerCase().includes('oil') || title.toLowerCase().includes('gas') || 
-            title.toLowerCase().includes('energy') || title.toLowerCase().includes('market') ||
-            articles.length < 3) {
+        // Broader energy and market-related filtering
+        const energyTerms = ['oil', 'gas', 'energy', 'crude', 'petroleum', 'lng', 'pipeline', 'refinery', 'drilling', 'iran', 'opec', 'exxon', 'chevron', 'shell', 'bp', 'hormuz', 'strait', 'brent', 'wti', 'market'];
+        const hasEnergyTerm = energyTerms.some(term => title.toLowerCase().includes(term));
+        
+        if (hasEnergyTerm || articles.length < 2) {
           
           articles.push({
             title,
@@ -257,10 +260,11 @@ async function fetchFoxBusinessRSS() {
       if (titleMatch && linkMatch && pubDateMatch) {
         const title = titleMatch[1].trim().replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&#039;/g, "'");
         
-        // Take energy-related or business news
-        if (title.toLowerCase().includes('oil') || title.toLowerCase().includes('gas') || 
-            title.toLowerCase().includes('energy') || title.toLowerCase().includes('market') ||
-            articles.length < 3) {
+        // Broader energy and market-related filtering
+        const energyTerms = ['oil', 'gas', 'energy', 'crude', 'petroleum', 'lng', 'pipeline', 'refinery', 'drilling', 'iran', 'opec', 'exxon', 'chevron', 'shell', 'bp', 'hormuz', 'strait', 'brent', 'wti', 'market'];
+        const hasEnergyTerm = energyTerms.some(term => title.toLowerCase().includes(term));
+        
+        if (hasEnergyTerm || articles.length < 2) {
           
           articles.push({
             title,
@@ -298,14 +302,17 @@ export async function GET() {
     
     let allArticles: any[] = [];
     
-    // Combine all successful results
+    // Combine all successful results with detailed logging
     results.forEach((result, index) => {
       const sources = ['Bloomberg', 'OilPrice.com', 'CNBC', 'Yahoo Finance', 'Fox Business', 'Energy.gov'];
       if (result.status === 'fulfilled') {
         console.log(`✅ ${sources[index]}: ${result.value.length} articles`);
+        result.value.forEach((article: any, i: number) => {
+          console.log(`  ${i+1}. [${sources[index]}] ${article.title}`);
+        });
         allArticles.push(...result.value);
       } else {
-        console.log(`❌ ${sources[index]}: Failed`);
+        console.log(`❌ ${sources[index]}: Failed -`, result.reason);
       }
     });
     
@@ -318,6 +325,13 @@ export async function GET() {
       console.log('❌ All RSS feeds failed - returning empty');
       return NextResponse.json([]);
     }
+    
+    // Sort and return articles with final summary
+    console.log(`🎯 FINAL RESULT: ${allArticles.length} total articles from ${results.filter(r => r.status === 'fulfilled').length} successful sources`);
+    console.log('Final articles by source:', allArticles.reduce((acc: any, article: any) => {
+      acc[article.source] = (acc[article.source] || 0) + 1;
+      return acc;
+    }, {}));
     
     // Return top 10 articles from all sources combined (widget will take 6)
     return NextResponse.json(allArticles.slice(0, 10));
