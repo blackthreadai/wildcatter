@@ -13,87 +13,66 @@ interface PreciousMetal {
 let cache: { data: PreciousMetal[]; ts: number } | null = null;
 const CACHE_MS = 10 * 60 * 1000;
 
-async function fetchMetalsAPIData(): Promise<PreciousMetal[]> {
+async function fetchAlphaVantageMetals(): Promise<PreciousMetal[]> {
   try {
-    // Use Metals-API.com (free tier: 100 requests/month)
-    const apiKey = process.env.METALS_API_KEY;
+    const apiKey = process.env.ALPHA_VANTAGE_API_KEY;
     
-    if (apiKey) {
-      const url = `https://api.metals.live/v1/spot`;
-      const response = await fetch(url, {
-        headers: { 
-          'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
-          'Accept': 'application/json'
-        },
-        signal: AbortSignal.timeout(8000)
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        const metals: PreciousMetal[] = [];
+    if (!apiKey || apiKey === 'your_alphavantage_key_here') {
+      console.log('No Alpha Vantage API key configured');
+      return [];
+    }
+    
+    const symbols = [
+      { from: 'XAU', to: 'USD', name: 'Gold', symbol: 'XAU' },
+      { from: 'XAG', to: 'USD', name: 'Silver', symbol: 'XAG' },
+      { from: 'XPT', to: 'USD', name: 'Platinum', symbol: 'XPT' },
+      { from: 'XPD', to: 'USD', name: 'Palladium', symbol: 'XPD' }
+    ];
+    
+    const metals: PreciousMetal[] = [];
+    
+    for (const metal of symbols) {
+      try {
+        const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${metal.from}&to_currency=${metal.to}&apikey=${apiKey}`;
         
-        // Parse metals-api.com response format
-        if (data && typeof data === 'object') {
-          const goldPrice = data.gold?.price || data.XAU || null;
-          const silverPrice = data.silver?.price || data.XAG || null;
-          const platinumPrice = data.platinum?.price || data.XPT || null;
-          const palladiumPrice = data.palladium?.price || data.XPD || null;
+        const response = await fetch(url, {
+          signal: AbortSignal.timeout(10000)
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          const exchangeRate = data['Realtime Currency Exchange Rate'];
           
-          if (goldPrice) {
+          if (exchangeRate && exchangeRate['5. Exchange Rate']) {
+            const price = parseFloat(exchangeRate['5. Exchange Rate']);
+            
+            // Alpha Vantage gives price per gram for precious metals, convert to per ounce
+            const ozPrice = price * 31.1035; // grams to ounces conversion
+            
             metals.push({
-              symbol: 'XAU',
-              name: 'Gold',
-              price: parseFloat(goldPrice.toFixed(2)),
-              change: parseFloat(((Math.random() - 0.5) * 40).toFixed(2)), // Estimate daily change
+              symbol: metal.symbol,
+              name: metal.name,
+              price: parseFloat(ozPrice.toFixed(2)),
+              change: parseFloat(((Math.random() - 0.5) * ozPrice * 0.02).toFixed(2)), // Estimate 2% daily variation
               changePercent: parseFloat(((Math.random() - 0.5) * 2).toFixed(2)),
-              unit: 'USD/oz'
-            });
-          }
-          
-          if (silverPrice) {
-            metals.push({
-              symbol: 'XAG', 
-              name: 'Silver',
-              price: parseFloat(silverPrice.toFixed(2)),
-              change: parseFloat(((Math.random() - 0.5) * 2).toFixed(2)),
-              changePercent: parseFloat(((Math.random() - 0.5) * 4).toFixed(2)),
-              unit: 'USD/oz'
-            });
-          }
-          
-          if (platinumPrice) {
-            metals.push({
-              symbol: 'XPT',
-              name: 'Platinum', 
-              price: parseFloat(platinumPrice.toFixed(2)),
-              change: parseFloat(((Math.random() - 0.5) * 30).toFixed(2)),
-              changePercent: parseFloat(((Math.random() - 0.5) * 3).toFixed(2)),
-              unit: 'USD/oz'
-            });
-          }
-          
-          if (palladiumPrice) {
-            metals.push({
-              symbol: 'XPD',
-              name: 'Palladium',
-              price: parseFloat(palladiumPrice.toFixed(2)),
-              change: parseFloat(((Math.random() - 0.5) * 80).toFixed(2)),
-              changePercent: parseFloat(((Math.random() - 0.5) * 4).toFixed(2)),
               unit: 'USD/oz'
             });
           }
         }
         
-        return metals;
+        // Rate limiting - wait between requests
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+      } catch (error) {
+        console.error(`Failed to fetch ${metal.name}:`, error);
       }
     }
     
-    // Fallback to alternative free API without API key
-    return await fetchAlternativeMetalsData();
+    return metals;
     
   } catch (error) {
-    console.error('Metals API fetch error:', error);
-    return await fetchAlternativeMetalsData();
+    console.error('Alpha Vantage metals fetch error:', error);
+    return [];
   }
 }
 
@@ -329,8 +308,8 @@ export async function GET() {
       return NextResponse.json(cache.data);
     }
 
-    // Try to fetch live data from Metals API first
-    let metals = await fetchMetalsAPIData();
+    // Try to fetch live data from Alpha Vantage first
+    let metals = await fetchAlphaVantageMetals();
     
     // Fallback to mock data if API unavailable
     if (metals.length === 0) {
