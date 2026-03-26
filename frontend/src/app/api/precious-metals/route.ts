@@ -255,13 +255,13 @@ function getMockPreciousMetalsData(): PreciousMetal[] {
   const now = new Date();
   const hour = now.getHours();
   
-  // Add variance based on time to simulate market movement (updated to 2026 realistic levels)
-  const goldBase = 2085.50;
-  const silverBase = 25.15;
-  const platinumBase = 948.75;
-  const palladiumBase = 1125.00;
-  const rhodiumBase = 3850.00;
-  const copperBase = 4.12;
+  // Add variance based on time to simulate market movement (2026 realistic levels)
+  const goldBase = 4300.00;
+  const silverBase = 67.50;
+  const platinumBase = 1850.00;
+  const palladiumBase = 1400.00;
+  const rhodiumBase = 4500.00;
+  const copperBase = 5.25;
   
   const goldVariance = (Math.random() - 0.5) * 60;
   const silverVariance = (Math.random() - 0.5) * 4;
