@@ -33,7 +33,7 @@ async function fetchAlphaVantageMetals(): Promise<PreciousMetal[]> {
     
     for (const metal of symbols) {
       try {
-        const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${metal.from}&to_currency=${metal.to}&apikey=${apiKey}`;
+        const url = `https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=${metal.from}&to_symbol=${metal.to}&apikey=${apiKey}`;
         
         const response = await fetch(url, {
           signal: AbortSignal.timeout(10000)
@@ -41,22 +41,29 @@ async function fetchAlphaVantageMetals(): Promise<PreciousMetal[]> {
         
         if (response.ok) {
           const data = await response.json();
-          const exchangeRate = data['Realtime Currency Exchange Rate'];
+          const timeSeries = data['Time Series FX (Daily)'];
           
-          if (exchangeRate && exchangeRate['5. Exchange Rate']) {
-            const price = parseFloat(exchangeRate['5. Exchange Rate']);
+          if (timeSeries) {
+            // Get the most recent day's close price
+            const dates = Object.keys(timeSeries).sort().reverse();
+            const latestDate = dates[0];
+            const latestData = timeSeries[latestDate];
             
-            // Alpha Vantage gives price per gram for precious metals, convert to per ounce
-            const ozPrice = price * 31.1035; // grams to ounces conversion
+            if (latestData && latestData['4. close']) {
+              const price = parseFloat(latestData['4. close']);
+              
+              // Alpha Vantage FX gives 1 USD = X ounces of metal, so we need to invert
+              const ozPrice = 1 / price;
             
-            metals.push({
-              symbol: metal.symbol,
-              name: metal.name,
-              price: parseFloat(ozPrice.toFixed(2)),
-              change: parseFloat(((Math.random() - 0.5) * ozPrice * 0.02).toFixed(2)), // Estimate 2% daily variation
-              changePercent: parseFloat(((Math.random() - 0.5) * 2).toFixed(2)),
-              unit: 'USD/oz'
-            });
+              metals.push({
+                symbol: metal.symbol,
+                name: metal.name,
+                price: parseFloat(ozPrice.toFixed(2)),
+                change: parseFloat(((Math.random() - 0.5) * ozPrice * 0.02).toFixed(2)), // Estimate 2% daily variation
+                changePercent: parseFloat(((Math.random() - 0.5) * 2).toFixed(2)),
+                unit: 'USD/oz'
+              });
+            }
           }
         }
         
