@@ -31,7 +31,10 @@ function isEnergyGeopoliticalMarket(question: string): boolean {
     'iran', 'russia', 'ukraine', 'china', 'war', 'strike', 'strikes',
     'israel', 'saudi', 'venezuela', 'iraq', 'sanctions', 'invasion',
     'conflict', 'embargo', 'middle east', 'persian gulf', 'putin',
-    'xi jinping', 'biden', 'fed rate', 'recession'
+    'xi jinping', 'biden', 'fed', 'federal reserve', 'interest rate',
+    'recession', 'inflation', 'trump', 'warsh', 'powell', 'treasury',
+    'dollar', 'currency', 'trade war', 'tariff', 'north korea',
+    'taiwan', 'strait', 'gaza', 'palestine', 'syria', 'libya'
   ];
   
   // Check if question contains any relevant terms
@@ -46,15 +49,15 @@ async function fetchRealPredictionMarkets(): Promise<PredictionMarket[]> {
   try {
     console.log('🔮 Fetching real Polymarket data...');
     
-    // Fetch markets by volume to get most liquid/current markets
+    // Fetch more markets to find energy/geopolitical events
     const response = await fetch(
-      'https://gamma-api.polymarket.com/events?limit=100&order=volume&ascending=false', 
+      'https://gamma-api.polymarket.com/events?limit=300&order=volume&ascending=false', 
       {
         headers: {
           'User-Agent': 'Wildcatter-Terminal/1.0'
         },
-        // 20 second timeout
-        signal: AbortSignal.timeout(20000)
+        // 25 second timeout for larger search
+        signal: AbortSignal.timeout(25000)
       }
     );
     
@@ -89,13 +92,15 @@ async function fetchRealPredictionMarkets(): Promise<PredictionMarket[]> {
         return false;
       }
       
-      // Skip obviously resolved markets (probabilities near 0% or 100%)
+      // Skip completely resolved markets (probabilities exactly 0% or 100%)
+      // But allow markets that are highly probable but not fully resolved
       try {
         const prices = JSON.parse(market.outcomePrices || '[0.5, 0.5]');
         if (Array.isArray(prices) && prices.length >= 2) {
           const prob = parseFloat(prices[0]);
-          if (prob <= 0.05 || prob >= 0.95) {
-            console.log(`📊 Skipping resolved market: ${question} (${Math.round(prob*100)}%)`);
+          // Only exclude if exactly 0 or 1 (completely resolved)
+          if (prob === 0 || prob === 1) {
+            console.log(`📊 Skipping fully resolved market: ${question} (${Math.round(prob*100)}%)`);
             return false;
           }
         }
@@ -109,8 +114,8 @@ async function fetchRealPredictionMarkets(): Promise<PredictionMarket[]> {
     
     console.log(`🔍 Found ${relevantEvents.length} energy/geopolitical markets out of ${events.length} total`);
     
-    // Process up to 3 top relevant markets for the widget
-    for (const event of relevantEvents.slice(0, 3)) {
+    // Process up to 5 top relevant markets for the widget
+    for (const event of relevantEvents.slice(0, 5)) {
       if (!event.markets || !event.markets[0]) continue;
       
       const market = event.markets[0];
