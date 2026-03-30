@@ -90,7 +90,7 @@ export default function GlobalEnergyMarketsWidget() {
       </div>
 
       {/* Scrollable stocks list */}
-      <div className="flex-1 overflow-y-auto bg-black min-h-0" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}
+      <div className="flex-1 overflow-y-auto bg-black min-h-0" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
         {stocks.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-gray-500 text-xs">No stocks available</div>
