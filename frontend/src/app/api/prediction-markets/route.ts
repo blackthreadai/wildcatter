@@ -19,26 +19,17 @@ const CACHE_MS = 15 * 60 * 1000;
 function isEnergyGeopoliticalMarket(question: string): boolean {
   const q = question.toLowerCase();
   
-  // Core energy keywords - direct energy market relevance
-  const energyTerms = [
-    'oil', 'gas', 'energy', 'crude', 'brent', 'wti', 'opec', 'gasoline',
-    'petroleum', 'fuel', 'pipeline', 'refinery', 'natural gas', 'lng',
-    'drilling', 'barrel', 'gallon', 'commodity'
+  // Energy-focused keywords
+  const allTerms = [
+    // Direct energy
+    'oil', 'natural gas', 'gas price', 'crude', 'brent', 'wti', 'opec',
+    'gasoline', 'petroleum', 'fuel', 'pipeline', 'refinery', 'lng',
+    'drilling', 'barrel', 'solar', 'energy',
+    // Key energy-moving geopolitics
+    'iran', 'middle east', 'venezuela', 'iraq', 'saudi', 'russia',
+    'sanctions', 'embargo', 'persian gulf', 'strait of hormuz',
+    'gaza', 'israel', 'libya', 'syria', 'ukraine'
   ];
-  
-  // Key geopolitical events that move energy markets
-  const geopoliticalTerms = [
-    'iran', 'russia', 'ukraine', 'china', 'war', 'strike', 'strikes',
-    'israel', 'saudi', 'venezuela', 'iraq', 'sanctions', 'invasion',
-    'conflict', 'embargo', 'middle east', 'persian gulf', 'putin',
-    'xi jinping', 'biden', 'fed', 'federal reserve', 'interest rate',
-    'recession', 'inflation', 'trump', 'warsh', 'powell', 'treasury',
-    'dollar', 'currency', 'trade war', 'tariff', 'north korea',
-    'taiwan', 'strait', 'gaza', 'palestine', 'syria', 'libya'
-  ];
-  
-  // Check if question contains any relevant terms
-  const allTerms = [...energyTerms, ...geopoliticalTerms];
   const hasMatch = allTerms.some(term => q.includes(term));
   
   console.log(`🔍 Checking: "${question}" → ${hasMatch}`);
@@ -114,8 +105,8 @@ async function fetchRealPredictionMarkets(): Promise<PredictionMarket[]> {
     
     console.log(`🔍 Found ${relevantEvents.length} energy/geopolitical markets out of ${events.length} total`);
     
-    // Process up to 5 top relevant markets for the widget
-    for (const event of relevantEvents.slice(0, 5)) {
+    // Process up to 10 top relevant markets for the widget
+    for (const event of relevantEvents.slice(0, 10)) {
       if (!event.markets || !event.markets[0]) continue;
       
       const market = event.markets[0];
