@@ -71,10 +71,10 @@ export default function PredictionMarketsWidget() {
   return (
     <div className="w-full flex flex-col bg-black border border-gray-700 h-[500px]">
       <div className="bg-gray-800 p-2 flex-shrink-0">
-        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>PREDICTION MARKETS - FIXED</h3>
+        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>PREDICTION MARKETS</h3>
       </div>
       
-      <div className="flex-1 bg-black p-3 space-y-3 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#4a5568 #1a202c' }}>
+      <div className="bg-black p-3 space-y-3 overflow-y-auto" style={{ height: 'calc(100% - 40px)', scrollbarWidth: 'thin', scrollbarColor: '#4a5568 #1a202c' }}>
         {predictions.length === 0 ? (
           <div className="flex items-center justify-center h-full min-h-[200px]">
             <div className="text-center">
