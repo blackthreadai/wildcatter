@@ -206,6 +206,7 @@ function DraggableWidget({
         ...style,
         opacity: isHidden ? 0.5 : 1,
         height: '400px', // All widgets now single-row height
+        overflow: 'hidden', // Prevent scrollable content from hiding bottom border
         filter: isDragging 
           ? 'drop-shadow(0 0 20px rgba(218, 165, 32, 0.5))'
           : isHidden 
