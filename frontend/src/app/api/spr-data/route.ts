@@ -21,11 +21,18 @@ async function fetchEIASPRData(): Promise<SPRResponse | null> {
     
     // EIA API endpoint for Strategic Petroleum Reserve data
     // Series: WCSSTUS1 (Weekly U.S. Ending Stocks of Crude Oil in SPR)
-    const eiaApiKey = process.env.EIA_API_KEY;
+    let eiaApiKey: string | undefined;
+    
+    try {
+      eiaApiKey = process.env.EIA_API_KEY;
+    } catch (envError) {
+      console.error('❌ Environment variable access error for EIA_API_KEY:', envError);
+      return null;
+    }
     
     console.log('🔑 EIA API Key available:', !!eiaApiKey);
     
-    if (!eiaApiKey || eiaApiKey === 'your_eia_key_here') {
+    if (!eiaApiKey || eiaApiKey === 'your_eia_key_here' || eiaApiKey === '') {
       console.log('❌ No valid EIA API key configured');
       return null;
     }

@@ -75,11 +75,18 @@ const CACHE_MS = 4 * 60 * 60 * 1000;
 
 async function fetchFREDSeries(seriesId: string, limit: number = 2): Promise<any[]> {
   try {
-    const fredApiKey = process.env.FRED_API_KEY;
+    let fredApiKey: string | undefined;
+    
+    try {
+      fredApiKey = process.env.FRED_API_KEY;
+    } catch (envError) {
+      console.error(`❌ Environment variable access error for ${seriesId}:`, envError);
+      return [];
+    }
     
     console.log(`🔑 FRED API Key available for ${seriesId}:`, !!fredApiKey);
     
-    if (!fredApiKey || fredApiKey === 'your_fred_key_here') {
+    if (!fredApiKey || fredApiKey === 'your_fred_key_here' || fredApiKey === '') {
       console.log(`❌ No valid FRED API key configured for ${seriesId}`);
       return [];
     }

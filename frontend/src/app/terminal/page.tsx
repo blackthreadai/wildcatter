@@ -745,7 +745,7 @@ export default function TerminalPage() {
               <span>DEFCON {defconStatus.level}</span>
             </div>
             
-            < 
+            <a 
               href="https://apps.apple.com/app/wildcatter-energy-intelligence/id123456789" 
               target="_blank" 
               rel="noopener noreferrer"
@@ -756,7 +756,7 @@ export default function TerminalPage() {
               <img src="/w-icon.svg" alt="W" className="w-6 h-6" />
               <span className="text-[#DAA520]">ENERGY INTELLIGENCE™</span>
               <span>ON iOS</span>
-            </a>
+            </a></a>
           </div>
         </div>
 
