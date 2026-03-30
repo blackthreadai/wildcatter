@@ -13,155 +13,68 @@ interface PreciousMetal {
 let cache: { data: PreciousMetal[]; ts: number } | null = null;
 const CACHE_MS = 10 * 60 * 1000;
 
-async function fetchAlphaVantageMetals(): Promise<PreciousMetal[]> {
+async function fetchGoldAPIMetals(): Promise<PreciousMetal[]> {
   try {
-    const apiKey = process.env.ALPHA_VANTAGE_API_KEY;
+    console.log('🔄 Fetching from goldapi.io...');
     
-    if (!apiKey || apiKey === 'your_alphavantage_key_here') {
-      console.log('No Alpha Vantage API key configured');
+    // GoldAPI.io requires an API key - check for it
+    const apiKey = process.env.GOLDAPI_KEY;
+    
+    if (!apiKey || apiKey === 'your_goldapi_key_here') {
+      console.log('❌ No GoldAPI.io API key configured');
       return [];
     }
     
-    const symbols = [
-      { from: 'XAU', to: 'USD', name: 'Gold', symbol: 'XAU' },
-      { from: 'XAG', to: 'USD', name: 'Silver', symbol: 'XAG' },
-      { from: 'XPT', to: 'USD', name: 'Platinum', symbol: 'XPT' },
-      { from: 'XPD', to: 'USD', name: 'Palladium', symbol: 'XPD' }
-    ];
-    
-    const metals: PreciousMetal[] = [];
-    
-    for (const metal of symbols) {
-      try {
-        const url = `https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=${metal.from}&to_symbol=${metal.to}&apikey=${apiKey}`;
-        
-        const response = await fetch(url, {
-          signal: AbortSignal.timeout(10000)
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          const timeSeries = data['Time Series FX (Daily)'];
-          
-          if (timeSeries) {
-            // Get the most recent day's close price
-            const dates = Object.keys(timeSeries).sort().reverse();
-            const latestDate = dates[0];
-            const latestData = timeSeries[latestDate];
-            
-            if (latestData && latestData['4. close']) {
-              const price = parseFloat(latestData['4. close']);
-              
-              // Alpha Vantage FX gives 1 USD = X ounces of metal, so we need to invert
-              const ozPrice = 1 / price;
-            
-              metals.push({
-                symbol: metal.symbol,
-                name: metal.name,
-                price: parseFloat(ozPrice.toFixed(2)),
-                change: parseFloat(((Math.random() - 0.5) * ozPrice * 0.02).toFixed(2)), // Estimate 2% daily variation
-                changePercent: parseFloat(((Math.random() - 0.5) * 2).toFixed(2)),
-                unit: 'USD/oz'
-              });
-            }
-          }
-        }
-        
-        // Rate limiting - wait between requests
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-      } catch (error) {
-        console.error(`Failed to fetch ${metal.name}:`, error);
-      }
-    }
-    
-    return metals;
-    
-  } catch (error) {
-    console.error('Alpha Vantage metals fetch error:', error);
-    return [];
-  }
-}
-
-async function fetchAlternativeMetalsData(): Promise<PreciousMetal[]> {
-  try {
-    // Use MetalPriceAPI.com free tier
-    const url = 'https://api.metalpriceapi.com/v1/latest?api_key=demo&base=USD&currencies=XAU,XAG,XPT,XPD';
+    const url = 'https://www.goldapi.io/api/XAU,XAG,XPT,XPD/USD';
     
     const response = await fetch(url, {
       headers: { 
-        'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
-        'Accept': 'application/json'
+        'x-access-token': apiKey,
+        'Content-Type': 'application/json'
       },
-      signal: AbortSignal.timeout(8000)
+      signal: AbortSignal.timeout(10000)
     });
     
-    if (response.ok) {
-      const data = await response.json();
-      const metals: PreciousMetal[] = [];
+    if (!response.ok) {
+      console.log(`❌ GoldAPI.io failed: HTTP ${response.status}`);
+      return [];
+    }
+    
+    const data = await response.json();
+    const metals: PreciousMetal[] = [];
+    
+    // GoldAPI.io returns data for each metal
+    if (data) {
+      const metalSymbols = ['XAU', 'XAG', 'XPT', 'XPD'];
+      const metalNames = ['Gold', 'Silver', 'Platinum', 'Palladium'];
       
-      if (data?.rates) {
-        const rates = data.rates;
+      for (let i = 0; i < metalSymbols.length; i++) {
+        const symbol = metalSymbols[i];
+        const metalData = data[symbol];
         
-        // Convert per-gram rates to per-ounce (multiply by 31.1035)
-        const ozFactor = 31.1035;
-        
-        if (rates.XAU) {
-          const price = (1 / rates.XAU) * ozFactor;
+        if (metalData && metalData.price && metalData.prev_close_price) {
+          const price = parseFloat(metalData.price);
+          const prevClose = parseFloat(metalData.prev_close_price);
+          const change = price - prevClose;
+          const changePercent = (change / prevClose) * 100;
+          
           metals.push({
-            symbol: 'XAU',
-            name: 'Gold',
+            symbol: symbol,
+            name: metalNames[i],
             price: parseFloat(price.toFixed(2)),
-            change: parseFloat(((Math.random() - 0.5) * 40).toFixed(2)),
-            changePercent: parseFloat(((Math.random() - 0.5) * 2).toFixed(2)),
-            unit: 'USD/oz'
-          });
-        }
-        
-        if (rates.XAG) {
-          const price = (1 / rates.XAG) * ozFactor;
-          metals.push({
-            symbol: 'XAG',
-            name: 'Silver',
-            price: parseFloat(price.toFixed(2)),
-            change: parseFloat(((Math.random() - 0.5) * 2).toFixed(2)),
-            changePercent: parseFloat(((Math.random() - 0.5) * 4).toFixed(2)),
-            unit: 'USD/oz'
-          });
-        }
-        
-        if (rates.XPT) {
-          const price = (1 / rates.XPT) * ozFactor;
-          metals.push({
-            symbol: 'XPT',
-            name: 'Platinum',
-            price: parseFloat(price.toFixed(2)),
-            change: parseFloat(((Math.random() - 0.5) * 30).toFixed(2)),
-            changePercent: parseFloat(((Math.random() - 0.5) * 3).toFixed(2)),
-            unit: 'USD/oz'
-          });
-        }
-        
-        if (rates.XPD) {
-          const price = (1 / rates.XPD) * ozFactor;
-          metals.push({
-            symbol: 'XPD',
-            name: 'Palladium',
-            price: parseFloat(price.toFixed(2)),
-            change: parseFloat(((Math.random() - 0.5) * 80).toFixed(2)),
-            changePercent: parseFloat(((Math.random() - 0.5) * 4).toFixed(2)),
+            change: parseFloat(change.toFixed(2)),
+            changePercent: parseFloat(changePercent.toFixed(2)),
             unit: 'USD/oz'
           });
         }
       }
-      
-      return metals;
     }
     
-    throw new Error('Alternative API failed');
+    console.log(`✅ GoldAPI.io: Found ${metals.length} metals with real prices`);
+    return metals;
     
   } catch (error) {
-    console.error('Alternative metals API error:', error);
+    console.error('❌ GoldAPI.io fetch error:', error);
     return [];
   }
 }
@@ -236,77 +149,7 @@ async function fetchMetalFromYahoo(symbol: string): Promise<PreciousMetal | null
   }
 }
 
-// High-quality mock data for precious metals when APIs are unavailable
-function getMockPreciousMetalsData(): PreciousMetal[] {
-  const now = new Date();
-  const hour = now.getHours();
-  
-  // Add variance based on time to simulate market movement (2026 realistic levels)
-  const goldBase = 4300.00;
-  const silverBase = 67.50;
-  const platinumBase = 1850.00;
-  const palladiumBase = 1400.00;
-  const rhodiumBase = 4500.00;
-  const copperBase = 5.25;
-  
-  const goldVariance = (Math.random() - 0.5) * 60;
-  const silverVariance = (Math.random() - 0.5) * 4;
-  const platinumVariance = (Math.random() - 0.5) * 40;
-  const palladiumVariance = (Math.random() - 0.5) * 120;
-  const rhodiumVariance = (Math.random() - 0.5) * 300;
-  const copperVariance = (Math.random() - 0.5) * 0.25;
-  
-  return [
-    {
-      symbol: 'XAU',
-      name: 'Gold',
-      price: parseFloat((goldBase + goldVariance).toFixed(2)),
-      change: parseFloat(goldVariance.toFixed(2)),
-      changePercent: parseFloat(((goldVariance / goldBase) * 100).toFixed(2)),
-      unit: 'USD/oz'
-    },
-    {
-      symbol: 'XAG',
-      name: 'Silver', 
-      price: parseFloat((silverBase + silverVariance).toFixed(2)),
-      change: parseFloat(silverVariance.toFixed(2)),
-      changePercent: parseFloat(((silverVariance / silverBase) * 100).toFixed(2)),
-      unit: 'USD/oz'
-    },
-    {
-      symbol: 'XPT',
-      name: 'Platinum',
-      price: parseFloat((platinumBase + platinumVariance).toFixed(2)),
-      change: parseFloat(platinumVariance.toFixed(2)),
-      changePercent: parseFloat(((platinumVariance / platinumBase) * 100).toFixed(2)),
-      unit: 'USD/oz'
-    },
-    {
-      symbol: 'XPD',
-      name: 'Palladium',
-      price: parseFloat((palladiumBase + palladiumVariance).toFixed(2)),
-      change: parseFloat(palladiumVariance.toFixed(2)),
-      changePercent: parseFloat(((palladiumVariance / palladiumBase) * 100).toFixed(2)),
-      unit: 'USD/oz'
-    },
-    {
-      symbol: 'XRH',
-      name: 'Rhodium',
-      price: parseFloat((rhodiumBase + rhodiumVariance).toFixed(2)),
-      change: parseFloat(rhodiumVariance.toFixed(2)),
-      changePercent: parseFloat(((rhodiumVariance / rhodiumBase) * 100).toFixed(2)),
-      unit: 'USD/oz'
-    },
-    {
-      symbol: 'XCU',
-      name: 'Copper',
-      price: parseFloat((copperBase + copperVariance).toFixed(2)),
-      change: parseFloat(copperVariance.toFixed(2)),
-      changePercent: parseFloat(((copperVariance / copperBase) * 100).toFixed(2)),
-      unit: 'USD/lb'
-    }
-  ];
-}
+// NO MOCK DATA ALLOWED - REMOVED ENTIRELY
 
 export async function GET() {
   try {
@@ -315,40 +158,28 @@ export async function GET() {
       return NextResponse.json(cache.data);
     }
 
-    // Try to fetch live data from Alpha Vantage first
-    let metals = await fetchAlphaVantageMetals();
+    console.log('🏅 PRECIOUS METALS: Fetching REAL data from goldapi.io only');
     
-    // Fallback to mock data if API unavailable
+    // ONLY fetch real data from goldapi.io - NO MOCK DATA
+    const metals = await fetchGoldAPIMetals();
+    
+    console.log(`🎯 PRECIOUS METALS: ${metals.length} REAL metals found`);
+    
     if (metals.length === 0) {
-      metals = getMockPreciousMetalsData();
+      console.log('🚫 NO REAL PRECIOUS METALS DATA AVAILABLE - returning empty array');
+      return NextResponse.json([]);
     }
     
-    // Ensure we have all 6 metals
-    const metalNames = ['Gold', 'Silver', 'Platinum', 'Palladium', 'Rhodium', 'Copper'];
-    const completedMetals: PreciousMetal[] = [];
+    // Cache ONLY the real results
+    cache = { data: metals, ts: Date.now() };
     
-    for (const metalName of metalNames) {
-      let metal = metals.find(m => m.name === metalName);
-      if (!metal) {
-        // Add missing metal from mock data
-        const mockData = getMockPreciousMetalsData();
-        metal = mockData.find(m => m.name === metalName);
-      }
-      if (metal) {
-        completedMetals.push(metal);
-      }
-    }
-    
-    // Cache the results
-    cache = { data: completedMetals, ts: Date.now() };
-    
-    return NextResponse.json(completedMetals);
+    return NextResponse.json(metals);
     
   } catch (error) {
     console.error('Precious metals API error:', error);
     
-    // Ultimate fallback
-    const fallbackData = getMockPreciousMetalsData();
-    return NextResponse.json(fallbackData);
+    // NO FALLBACK TO MOCK DATA - return empty array
+    console.log('💔 GOLDAPI.IO FAILED - returning empty array (NO MOCK DATA)');
+    return NextResponse.json([]);
   }
 }

@@ -149,36 +149,7 @@ async function fetchYahooGlobalStock(symbol: string, stockInfo: any): Promise<Gl
   }
 }
 
-// Generate realistic mock data for when APIs fail
-function getMockGlobalEnergyStocks(): GlobalEnergyStock[] {
-  return GLOBAL_ENERGY_SYMBOLS.map(stock => {
-    // Generate realistic price based on typical ranges for each stock
-    let basePrice = 100;
-    if (stock.symbol === 'XOM') basePrice = 118;
-    else if (stock.symbol === 'CVX') basePrice = 163;
-    else if (stock.symbol === 'SHEL') basePrice = 92;
-    else if (stock.symbol === 'PTR') basePrice = 45;
-    else if (stock.symbol === 'BP') basePrice = 47;
-    else if (stock.symbol === 'TTE') basePrice = 90;
-    
-    const randomVariance = (Math.random() - 0.5) * 10; // ±5 variance
-    const price = parseFloat((basePrice + randomVariance).toFixed(2));
-    const changePercent = (Math.random() - 0.5) * 6; // ±3% change
-    const change = parseFloat((price * changePercent / 100).toFixed(2));
-    
-    return {
-      symbol: stock.symbol,
-      name: stock.name,
-      price: price,
-      change: change,
-      changePercent: parseFloat(changePercent.toFixed(2)),
-      region: stock.region,
-      exchange: stock.exchange,
-      chartUrl: generateChartUrl(stock.symbol, stock.exchange),
-      sector: stock.sector
-    };
-  });
-}
+// NO MOCK DATA ALLOWED - REMOVED ENTIRELY
 
 export async function GET() {
   try {
@@ -187,11 +158,10 @@ export async function GET() {
       return NextResponse.json(cache.data);
     }
 
-    console.log('🌍 Fetching global energy stocks from 3 regions...');
+    console.log('🌍 GLOBAL ENERGY MARKETS: Fetching REAL stock data only');
     
-    // Try to fetch live data for a subset of stocks (to avoid API limits)
-    const priorityStocks = GLOBAL_ENERGY_SYMBOLS.slice(0, 20); // Top 20 for live data
-    const stockPromises = priorityStocks.map(stock => 
+    // Try to fetch ALL symbols - no shortcuts, no mock data
+    const stockPromises = GLOBAL_ENERGY_SYMBOLS.map(stock => 
       fetchYahooGlobalStock(stock.symbol, stock)
     );
     
@@ -206,49 +176,25 @@ export async function GET() {
       }
     }
     
-    console.log(`✅ Successfully fetched ${successCount} live stock prices`);
+    console.log(`✅ Successfully fetched ${successCount} REAL stock prices out of ${GLOBAL_ENERGY_SYMBOLS.length}`);
     
-    // If we have very few live results, supplement with mock data
-    if (successCount < 10) {
-      console.log('📊 Using comprehensive mock data for consistent display');
-      const mockStocks = getMockGlobalEnergyStocks();
-      
-      // Merge live data with mock data (prioritize live where available)
-      const finalStocks = mockStocks.map(mockStock => {
-        const liveStock = liveStocks.find(live => live.symbol === mockStock.symbol);
-        return liveStock || mockStock;
-      });
-      
-      // Cache and return all 42 stocks
-      cache = { data: finalStocks, ts: Date.now() };
-      return NextResponse.json(finalStocks);
+    if (liveStocks.length === 0) {
+      console.log('🚫 NO REAL STOCK DATA AVAILABLE - returning empty array');
+      return NextResponse.json([]);
     }
     
-    // We have good live data - fill remaining with mock
-    const allSymbols = GLOBAL_ENERGY_SYMBOLS;
-    const mockStocks = getMockGlobalEnergyStocks();
+    console.log(`🎯 Final result: ${liveStocks.length} REAL global energy stocks (NO MOCK DATA)`);
     
-    const finalStocks = allSymbols.map(symbolInfo => {
-      const liveStock = liveStocks.find(live => live.symbol === symbolInfo.symbol);
-      if (liveStock) return liveStock;
-      
-      // Use mock data for this stock
-      return mockStocks.find(mock => mock.symbol === symbolInfo.symbol)!;
-    });
+    // Cache ONLY the real results
+    cache = { data: liveStocks, ts: Date.now() };
     
-    console.log(`🎯 Final result: ${finalStocks.length} global energy stocks`);
-    
-    // Cache the results
-    cache = { data: finalStocks, ts: Date.now() };
-    
-    return NextResponse.json(finalStocks);
+    return NextResponse.json(liveStocks);
     
   } catch (error) {
     console.error('Global energy stocks API error:', error);
     
-    // Ultimate fallback to mock data
-    console.log('💔 Falling back to full mock dataset');
-    const fallbackStocks = getMockGlobalEnergyStocks();
-    return NextResponse.json(fallbackStocks);
+    // NO FALLBACK TO MOCK DATA - return empty array
+    console.log('💔 API FAILED - returning empty array (NO MOCK DATA)');
+    return NextResponse.json([]);
   }
 }
