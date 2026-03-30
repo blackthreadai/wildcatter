@@ -159,7 +159,7 @@ export default function AIPriceForecastWidget() {
 
   if (loading) {
     return (
-      <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
+      <div className="w-full flex flex-col bg-black border border-gray-700 h-full">
         <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>AI PRICE FORECAST</h3>
         </div>
@@ -172,7 +172,7 @@ export default function AIPriceForecastWidget() {
 
   if (!data) {
     return (
-      <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
+      <div className="w-full flex flex-col bg-black border border-gray-700 h-full">
         <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>AI PRICE FORECAST</h3>
         </div>
@@ -186,7 +186,7 @@ export default function AIPriceForecastWidget() {
   const activeForecast = data.forecasts.find(f => f.instrument === selectedInstrument) || data.forecasts[0];
 
   return (
-    <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
+    <div className="w-full flex flex-col bg-black border border-gray-700 h-full">
       <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>AI PRICE FORECAST</h3>
       </div>

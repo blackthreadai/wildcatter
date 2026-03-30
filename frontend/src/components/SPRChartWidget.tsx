@@ -134,7 +134,7 @@ export default function SPRChartWidget() {
 
   if (loading) {
     return (
-      <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
+      <div className="w-full flex flex-col bg-black border border-gray-700 h-full">
         <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>STRATEGIC RESERVE</h3>
         </div>
@@ -151,7 +151,7 @@ export default function SPRChartWidget() {
   const changePercent = latestData && yearAgoData ? ((change / yearAgoData.value) * 100) : 0;
 
   return (
-    <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
+    <div className="w-full flex flex-col bg-black border border-gray-700 h-full">
       <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>STRATEGIC RESERVE</h3>
       </div>

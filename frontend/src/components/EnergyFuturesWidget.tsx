@@ -77,7 +77,7 @@ export default function EnergyFuturesWidget() {
 
   if (loading) {
     return (
-      <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
+      <div className="w-full flex flex-col bg-black border border-gray-700 h-full">
         <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>ENERGY FUTURES</h3>
         </div>
@@ -90,7 +90,7 @@ export default function EnergyFuturesWidget() {
 
   if (!data || data.curves.length === 0) {
     return (
-      <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
+      <div className="w-full flex flex-col bg-black border border-gray-700 h-full">
         <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>ENERGY FUTURES</h3>
         </div>
@@ -108,7 +108,7 @@ export default function EnergyFuturesWidget() {
   const activeCurve = data.curves.find(c => c.commodity === selectedCurve) || data.curves[0];
 
   return (
-    <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
+    <div className="w-full flex flex-col bg-black border border-gray-700 h-full">
       <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>ENERGY FUTURES</h3>
       </div>
