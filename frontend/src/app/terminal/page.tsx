@@ -201,11 +201,12 @@ function DraggableWidget({
   return (
     <div 
       ref={setNodeRef}
-      className={`relative group ${getSpanClasses()}`}
+      className={`relative group ${getSpanClasses()} border-b border-gray-700`}
       style={{
         ...style,
         opacity: isHidden ? 0.5 : 1,
         height: '400px', // All widgets now single-row height
+        overflow: 'hidden',
         filter: isDragging 
           ? 'drop-shadow(0 0 20px rgba(218, 165, 32, 0.5))'
           : isHidden 
