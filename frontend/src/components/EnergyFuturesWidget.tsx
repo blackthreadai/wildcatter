@@ -163,7 +163,10 @@ export default function EnergyFuturesWidget() {
           <div className="mb-3 pb-2 border-b border-gray-700">
             <div className="flex items-center justify-between mb-2">
               <div className="text-white text-xs font-medium">{activeCurve.commodity}</div>
-              <div className="text-gray-400 text-xs">{activeCurve.unit}</div>
+              <div className="text-white text-xs font-bold">
+                ${activeCurve.contracts[0]?.price?.toFixed(2) || 'N/A'} 
+                <span className="text-gray-400 ml-1">{activeCurve.unit?.replace('$', '')}</span>
+              </div>
             </div>
             
             <div className="grid grid-cols-2 gap-2 text-xs mb-2">
