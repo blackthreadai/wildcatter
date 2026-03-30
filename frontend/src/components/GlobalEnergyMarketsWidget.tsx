@@ -17,8 +17,6 @@ interface GlobalEnergyStock {
 export default function GlobalEnergyMarketsWidget() {
   const [stocks, setStocks] = useState<GlobalEnergyStock[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedRegion, setSelectedRegion] = useState<'ALL' | 'US' | 'Europe' | 'Asia'>('ALL');
-
   useEffect(() => {
     const fetchStocks = async () => {
       try {
@@ -38,10 +36,6 @@ export default function GlobalEnergyMarketsWidget() {
     const interval = setInterval(fetchStocks, 2 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
-
-  const filteredStocks = selectedRegion === 'ALL' 
-    ? stocks 
-    : stocks.filter(stock => stock.region === selectedRegion);
 
   // Group stocks by region for display
   const stocksByRegion = {
@@ -76,11 +70,10 @@ export default function GlobalEnergyMarketsWidget() {
   if (loading) {
     return (
       <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
-        <div className="bg-gray-800 p-2 flex justify-between items-center flex-shrink-0">
+        <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>
             ENERGY MARKETS
           </h3>
-          <span className="text-gray-400 text-xs">{stocks.length} TICKERS</span>
         </div>
         <div className="flex-1 p-2 flex items-center justify-center">
           <div className="text-gray-500 text-xs">Loading global markets...</div>
@@ -91,32 +84,22 @@ export default function GlobalEnergyMarketsWidget() {
 
   return (
     <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
-      {/* Header - clean and simple */}
-      <div className="bg-gray-800 p-2 flex justify-between items-center flex-shrink-0">
+      {/* Header - just title */}
+      <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>
           ENERGY MARKETS
         </h3>
-        <select
-          value={selectedRegion}
-          onChange={(e) => setSelectedRegion(e.target.value as any)}
-          className="bg-gray-700 text-white text-xs border border-gray-600 rounded px-2 py-1 focus:outline-none focus:border-[#DAA520]"
-        >
-          <option value="ALL">ALL REGIONS</option>
-          <option value="US">US</option>
-          <option value="Europe">EUROPE</option>
-          <option value="Asia">ASIA</option>
-        </select>
       </div>
 
       {/* Scrollable stocks list */}
       <div className="flex-1 overflow-y-auto bg-black min-h-0">
-        {filteredStocks.length === 0 ? (
+        {stocks.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-gray-500 text-xs">No stocks available</div>
           </div>
         ) : (
           <div className="p-2 space-y-1">
-            {filteredStocks.map((stock, i) => (
+            {stocks.map((stock, i) => (
               <div
                 key={`${stock.symbol}-${i}`}
                 onClick={() => handleStockClick(stock)}
@@ -160,7 +143,7 @@ export default function GlobalEnergyMarketsWidget() {
         )}
 
         {/* Summary footer */}
-        {selectedRegion === 'ALL' && stocks.length > 0 && (
+        {stocks.length > 0 && (
           <div className="bg-gray-900 p-2 text-xs text-gray-400 border-t border-gray-700">
             <div className="flex justify-between items-center">
               <span>
