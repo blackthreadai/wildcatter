@@ -69,7 +69,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '18.2-RESTORE-STRATEGIC-RESERVE';
+const WIDGET_VERSION = '18.3-BETA-WARNING-BANNER';
 
 const defaultWidgets: Widget[] = [
   // NEW DEFAULT ORDER - Consolidated global modules
@@ -619,6 +619,21 @@ export default function TerminalPage() {
         }
       `}</style>
 
+      {/* Beta Warning Banner */}
+      <div className="bg-red-600 border-b border-red-500 px-6 py-2">
+        <div className="flex items-center justify-center text-center">
+          <div className="flex items-center gap-3">
+            <svg className="w-5 h-5 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 16h2v2h-2v-2zm0-6h2v4h-2v-4z"/>
+            </svg>
+            <span className="text-white text-sm font-medium">
+              <strong>BETA WARNING:</strong> This terminal is in beta testing. All data should be independently verified before making financial or operational decisions. 
+              Not investment advice. Use at your own risk. Market data may be delayed or inaccurate.
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Header Bar */}
       <header className="bg-black border-b border-gray-800 px-6 py-4">
         <div className="flex items-center justify-between">
@@ -769,7 +784,7 @@ export default function TerminalPage() {
       </header>
 
       {/* Main Content */}
-      <div className="h-[calc(100vh-73px)] relative">
+      <div className="h-[calc(100vh-115px)] relative">
         {/* Status Bar with Date/Time and DEFCON Status */}
         <div className="bg-gray-800 border-b border-gray-700 py-2 px-6 pb-3">
           <div className="flex items-center justify-center gap-8">
