@@ -134,7 +134,7 @@ export default function PowerGridStressWidget() {
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>POWER GRID STRESS</h3>
       </div>
       
-      <div className="flex-1 bg-black px-3 py-2 overflow-y-auto h-0">
+      <div className="flex-1 bg-black px-3 py-2 overflow-y-auto h-0" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
         {/* Grid Status */}
         <div className="mb-3">
           {data.grids.map((grid, i) => (

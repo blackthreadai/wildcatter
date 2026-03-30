@@ -106,7 +106,7 @@ export default function TravelAdvisoryWidget() {
         <h3 className="text-white text-xs font-semibold tracking-wider">TRAVEL ADVISORIES</h3>
       </div>
       
-      <div className="flex-1 bg-black px-3 py-1 overflow-y-auto">
+      <div className="flex-1 bg-black px-3 py-1 overflow-y-auto" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
         {advisories.map((advisory, i) => (
           <div key={advisory.country} className="border-b border-gray-700 pb-1 mb-1 last:border-b-0 last:mb-0">
             <div className="flex items-center justify-between">

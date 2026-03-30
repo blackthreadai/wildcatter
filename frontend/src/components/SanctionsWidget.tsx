@@ -159,7 +159,7 @@ export default function SanctionsWidget() {
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>SANCTIONS</h3>
       </div>
       
-      <div className="flex-1 bg-black px-3 py-2 overflow-y-auto h-0">
+      <div className="flex-1 bg-black px-3 py-2 overflow-y-auto h-0" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
         {/* Summary */}
         <div className="mb-3 pb-2 border-b border-gray-700">
           <div className="grid grid-cols-2 gap-2 text-xs">

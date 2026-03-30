@@ -773,7 +773,7 @@ export default function TerminalPage() {
               strategy={rectSortingStrategy}
             >
               <div 
-                className="grid grid-cols-5 gap-4 h-full overflow-y-auto p-4"
+                className="grid grid-cols-5 gap-4 h-full overflow-y-auto p-4" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}
                 style={{
                   gridAutoRows: 'minmax(402px, max-content)',
                   alignItems: 'start'

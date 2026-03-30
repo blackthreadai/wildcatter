@@ -120,7 +120,7 @@ export default function OilRigTrackerWidget() {
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>OIL RIG TRACKER</h3>
       </div>
       
-      <div className="flex-1 bg-black px-3 py-2 overflow-y-auto h-0">
+      <div className="flex-1 bg-black px-3 py-2 overflow-y-auto h-0" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
         {/* US Totals */}
         <div className="mb-3 pb-2 border-b border-gray-700">
           <div className="text-[#DAA520] text-xs font-bold mb-2">US TOTALS</div>

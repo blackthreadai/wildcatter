@@ -114,7 +114,7 @@ export default function GlobalOilTrackerWidget() {
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>GLOBAL O/G TRACKER</h3>
       </div>
       
-      <div className="flex-1 bg-black px-3 py-2 overflow-y-auto h-0">
+      <div className="flex-1 bg-black px-3 py-2 overflow-y-auto h-0" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
         {/* Storage Section */}
         <div className="mb-3">
           <div className="text-[#DAA520] text-xs font-bold mb-2">STORAGE LEVELS</div>

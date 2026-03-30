@@ -113,7 +113,7 @@ export default function EnergyFuturesWidget() {
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>ENERGY FUTURES</h3>
       </div>
       
-      <div className="flex-1 bg-black px-3 py-2 overflow-y-auto min-h-0">
+      <div className="flex-1 bg-black px-3 py-2 overflow-y-auto min-h-0" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
         {/* Market Sentiment */}
         <div className="mb-3 pb-2 border-b border-gray-700">
           <div className="text-[#DAA520] text-xs font-bold mb-2">MARKET SENTIMENT</div>
