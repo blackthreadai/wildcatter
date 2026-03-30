@@ -581,6 +581,22 @@ export default function TerminalPage() {
           width: 100%;
           /* overflow: hidden; */ /* Removed - was preventing scrolling */
         }
+
+        /* Global thin scrollbar for all scrollable elements */
+        *::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        *::-webkit-scrollbar-track {
+          background: #1a202c;
+        }
+        *::-webkit-scrollbar-thumb {
+          background: #4a5568;
+          border-radius: 3px;
+        }
+        *::-webkit-scrollbar-thumb:hover {
+          background: #718096;
+        }
       `}</style>
 
       <div className="beta-warning-banner bg-red-600 border-b border-red-500 px-6 py-2 sticky top-0 z-[99999] w-full">
