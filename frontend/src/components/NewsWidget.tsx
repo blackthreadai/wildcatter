@@ -123,7 +123,7 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
             </div>
           </div>
         ) : (
-          <div className="space-y-2 pb-3">
+          <div className="space-y-2 pb-6">
             {articles.map((article, i) => (
               <div key={i} className="border-b border-gray-700 pb-1 last:border-b-0">
                 <a 
