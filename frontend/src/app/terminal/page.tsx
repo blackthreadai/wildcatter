@@ -14,6 +14,7 @@ import PredictionMarketsWidget from '@/components/PredictionMarketsWidget';
 import PreciousMetalsWidget from '@/components/PreciousMetalsWidget';
 import CryptocurrencyWidget from '@/components/CryptocurrencyWidget';
 import EuropeanEnergyMarketsWidget from '@/components/EuropeanEnergyMarketsWidget';
+import GlobalEnergyMarketsWidget from '@/components/GlobalEnergyMarketsWidget';
 import EconomicIndicatorsWidget from '@/components/EconomicIndicatorsWidget';
 import ClimateExtremesWidget from '@/components/ClimateExtremesWidget';
 import GlobalOilTrackerWidget from '@/components/GlobalOilTrackerWidget';
@@ -60,7 +61,7 @@ import { CSS } from '@dnd-kit/utilities';
 // Widget configuration - defines all widgets in the grid
 type Widget = {
   id: string;
-  type: 'news' | 'youtube' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'economic-indicators' | 'climate-extremes' | 'global-oil-tracker' | 'opec' | 'natural-gas' | 'oil-rig-tracker' | 'power-grid-stress' | 'refinery-outages' | 'sanctions' | 'energy-futures' | 'crack-spread' | 'global-lng' | 'carbon-credit' | 'global-fuel-demand' | 'position-monitor' | 'ai-price-forecast' | 'event-calendar' | 'trade-signals' | 'world-map';
+  type: 'news' | 'youtube' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'global-energy-markets' | 'economic-indicators' | 'climate-extremes' | 'global-oil-tracker' | 'opec' | 'natural-gas' | 'oil-rig-tracker' | 'power-grid-stress' | 'refinery-outages' | 'sanctions' | 'energy-futures' | 'crack-spread' | 'global-lng' | 'carbon-credit' | 'global-fuel-demand' | 'position-monitor' | 'ai-price-forecast' | 'event-calendar' | 'trade-signals' | 'world-map';
   title: string;
   span?: { col: number; row: number };
   region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS' | 'STRATEGIC RESERVE' | 'GLOBAL';
@@ -68,14 +69,14 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '17.0-GLOBAL-ENERGY-NEWS';
+const WIDGET_VERSION = '18.0-GLOBAL-ENERGY-MARKETS';
 
 const defaultWidgets: Widget[] = [
-  // NEW DEFAULT ORDER - Consolidated global energy news
+  // NEW DEFAULT ORDER - Consolidated global modules
   { id: 'world-map', type: 'world-map', title: 'GLOBAL ENERGY MAP', span: { col: 3, row: 1 }, activeLayers: [] },
   { id: 'youtube', type: 'youtube', title: 'LIVE NEWS', span: { col: 2, row: 1 } },
   { id: 'energy-news', type: 'news', title: 'ENERGY NEWS', region: 'GLOBAL' },
-  { id: 'us-markets', type: 'stock', title: 'US ENERGY MARKETS' },
+  { id: 'global-energy-markets', type: 'global-energy-markets', title: 'ENERGY MARKETS' },
   { id: 'position-monitor', type: 'position-monitor', title: 'POSITION MONITOR' },
   { id: 'energy-futures', type: 'energy-futures', title: 'ENERGY FUTURES' },
   { id: 'strategic-reserve', type: 'news', title: 'STRATEGIC RESERVE', region: 'STRATEGIC RESERVE' },
@@ -83,14 +84,12 @@ const defaultWidgets: Widget[] = [
   { id: 'opec', type: 'opec', title: 'OPEC' },
   { id: 'travel', type: 'travel', title: 'TRAVEL ADVISORIES' },
   { id: 'economic-indicators', type: 'economic-indicators', title: 'ECONOMIC INDICATORS' },
-  { id: 'european-energy-markets', type: 'european-energy-markets', title: 'EURO ENERGY MARKETS' },
   { id: 'precious-metals', type: 'precious-metals', title: 'PRECIOUS METALS' },
   
-  // Secondary modules (streamlined without individual regional news)
+  // Secondary modules (streamlined layout)
   { id: 'global-oil-tracker', type: 'global-oil-tracker', title: 'GLOBAL O/G TRACKER' },
   { id: 'predictions', type: 'prediction', title: 'PREDICTION MARKETS' },
   { id: 'natural-gas', type: 'natural-gas', title: 'NATURAL GAS' },
-  { id: 'asian-markets', type: 'asian-stock', title: 'ASIAN ENERGY MARKETS' },
   { id: 'intel-feed', type: 'intel-feed', title: 'WILDCATTER' },
   { id: 'power-grid-stress', type: 'power-grid-stress', title: 'POWER GRID STRESS' },
   { id: 'climate-extremes', type: 'climate-extremes', title: 'CLIMATE EXTREMES' },
@@ -162,6 +161,8 @@ function DraggableWidget({
         return <CryptocurrencyWidget />;
       case 'european-energy-markets':
         return <EuropeanEnergyMarketsWidget />;
+      case 'global-energy-markets':
+        return <GlobalEnergyMarketsWidget />;
       case 'economic-indicators':
         return <EconomicIndicatorsWidget />;
       case 'climate-extremes':
