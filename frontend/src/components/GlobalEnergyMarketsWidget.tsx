@@ -91,24 +91,21 @@ export default function GlobalEnergyMarketsWidget() {
 
   return (
     <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
-      {/* Header with region filter */}
+      {/* Header - clean and simple */}
       <div className="bg-gray-800 p-2 flex justify-between items-center flex-shrink-0">
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>
           ENERGY MARKETS
         </h3>
-        <div className="flex items-center gap-2">
-          <span className="text-gray-400 text-xs">{filteredStocks.length} TICKERS</span>
-          <select
-            value={selectedRegion}
-            onChange={(e) => setSelectedRegion(e.target.value as any)}
-            className="bg-gray-700 text-white text-xs border border-gray-600 rounded px-2 py-1 focus:outline-none focus:border-[#DAA520]"
-          >
-            <option value="ALL">ALL REGIONS</option>
-            <option value="US">US ({stocksByRegion.US.length})</option>
-            <option value="Europe">EUROPE ({stocksByRegion.Europe.length})</option>
-            <option value="Asia">ASIA ({stocksByRegion.Asia.length})</option>
-          </select>
-        </div>
+        <select
+          value={selectedRegion}
+          onChange={(e) => setSelectedRegion(e.target.value as any)}
+          className="bg-gray-700 text-white text-xs border border-gray-600 rounded px-2 py-1 focus:outline-none focus:border-[#DAA520]"
+        >
+          <option value="ALL">ALL REGIONS</option>
+          <option value="US">US</option>
+          <option value="Europe">EUROPE</option>
+          <option value="Asia">ASIA</option>
+        </select>
       </div>
 
       {/* Scrollable stocks list */}
