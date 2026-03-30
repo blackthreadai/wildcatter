@@ -13,73 +13,70 @@ interface PreciousMetal {
 let cache: { data: PreciousMetal[]; ts: number } | null = null;
 const CACHE_MS = 10 * 60 * 1000;
 
-async function fetchGoldAPIMetals(): Promise<PreciousMetal[]> {
+async function fetchYahooMetals(): Promise<PreciousMetal[]> {
   try {
-    console.log('🔄 Fetching from goldapi.io...');
+    console.log('🔄 Fetching precious metals from Yahoo Finance...');
     
-    // GoldAPI.io requires an API key - check for it
-    const apiKey = process.env.GOLDAPI_KEY;
+    const symbols = [
+      { yahoo: 'GC=F', symbol: 'XAU', name: 'Gold' },
+      { yahoo: 'SI=F', symbol: 'XAG', name: 'Silver' },
+      { yahoo: 'PL=F', symbol: 'XPT', name: 'Platinum' },
+      { yahoo: 'PA=F', symbol: 'XPD', name: 'Palladium' },
+      { yahoo: 'HG=F', symbol: 'XCU', name: 'Copper' }
+    ];
     
-    if (!apiKey || apiKey === 'your_goldapi_key_here') {
-      console.log('❌ No GoldAPI.io API key configured');
-      return [];
-    }
-    
-    const url = 'https://www.goldapi.io/api/XAU,XAG,XPT,XPD/USD';
-    
-    const response = await fetch(url, {
-      headers: { 
-        'x-access-token': apiKey,
-        'Content-Type': 'application/json'
-      },
-      signal: AbortSignal.timeout(10000)
-    });
-    
-    if (!response.ok) {
-      console.log(`❌ GoldAPI.io failed: HTTP ${response.status}`);
-      return [];
-    }
-    
-    const data = await response.json();
     const metals: PreciousMetal[] = [];
     
-    // GoldAPI.io returns data for each metal
-    if (data) {
-      const metalSymbols = ['XAU', 'XAG', 'XPT', 'XPD'];
-      const metalNames = ['Gold', 'Silver', 'Platinum', 'Palladium'];
-      
-      for (let i = 0; i < metalSymbols.length; i++) {
-        const symbol = metalSymbols[i];
-        const metalData = data[symbol];
+    for (const metal of symbols) {
+      try {
+        const url = `https://query2.finance.yahoo.com/v8/finance/chart/${metal.yahoo}?interval=1d&range=2d&includePrePost=false`;
+        const response = await fetch(url, {
+          headers: { 
+            'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
+            'Accept': 'application/json'
+          },
+          signal: AbortSignal.timeout(8000)
+        });
         
-        if (metalData && metalData.price && metalData.prev_close_price) {
-          const price = parseFloat(metalData.price);
-          const prevClose = parseFloat(metalData.prev_close_price);
-          const change = price - prevClose;
-          const changePercent = (change / prevClose) * 100;
+        if (response.ok) {
+          const data = await response.json();
+          const meta = data?.chart?.result?.[0]?.meta;
           
-          metals.push({
-            symbol: symbol,
-            name: metalNames[i],
-            price: parseFloat(price.toFixed(2)),
-            change: parseFloat(change.toFixed(2)),
-            changePercent: parseFloat(changePercent.toFixed(2)),
-            unit: 'USD/oz'
-          });
+          if (meta?.regularMarketPrice && meta?.chartPreviousClose) {
+            const price = parseFloat(meta.regularMarketPrice);
+            const previousClose = parseFloat(meta.chartPreviousClose);
+            const change = price - previousClose;
+            const changePercent = (change / previousClose) * 100;
+            
+            metals.push({
+              symbol: metal.symbol,
+              name: metal.name,
+              price: parseFloat(price.toFixed(2)),
+              change: parseFloat(change.toFixed(2)),
+              changePercent: parseFloat(changePercent.toFixed(2)),
+              unit: metal.symbol === 'XCU' ? 'USD/lb' : 'USD/oz'
+            });
+            
+            console.log(`✅ ${metal.name}: $${price.toFixed(2)}`);
+          }
         }
+        
+        // Rate limiting
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+      } catch (error) {
+        console.error(`❌ Failed to fetch ${metal.name}:`, error);
       }
     }
     
-    console.log(`✅ GoldAPI.io: Found ${metals.length} metals with real prices`);
+    console.log(`🎯 Yahoo Metals: ${metals.length} metals fetched successfully`);
     return metals;
     
   } catch (error) {
-    console.error('❌ GoldAPI.io fetch error:', error);
+    console.error('❌ Yahoo metals fetch error:', error);
     return [];
   }
 }
-
-// REMOVED YAHOO METALS FUNCTION - ONLY USING GOLDAPI.IO
 
 // NO MOCK DATA ALLOWED - REMOVED ENTIRELY
 
@@ -90,10 +87,10 @@ export async function GET() {
       return NextResponse.json(cache.data);
     }
 
-    console.log('🏅 PRECIOUS METALS: Fetching REAL data from goldapi.io only');
+    console.log('🏅 PRECIOUS METALS: Fetching REAL data from Yahoo Finance (temporary until goldapi.io key)');
     
-    // ONLY fetch real data from goldapi.io - NO MOCK DATA
-    const metals = await fetchGoldAPIMetals();
+    // Use Yahoo Finance until goldapi.io key is available
+    const metals = await fetchYahooMetals();
     
     console.log(`🎯 PRECIOUS METALS: ${metals.length} REAL metals found`);
     
@@ -111,7 +108,7 @@ export async function GET() {
     console.error('Precious metals API error:', error);
     
     // NO FALLBACK TO MOCK DATA - return empty array
-    console.log('💔 GOLDAPI.IO FAILED - returning empty array (NO MOCK DATA)');
+    console.log('💔 YAHOO METALS FAILED - returning empty array (NO MOCK DATA)');
     return NextResponse.json([]);
   }
 }
