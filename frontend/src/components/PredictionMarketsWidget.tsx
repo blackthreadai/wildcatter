@@ -57,12 +57,14 @@ export default function PredictionMarketsWidget() {
 
   if (loading) {
     return (
-      <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
-        <div className="bg-gray-800 p-2 flex-shrink-0">
-          <h3 className="text-white text-xs font-semibold tracking-wider">PREDICTION MARKETS</h3>
+      <div className="w-full bg-black border border-gray-700">
+        <div className="bg-gray-800 p-2">
+          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>PREDICTION MARKETS</h3>
         </div>
-        <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
-          <div className="text-gray-500 text-xs">Loading...</div>
+        <div className="bg-black p-3 space-y-3" style={{ height: '500px', overflowY: 'scroll', scrollbarWidth: 'thin', scrollbarColor: '#4a5568 #1a202c' }}>
+          <div className="flex items-center justify-center h-full">
+            <div className="text-gray-500 text-xs">Loading...</div>
+          </div>
         </div>
       </div>
     );
