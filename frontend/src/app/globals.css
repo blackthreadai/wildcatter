@@ -19,18 +19,20 @@ body {
   color: #e5e5e5;
 }
 
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #4a5568 #1a202c;
+*,
+*::before,
+*::after {
+  scrollbar-width: thin !important;
+  scrollbar-color: #4a5568 #1a202c !important;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
+*::-webkit-scrollbar {
+  width: 6px !important;
 }
-::-webkit-scrollbar-track {
-  background: #1a202c;
+*::-webkit-scrollbar-track {
+  background: #1a202c !important;
 }
-::-webkit-scrollbar-thumb {
-  background: #4a5568;
-  border-radius: 3px;
+*::-webkit-scrollbar-thumb {
+  background: #4a5568 !important;
+  border-radius: 3px !important;
 }
