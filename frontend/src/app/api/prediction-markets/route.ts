@@ -22,14 +22,16 @@ function isEnergyGeopoliticalMarket(question: string): boolean {
   // Core energy keywords - direct energy market relevance
   const energyTerms = [
     'oil', 'gas', 'energy', 'crude', 'brent', 'wti', 'opec', 'gasoline',
-    'petroleum', 'fuel', 'pipeline', 'refinery'
+    'petroleum', 'fuel', 'pipeline', 'refinery', 'natural gas', 'lng',
+    'drilling', 'barrel', 'gallon', 'commodity'
   ];
   
   // Key geopolitical events that move energy markets
   const geopoliticalTerms = [
     'iran', 'russia', 'ukraine', 'china', 'war', 'strike', 'strikes',
     'israel', 'saudi', 'venezuela', 'iraq', 'sanctions', 'invasion',
-    'conflict', 'embargo', 'middle east', 'persian gulf'
+    'conflict', 'embargo', 'middle east', 'persian gulf', 'putin',
+    'xi jinping', 'biden', 'fed rate', 'recession'
   ];
   
   // Check if question contains any relevant terms
@@ -44,15 +46,15 @@ async function fetchRealPredictionMarkets(): Promise<PredictionMarket[]> {
   try {
     console.log('🔮 Fetching real Polymarket data...');
     
-    // Fetch more markets to filter for energy/geopolitical relevance
+    // Fetch active markets to find energy/geopolitical ones (not just highest volume)
     const response = await fetch(
-      'https://gamma-api.polymarket.com/events?limit=50&order=volume&ascending=false', 
+      'https://gamma-api.polymarket.com/events?limit=100&active=true', 
       {
         headers: {
           'User-Agent': 'Wildcatter-Terminal/1.0'
         },
-        // 15 second timeout
-        signal: AbortSignal.timeout(15000)
+        // 20 second timeout for larger dataset
+        signal: AbortSignal.timeout(20000)
       }
     );
     
