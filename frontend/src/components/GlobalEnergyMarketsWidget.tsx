@@ -100,7 +100,7 @@ export default function GlobalEnergyMarketsWidget() {
             {stocks.map((stock, i) => (
               <div
                 key={`${stock.symbol}-${i}`}
-                className="flex items-center justify-between py-1 px-2 hover:bg-gray-800 transition-colors border-b border-gray-800 last:border-b-0"
+                className="flex items-center justify-between py-1 px-2 border-b border-gray-800 last:border-b-0"
               >
                 {/* Left side - Symbol and name */}
                 <div className="flex-1 min-w-0">
