@@ -28,10 +28,10 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
         
         if (region === 'GLOBAL') {
           apiEndpoint = '/api/energy-news';
-          articleCount = 12;
+          articleCount = 5;
         } else if (region === 'US') {
           apiEndpoint = '/api/us-news';
-          articleCount = 12;
+          articleCount = 5;
         } else if (region === 'ASIAN') {
           apiEndpoint = '/api/asian-energy-news';
           articleCount = 5;
@@ -114,7 +114,7 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
       <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>{title || `${region} ENERGY`}</h3>
       </div>
-      <div className="flex-1 p-2 pb-8 overflow-y-auto bg-black min-h-0" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
+      <div className="flex-1 p-2 pb-8 bg-black min-h-0">
         {articles.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">

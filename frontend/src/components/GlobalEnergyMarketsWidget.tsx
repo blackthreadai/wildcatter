@@ -22,7 +22,9 @@ export default function GlobalEnergyMarketsWidget() {
       try {
         const response = await fetch('/api/global-energy-markets');
         const data = await response.json();
-        setStocks(data);
+        // Show only top 8 US tickers
+        const usStocks = data.filter((s: GlobalEnergyStock) => s.region === 'US').slice(0, 8);
+        setStocks(usStocks);
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch global energy markets:', error);
@@ -90,7 +92,7 @@ export default function GlobalEnergyMarketsWidget() {
       </div>
 
       {/* Scrollable stocks list */}
-      <div className="flex-1 overflow-y-auto bg-black min-h-0" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
+      <div className="flex-1 bg-black min-h-0">
         {stocks.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-gray-500 text-xs">No stocks available</div>
@@ -144,7 +146,7 @@ export default function GlobalEnergyMarketsWidget() {
           <div className="bg-gray-900 p-2 text-xs text-gray-400 border-t border-gray-700">
             <div className="flex justify-between items-center">
               <span>
-                US: {stocksByRegion.US.length} • EU: {stocksByRegion.Europe.length} • ASIA: {stocksByRegion.Asia.length}
+                Top {stocks.length} US Energy Stocks
               </span>
               <span className="text-green-400">
                 ↗ {stocks.filter(s => s.change > 0).length} UP

@@ -205,7 +205,7 @@ function DraggableWidget({
       style={{
         ...style,
         opacity: isHidden ? 0.5 : 1,
-        height: '400px',
+        height: '420px',
         overflow: 'hidden',
         border: '1px solid #404040',
         filter: isDragging 
@@ -791,7 +791,7 @@ export default function TerminalPage() {
               <div 
                 className="grid grid-cols-5 gap-4 h-full overflow-y-auto p-4" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}
                 style={{
-                  gridAutoRows: 'minmax(402px, max-content)',
+                  gridAutoRows: 'minmax(420px, max-content)',
                   alignItems: 'start'
                 }}
               >
