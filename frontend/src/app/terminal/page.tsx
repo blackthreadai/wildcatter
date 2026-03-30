@@ -577,7 +577,7 @@ export default function TerminalPage() {
           min-height: 400px;
           max-height: 500px;
           width: 100%;
-          overflow: hidden;
+          /* overflow: hidden; */ /* Removed - was preventing scrolling */
         }
       `}</style>
 
