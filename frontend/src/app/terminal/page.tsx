@@ -756,7 +756,7 @@ export default function TerminalPage() {
               <img src="/w-icon.svg" alt="W" className="w-6 h-6" />
               <span className="text-[#DAA520]">ENERGY INTELLIGENCE™</span>
               <span>ON iOS</span>
-            </a></a>
+            </a>
           </div>
         </div>
 
