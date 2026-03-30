@@ -534,64 +534,22 @@ export default function TerminalPage() {
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
-        /* Scrollbar styles - COMPLETELY SQUARE */
+        /* Scrollbar styles */
         .scrollbar-thin {
           scrollbar-width: thin;
         }
-        
-        /* ALL webkit scrollbar elements - NO BORDER RADIUS */
-        ::-webkit-scrollbar {
-          width: 12px;
-          height: 12px;
-        }
-        ::-webkit-scrollbar-track {
-          background: #1f2937;
-          border-radius: 0px !important;
-        }
-        ::-webkit-scrollbar-thumb {
-          background: #4b5563;
-          border-radius: 0px !important;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-          background: #6b7280;
-          border-radius: 0px !important;
-        }
-        ::-webkit-scrollbar-corner {
-          background: #1f2937;
-          border-radius: 0px !important;
-        }
-        ::-webkit-scrollbar-button {
-          background: #4b5563;
-          border-radius: 0px !important;
-        }
-        ::-webkit-scrollbar-button:hover {
-          background: #6b7280;
-          border-radius: 0px !important;
-        }
-        
-        /* Specific widget scrollbars */
         .scrollbar-track-gray-800::-webkit-scrollbar {
           width: 12px;
         }
         .scrollbar-track-gray-800::-webkit-scrollbar-track {
           background: #1f2937;
-          border-radius: 0px !important;
         }
         .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb {
           background: #4b5563;
-          border-radius: 0px !important;
+          border-radius: 6px;
         }
         .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb:hover {
           background: #6b7280;
-          border-radius: 0px !important;
-        }
-        .scrollbar-thumb-gray-600::-webkit-scrollbar-button {
-          background: #4b5563;
-          border-radius: 0px !important;
-        }
-        .scrollbar-thumb-gray-600::-webkit-scrollbar-corner {
-          background: #1f2937;
-          border-radius: 0px !important;
         }
         /* Geopolitical alert pulse animation */
         @keyframes pulse {
@@ -610,27 +568,16 @@ export default function TerminalPage() {
         }
         .scrollbar-thin::-webkit-scrollbar {
           width: 4px;
-          height: 4px;
         }
-        .scrollbar-thin::-webkit-scrollbar-track {
+        .scrollbar-track-gray-800::-webkit-scrollbar-track {
           background: #1f2937;
-          border-radius: 0px !important;
         }
-        .scrollbar-thin::-webkit-scrollbar-thumb {
+        .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb {
           background: #4b5563;
-          border-radius: 0px !important;
+          border-radius: 2px;
         }
-        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+        .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb:hover {
           background: #6b7280;
-          border-radius: 0px !important;
-        }
-        .scrollbar-thin::-webkit-scrollbar-corner {
-          background: #1f2937;
-          border-radius: 0px !important;
-        }
-        .scrollbar-thin::-webkit-scrollbar-button {
-          background: #4b5563;
-          border-radius: 0px !important;
         }
         .leaflet-popup-content-wrapper {
           background: #1f2937 !important;
@@ -651,26 +598,6 @@ export default function TerminalPage() {
         select option:checked {
           background-color: #DAA520 !important;
           color: black !important;
-        }
-        
-        /* GLOBAL SCROLLBAR SQUARE OVERRIDE - HIGHEST PRIORITY */
-        * {
-          scrollbar-width: thin;
-        }
-        *::-webkit-scrollbar {
-          border-radius: 0px !important;
-        }
-        *::-webkit-scrollbar-track {
-          border-radius: 0px !important;
-        }
-        *::-webkit-scrollbar-thumb {
-          border-radius: 0px !important;
-        }
-        *::-webkit-scrollbar-corner {
-          border-radius: 0px !important;
-        }
-        *::-webkit-scrollbar-button {
-          border-radius: 0px !important;
         }
         
         /* Standardized Widget Grid */
