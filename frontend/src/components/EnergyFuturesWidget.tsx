@@ -214,16 +214,8 @@ export default function EnergyFuturesWidget() {
                 </div>
               </div>
               
-              <div className="text-xs text-gray-500 mt-1">
-                Vol: {(contract.volume / 1000).toFixed(0)}K
-              </div>
             </div>
           ))}
-          
-          {/* Source attribution */}
-          <div className="text-xs text-gray-500 text-center mt-3 pt-2 border-t border-gray-700">
-            Source: Alpha Vantage Commodity Data
-          </div>
         </div>
       </div>
     </div>
