@@ -24,15 +24,8 @@ export default function EconomicIndicatorsWidget() {
       } catch (error) {
         console.error('Failed to fetch economic indicators:', error);
         
-        // Fallback data
-        const fallbackData: EconomicIndicator[] = [
-          { name: 'National Debt', value: '$33.8T', change: 0.8, unit: 'USD Trillions', period: 'Mar 2026' },
-          { name: 'GDP', value: '$27.2T', change: 2.1, unit: 'USD Trillions', period: 'Q4 2025' },
-          { name: '10-Year Treasury', value: '4.25%', change: -0.12, unit: 'Yield Percentage', period: 'Current' },
-          { name: 'Unemployment', value: '3.8%', change: -0.1, unit: 'Percentage', period: 'Mar 2026' }
-        ];
-        
-        setIndicators(fallbackData);
+        // NO FALLBACK DATA - show empty state
+        setIndicators([]);
         setLoading(false);
       }
     };
@@ -62,20 +55,31 @@ export default function EconomicIndicatorsWidget() {
       </div>
       
       <div className="flex-1 bg-black px-3 py-1">
-        {indicators.map((indicator, i) => (
-          <div key={indicator.name} className="flex items-center justify-between py-1 border-b border-gray-700 last:border-b-0">
-            <div className="min-w-0 flex-1">
-              <div className="text-[#DAA520] text-xs font-semibold">{indicator.name}</div>
-              <div className="text-gray-400 text-xs">{indicator.period}</div>
-            </div>
-            <div className="text-right ml-1">
-              <div className="text-white text-xs font-mono font-bold">{indicator.value}</div>
-              <div className={`text-xs ${indicator.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {indicator.change >= 0 ? '+' : ''}{indicator.change.toFixed(2)}%
-              </div>
+        {indicators.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <div className="text-red-400 text-xs font-bold mb-2">FRED API UNAVAILABLE</div>
+              <div className="text-gray-500 text-xs">Real economic data requires Federal Reserve API</div>
+              <div className="text-gray-600 text-xs mt-1">Check API connection</div>
             </div>
           </div>
-        ))}
+        ) : (
+          indicators.map((indicator, i) => (
+            <div key={indicator.name} className="flex items-center justify-between py-1 border-b border-gray-700 last:border-b-0">
+              <div className="min-w-0 flex-1">
+                <div className="text-[#DAA520] text-xs font-semibold">{indicator.name}</div>
+                <div className="text-gray-400 text-xs">{indicator.period}</div>
+              </div>
+              <div className="text-right ml-1">
+                <div className="text-white text-xs font-mono font-bold">{indicator.value}</div>
+                <div className={`text-xs ${indicator.change >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {indicator.change >= 0 ? '+' : ''}{indicator.change.toFixed(2)}
+                  {indicator.name.includes('Treasury') || indicator.name.includes('Rate') || indicator.name.includes('Unemployment') ? 'bp' : '%'}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

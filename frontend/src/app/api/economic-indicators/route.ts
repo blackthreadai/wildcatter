@@ -8,18 +8,79 @@ interface EconomicIndicator {
   period: string;
 }
 
-// Cache for 2 hours (economic data doesn't update frequently)
-let cache: { data: EconomicIndicator[]; ts: number } | null = null;
-const CACHE_MS = 2 * 60 * 60 * 1000;
+interface FREDSeries {
+  seriesId: string;
+  name: string;
+  unit: string;
+  formatValue: (value: number) => string;
+  isPercentage: boolean;
+}
 
-async function fetchTreasuryYield(): Promise<number | null> {
+// FRED API series configuration
+const FRED_SERIES: FREDSeries[] = [
+  {
+    seriesId: 'GDP',
+    name: 'GDP',
+    unit: 'USD Billions',
+    formatValue: (val) => `$${(val / 1000).toFixed(1)}T`,
+    isPercentage: false
+  },
+  {
+    seriesId: 'UNRATE',
+    name: 'Unemployment',
+    unit: 'Percentage',
+    formatValue: (val) => `${val.toFixed(1)}%`,
+    isPercentage: true
+  },
+  {
+    seriesId: 'CPIAUCSL',
+    name: 'CPI Index',
+    unit: 'Index 1982-84=100',
+    formatValue: (val) => val.toFixed(1),
+    isPercentage: false
+  },
+  {
+    seriesId: 'FEDFUNDS',
+    name: 'Fed Funds Rate',
+    unit: 'Percentage',
+    formatValue: (val) => `${val.toFixed(2)}%`,
+    isPercentage: true
+  },
+  {
+    seriesId: 'DGS10',
+    name: '10-Year Treasury',
+    unit: 'Percentage',
+    formatValue: (val) => `${val.toFixed(2)}%`,
+    isPercentage: true
+  },
+  {
+    seriesId: 'DGS30',
+    name: '30-Year Treasury',
+    unit: 'Percentage',
+    formatValue: (val) => `${val.toFixed(2)}%`,
+    isPercentage: true
+  },
+  {
+    seriesId: 'GFDEBTN',
+    name: 'National Debt',
+    unit: 'USD Millions',
+    formatValue: (val) => `$${(val / 1000000).toFixed(1)}T`,
+    isPercentage: false
+  }
+];
+
+// Cache for 4 hours (economic data updates infrequently)
+let cache: { data: EconomicIndicator[]; ts: number } | null = null;
+const CACHE_MS = 4 * 60 * 60 * 1000;
+
+async function fetchFREDSeries(seriesId: string, limit: number = 2): Promise<any[]> {
   try {
-    // Try to fetch 10-year treasury yield from a free API
-    // Note: In production, you'd want to use a reliable financial data provider
-    const response = await fetch('https://api.fiscaldata.treasury.gov/services/api/v1/accounting/od/avg_interest_rates?fields=record_date,security_desc,avg_interest_rate_amt&filter=security_desc:eq:Treasury%20Notes&sort=-record_date&limit=1', {
-      headers: { 
-        'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
-        'Accept': 'application/json'
+    // FRED API - No API key required for basic usage
+    const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&file_type=json&limit=${limit}&sort_order=desc`;
+    
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)'
       },
       signal: AbortSignal.timeout(10000)
     });
@@ -27,119 +88,118 @@ async function fetchTreasuryYield(): Promise<number | null> {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     
     const data = await response.json();
-    const rate = data?.data?.[0]?.avg_interest_rate_amt;
+    const observations = data?.observations || [];
     
-    if (rate && !isNaN(parseFloat(rate))) {
-      return parseFloat(rate);
-    }
-    
-    throw new Error('Invalid treasury data');
+    // Filter out missing data points (marked with ".")
+    return observations.filter((obs: any) => obs.value && obs.value !== '.' && !isNaN(parseFloat(obs.value)));
     
   } catch (error) {
-    console.error('Treasury API fetch error:', error);
-    return null;
+    console.error(`FRED API error for ${seriesId}:`, error);
+    return [];
   }
 }
 
-// High-quality mock data for US economic indicators
-function getMockEconomicIndicators(): EconomicIndicator[] {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.toLocaleDateString('en-US', { month: 'short' });
-  
-  // Generate realistic values with some variation
-  const baseDebt = 33800; // ~$33.8T current US debt
-  const baseGDP = 27000; // ~$27T US GDP
-  const baseTreasury = 4.25; // ~4.25% current 10-year
-  const base30Year = 4.35; // ~4.35% current 30-year treasury
-  const baseUnemployment = 3.8; // ~3.8% current unemployment
-  const baseInflation = 3.2; // ~3.2% current CPI inflation
-  const baseFedRate = 5.25; // ~5.25% current Fed funds rate
-  
-  const debtVariation = (Math.random() - 0.5) * 100;
-  const gdpVariation = (Math.random() - 0.5) * 500;
-  const treasuryVariation = (Math.random() - 0.5) * 0.2;
-  const treasury30Variation = (Math.random() - 0.5) * 0.2;
-  const unemploymentVariation = (Math.random() - 0.5) * 0.2;
-  const inflationVariation = (Math.random() - 0.5) * 0.3;
-  const fedRateVariation = (Math.random() - 0.5) * 0.25;
-  
-  return [
-    {
-      name: 'National Debt',
-      value: `$${(baseDebt + debtVariation).toFixed(1)}T`,
-      change: (Math.random() - 0.3) * 2, // Debt usually goes up
-      unit: 'USD Trillions',
-      period: `${currentMonth} ${currentYear}`
-    },
-    {
-      name: 'GDP',
-      value: `$${(baseGDP + gdpVariation).toFixed(1)}T`,
-      change: (Math.random() - 0.2) * 4, // GDP usually grows
-      unit: 'USD Trillions',
-      period: `Q4 ${currentYear - 1}`
-    },
-    {
-      name: 'Unemployment',
-      value: `${(baseUnemployment + unemploymentVariation).toFixed(1)}%`,
-      change: (Math.random() - 0.5) * 0.3,
-      unit: 'Percentage',
-      period: `${currentMonth} ${currentYear}`
-    },
-    {
-      name: 'Inflation Rate',
-      value: `${(baseInflation + inflationVariation).toFixed(1)}%`,
-      change: (Math.random() - 0.5) * 0.4,
-      unit: 'CPI Y/Y %',
-      period: `${currentMonth} ${currentYear}`
-    },
-    {
-      name: 'Interest Rate',
-      value: `${(baseFedRate + fedRateVariation).toFixed(2)}%`,
-      change: (Math.random() - 0.5) * 0.25,
-      unit: 'Fed Funds Rate',
-      period: 'Current'
-    },
-    {
-      name: '10-Year Treasury',
-      value: `${(baseTreasury + treasuryVariation).toFixed(2)}%`,
-      change: (Math.random() - 0.5) * 0.5,
-      unit: 'Yield Percentage',
-      period: 'Current'
-    },
-    {
-      name: '30-Year Treasury',
-      value: `${(base30Year + treasury30Variation).toFixed(2)}%`,
-      change: (Math.random() - 0.5) * 0.4,
-      unit: 'Yield Percentage',
-      period: 'Current'
-    }
-  ];
+function calculateInflationRate(cpiCurrent: number, cpiYearAgo: number): number {
+  if (!cpiYearAgo || cpiYearAgo === 0) return 0;
+  return ((cpiCurrent - cpiYearAgo) / cpiYearAgo) * 100;
 }
 
-async function fetchLiveEconomicData(): Promise<EconomicIndicator[]> {
+function formatPeriod(dateStr: string): string {
   try {
-    // Start with mock data as base
-    const indicators = getMockEconomicIndicators();
-    
-    // Try to get real 10-year treasury yield
-    const treasuryYield = await fetchTreasuryYield();
-    
-    if (treasuryYield !== null) {
-      // Update treasury indicator with real data
-      const treasuryIndex = indicators.findIndex(i => i.name === '10-Year Treasury');
-      if (treasuryIndex !== -1) {
-        indicators[treasuryIndex].value = `${treasuryYield.toFixed(2)}%`;
-        indicators[treasuryIndex].change = (Math.random() - 0.5) * 0.3; // Mock the change for now
-      }
-    }
-    
-    return indicators;
-    
-  } catch (error) {
-    console.error('Economic indicators fetch error:', error);
-    return getMockEconomicIndicators();
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      year: 'numeric' 
+    });
+  } catch {
+    return dateStr;
   }
+}
+
+// NO MOCK DATA - REMOVED ENTIRELY
+
+async function fetchRealEconomicData(): Promise<EconomicIndicator[]> {
+  console.log('📊 ECONOMIC INDICATORS: Fetching REAL data from FRED API only');
+  
+  const indicators: EconomicIndicator[] = [];
+  let successCount = 0;
+  
+  for (const series of FRED_SERIES) {
+    try {
+      const observations = await fetchFREDSeries(series.seriesId, 2);
+      
+      if (observations.length === 0) {
+        console.log(`❌ No data for ${series.name} (${series.seriesId})`);
+        continue;
+      }
+      
+      const latest = observations[0];
+      const previous = observations[1] || observations[0];
+      
+      const currentValue = parseFloat(latest.value);
+      const previousValue = parseFloat(previous.value);
+      
+      if (isNaN(currentValue)) {
+        console.log(`❌ Invalid data for ${series.name}`);
+        continue;
+      }
+      
+      // Calculate change
+      let change = 0;
+      if (!isNaN(previousValue) && previousValue !== 0) {
+        if (series.isPercentage) {
+          // For percentages, show absolute change in basis points
+          change = currentValue - previousValue;
+        } else {
+          // For other values, show percentage change
+          change = ((currentValue - previousValue) / previousValue) * 100;
+        }
+      }
+      
+      // Special handling for CPI -> Inflation Rate
+      if (series.seriesId === 'CPIAUCSL') {
+        // Get 12-month-old data for YoY inflation calculation
+        const yearAgoData = await fetchFREDSeries(series.seriesId, 15);
+        let inflationRate = 0;
+        
+        if (yearAgoData.length >= 12) {
+          const yearAgoValue = parseFloat(yearAgoData[11].value);
+          if (!isNaN(yearAgoValue)) {
+            inflationRate = calculateInflationRate(currentValue, yearAgoValue);
+          }
+        }
+        
+        indicators.push({
+          name: 'Inflation Rate',
+          value: `${inflationRate.toFixed(1)}%`,
+          change: inflationRate - 3.2, // Compare to Fed target of ~3.2%
+          unit: 'CPI Y/Y %',
+          period: formatPeriod(latest.date)
+        });
+        
+        successCount++;
+        continue;
+      }
+      
+      indicators.push({
+        name: series.name,
+        value: series.formatValue(currentValue),
+        change: change,
+        unit: series.unit,
+        period: formatPeriod(latest.date)
+      });
+      
+      console.log(`✅ ${series.name}: ${series.formatValue(currentValue)}`);
+      successCount++;
+      
+    } catch (error) {
+      console.error(`❌ Failed to fetch ${series.name}:`, error);
+    }
+  }
+  
+  console.log(`🎯 FRED API SUCCESS: ${successCount} real indicators fetched out of ${FRED_SERIES.length}`);
+  
+  return indicators;
 }
 
 export async function GET() {
@@ -149,10 +209,19 @@ export async function GET() {
       return NextResponse.json(cache.data);
     }
 
-    // Fetch live data (will fall back to mock for most indicators)
-    const indicators = await fetchLiveEconomicData();
+    console.log('🏦 ECONOMIC INDICATORS: Fetching REAL data from Federal Reserve Economic Data (FRED)');
     
-    // Cache the results
+    // ONLY fetch real FRED data - NO FALLBACK TO MOCK DATA
+    const indicators = await fetchRealEconomicData();
+    
+    if (indicators.length === 0) {
+      console.log('🚫 NO REAL ECONOMIC DATA AVAILABLE - returning empty array');
+      return NextResponse.json([]);
+    }
+    
+    console.log(`🎯 Final result: ${indicators.length} REAL economic indicators (NO MOCK DATA)`);
+    
+    // Cache ONLY the real results
     cache = { data: indicators, ts: Date.now() };
     
     return NextResponse.json(indicators);
@@ -160,8 +229,8 @@ export async function GET() {
   } catch (error) {
     console.error('Economic indicators API error:', error);
     
-    // Ultimate fallback
-    const fallbackData = getMockEconomicIndicators();
-    return NextResponse.json(fallbackData);
+    // NO FALLBACK TO MOCK DATA - return empty array
+    console.log('💔 FRED API FAILED - returning empty array (NO MOCK DATA)');
+    return NextResponse.json([]);
   }
 }
