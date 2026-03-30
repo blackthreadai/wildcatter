@@ -61,7 +61,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '18.11-NO-BLUE-ARTIFACTS';
+const WIDGET_VERSION = '18.12-LEDGER-STYLE';
 
 const defaultWidgets: Widget[] = [
   // NEW CUSTOM ORDER AS REQUESTED

@@ -66,7 +66,10 @@ export default function EconomicIndicatorsWidget() {
         ) : (
           <>
             {indicators.map((indicator, i) => (
-              <div key={indicator.name} className="flex items-center justify-between py-1 border-b border-gray-700 last:border-b-0">
+              <div 
+                key={indicator.name} 
+                className={`flex items-center justify-between py-1 px-2 ${i % 2 === 1 ? 'bg-[#DAA520]/10' : 'bg-transparent'}`}
+              >
                 <div className="min-w-0 flex-1">
                   <div className="text-[#DAA520] text-xs font-semibold">{indicator.name}</div>
                   <div className="text-gray-400 text-xs">{indicator.period}</div>
