@@ -201,12 +201,13 @@ function DraggableWidget({
   return (
     <div 
       ref={setNodeRef}
-      className={`relative group ${getSpanClasses()} border border-gray-700 rounded-sm`}
+      className={`relative group ${getSpanClasses()}`}
       style={{
         ...style,
         opacity: isHidden ? 0.5 : 1,
-        height: '400px', // All widgets now single-row height
+        height: '400px',
         overflow: 'hidden',
+        border: '1px solid #404040',
         filter: isDragging 
           ? 'drop-shadow(0 0 20px rgba(218, 165, 32, 0.5))'
           : isHidden 
@@ -774,7 +775,7 @@ export default function TerminalPage() {
               <div 
                 className="grid grid-cols-5 gap-4 h-full overflow-y-auto p-4"
                 style={{
-                  gridAutoRows: 'minmax(400px, max-content)',
+                  gridAutoRows: 'minmax(402px, max-content)',
                   alignItems: 'start'
                 }}
               >
