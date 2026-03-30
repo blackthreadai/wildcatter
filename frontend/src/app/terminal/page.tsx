@@ -61,7 +61,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '18.9-CLEAN-HEADER';
+const WIDGET_VERSION = '18.10-CLEAN-SOURCE';
 
 const defaultWidgets: Widget[] = [
   // NEW CUSTOM ORDER AS REQUESTED

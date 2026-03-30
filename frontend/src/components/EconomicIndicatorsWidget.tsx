@@ -93,7 +93,7 @@ export default function EconomicIndicatorsWidget() {
             
             {/* Source attribution */}
             <div className="text-xs text-gray-500 text-center mt-2 pt-2 border-t border-gray-700">
-              Source: Federal Reserve Economic Data (FRED API)
+              Source: Federal Reserve Economic Data
             </div>
           </>
         )}
