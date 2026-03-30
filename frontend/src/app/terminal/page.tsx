@@ -61,7 +61,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '18.10-CLEAN-SOURCE';
+const WIDGET_VERSION = '18.11-NO-BLUE-ARTIFACTS';
 
 const defaultWidgets: Widget[] = [
   // NEW CUSTOM ORDER AS REQUESTED
