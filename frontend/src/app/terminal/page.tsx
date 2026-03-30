@@ -64,12 +64,12 @@ type Widget = {
   type: 'news' | 'youtube' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'global-energy-markets' | 'economic-indicators' | 'climate-extremes' | 'global-oil-tracker' | 'opec' | 'natural-gas' | 'oil-rig-tracker' | 'power-grid-stress' | 'refinery-outages' | 'sanctions' | 'energy-futures' | 'crack-spread' | 'global-lng' | 'carbon-credit' | 'global-fuel-demand' | 'position-monitor' | 'ai-price-forecast' | 'event-calendar' | 'trade-signals' | 'world-map';
   title: string;
   span?: { col: number; row: number };
-  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS' | 'STRATEGIC RESERVE' | 'GLOBAL';
+  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS' | 'GLOBAL';
   activeLayers?: string[]; // For world map widget
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '18.0-GLOBAL-ENERGY-MARKETS';
+const WIDGET_VERSION = '18.1-FIX-DEPLOYMENT';
 
 const defaultWidgets: Widget[] = [
   // NEW DEFAULT ORDER - Consolidated global modules
@@ -79,7 +79,6 @@ const defaultWidgets: Widget[] = [
   { id: 'global-energy-markets', type: 'global-energy-markets', title: 'ENERGY MARKETS' },
   { id: 'position-monitor', type: 'position-monitor', title: 'POSITION MONITOR' },
   { id: 'energy-futures', type: 'energy-futures', title: 'ENERGY FUTURES' },
-  { id: 'strategic-reserve', type: 'news', title: 'STRATEGIC RESERVE', region: 'STRATEGIC RESERVE' },
   { id: 'world-clock', type: 'world-clock', title: 'WORLD CLOCK' },
   { id: 'opec', type: 'opec', title: 'OPEC' },
   { id: 'travel', type: 'travel', title: 'TRAVEL ADVISORIES' },
