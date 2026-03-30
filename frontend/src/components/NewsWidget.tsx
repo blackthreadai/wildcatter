@@ -11,7 +11,7 @@ interface NewsArticle {
 }
 
 interface NewsWidgetProps {
-  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS' | 'STRATEGIC RESERVE';
+  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS' | 'STRATEGIC RESERVE' | 'GLOBAL';
   title?: string;
 }
 
@@ -26,7 +26,10 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
         let apiEndpoint;
         let articleCount;
         
-        if (region === 'US') {
+        if (region === 'GLOBAL') {
+          apiEndpoint = '/api/energy-news';
+          articleCount = 12;
+        } else if (region === 'US') {
           apiEndpoint = '/api/us-news';
           articleCount = 12;
         } else if (region === 'ASIAN') {
@@ -71,7 +74,7 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
     fetchNews();
     
     // Set up refresh interval - more frequent for energy-focused regions
-    const refreshInterval = (region === 'US' || region === 'ASIAN' || region === 'SOUTH AMERICAN' || region === 'RUSSIAN' || region === 'MIDDLE EAST ENERGY' || region === 'EUROPEAN ENERGY' || region === 'AFRICAN') ? 30 * 60 * 1000 : 35 * 60 * 1000; // 30 min for energy regions, 35 min for others
+    const refreshInterval = (region === 'GLOBAL' || region === 'US' || region === 'ASIAN' || region === 'SOUTH AMERICAN' || region === 'RUSSIAN' || region === 'MIDDLE EAST ENERGY' || region === 'EUROPEAN ENERGY' || region === 'AFRICAN') ? 15 * 60 * 1000 : 35 * 60 * 1000; // 15 min for global/energy regions, 35 min for others
     const interval = setInterval(fetchNews, refreshInterval);
     
     return () => clearInterval(interval);
