@@ -69,7 +69,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '18.3-BETA-WARNING-BANNER';
+const WIDGET_VERSION = '18.4-BETA-WARNING-BANNER-FIXED';
 
 const defaultWidgets: Widget[] = [
   // NEW DEFAULT ORDER - Consolidated global modules
@@ -329,6 +329,26 @@ export default function TerminalPage() {
   const [showHomepagePopup, setShowHomepagePopup] = useState(false);
   const [hoveredTooltip, setHoveredTooltip] = useState<string | null>(null);
 
+  // Debug: Log when component renders
+  console.log('🦝 Terminal component render - Beta banner should be visible');
+
+  // Debug: Monitor banner visibility
+  useEffect(() => {
+    console.log('🚨 BETA BANNER: Component mounted, banner should be visible');
+    
+    // Check if banner exists in DOM after 3 seconds
+    const checkBanner = setTimeout(() => {
+      const banner = document.querySelector('.beta-warning-banner');
+      if (banner) {
+        console.log('✅ BETA BANNER: Still visible in DOM after 3s');
+      } else {
+        console.error('❌ BETA BANNER: MISSING FROM DOM after 3s!');
+      }
+    }, 3000);
+
+    return () => clearTimeout(checkBanner);
+  }, []);
+
   // Remove the localStorage clearing to prevent interference
 
   // Tailwind safelist for dynamic classes (ensures they're not purged)
@@ -514,6 +534,20 @@ export default function TerminalPage() {
     <div className="min-h-screen bg-gray-950">
       {/* Leaflet CSS overrides for dark theme + Masonry Layout Styles */}
       <style jsx global>{`
+        /* FORCE BETA BANNER TO ALWAYS STAY VISIBLE */
+        .beta-warning-banner {
+          display: block !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+          position: relative !important;
+          top: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          width: 100% !important;
+          z-index: 99999 !important;
+          background: #dc2626 !important;
+        }
+        
         .leaflet-container {
           background: #374151 !important;
         }
@@ -619,8 +653,8 @@ export default function TerminalPage() {
         }
       `}</style>
 
-      {/* Beta Warning Banner */}
-      <div className="bg-red-600 border-b border-red-500 px-6 py-2">
+      {/* Beta Warning Banner - FORCED ALWAYS VISIBLE */}
+      <div className="beta-warning-banner bg-red-600 border-b border-red-500 px-6 py-2 sticky top-0 z-[99999] w-full">
         <div className="flex items-center justify-center text-center">
           <div className="flex items-center gap-3">
             <svg className="w-5 h-5 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
