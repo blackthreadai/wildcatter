@@ -13,183 +13,42 @@ interface GlobalEnergyNewsArticle {
 let cache: { data: GlobalEnergyNewsArticle[]; ts: number } | null = null;
 const CACHE_MS = 15 * 60 * 1000;
 
-// Comprehensive global energy news from all continents
-function getGlobalEnergyNews(): GlobalEnergyNewsArticle[] {
-  const now = new Date();
-  
-  return [
-    // NORTH AMERICA (US/Canada)
-    {
-      title: "US Strategic Petroleum Reserve Releases 50M Barrels Amid Price Volatility",
-      url: "https://www.reuters.com/business/energy/",
-      publishedAt: new Date(now.getTime() - 1.2 * 60 * 60 * 1000).toISOString(),
-      source: "Reuters",
-      region: "North America",
-      summary: "Biden administration authorizes major SPR release as WTI crude approaches $90/barrel, marking largest draw since Hurricane Harvey..."
-    },
-    {
-      title: "Chevron Reports Record Permian Basin Production of 850K bpd",
-      url: "https://www.bloomberg.com/energy",
-      publishedAt: new Date(now.getTime() - 2.1 * 60 * 60 * 1000).toISOString(),
-      source: "Bloomberg",
-      region: "North America", 
-      summary: "California-based energy giant achieves highest-ever shale oil output from Texas operations, driving Q4 earnings surge..."
-    },
-    
-    // EUROPE
-    {
-      title: "Norway's Equinor Discovers 500M Barrel Oil Field in Barents Sea",
-      url: "https://www.upstreamonline.com/",
-      publishedAt: new Date(now.getTime() - 1.8 * 60 * 60 * 1000).toISOString(),
-      source: "Upstream Online",
-      region: "Europe",
-      summary: "Major Arctic discovery could extend Norway's production timeline by decades as North Sea fields mature..."
-    },
-    {
-      title: "Germany Extends Nuclear Plant Operations Through 2027 Amid Energy Crisis",
-      url: "https://www.cleanenergywire.org/",
-      publishedAt: new Date(now.getTime() - 3.2 * 60 * 60 * 1000).toISOString(),
-      source: "Clean Energy Wire",
-      region: "Europe",
-      summary: "Berlin reverses nuclear phase-out as Russian gas supply disruptions force energy security rethink..."
-    },
+// REMOVED ALL MOCK DATA FUNCTIONS - REAL RSS ONLY
 
-    // ASIA
-    {
-      title: "China's LNG Imports Surge 40% as Winter Heating Demand Peaks",
-      url: "https://asia.nikkei.com/Business/Energy",
-      publishedAt: new Date(now.getTime() - 1.5 * 60 * 60 * 1000).toISOString(),
-      source: "Nikkei Asia",
-      region: "Asia",
-      summary: "Record 8.2 million tonnes imported in December as northern China experiences coldest winter in decade..."
-    },
-    {
-      title: "India Approves $20B Green Hydrogen Mission to Cut Oil Dependency",
-      url: "https://www.reuters.com/world/india/",
-      publishedAt: new Date(now.getTime() - 4.1 * 60 * 60 * 1000).toISOString(),
-      source: "Reuters",
-      region: "Asia",
-      summary: "New Delhi targets 5 MMT annual hydrogen production by 2030 as part of energy independence strategy..."
-    },
-
-    // SOUTH AMERICA
-    {
-      title: "Brazil's Petrobras Reports Record Q4 Profits of $15.2B from Pre-Salt",
-      url: "https://www.reuters.com/business/energy/",
-      publishedAt: new Date(now.getTime() - 2.3 * 60 * 60 * 1000).toISOString(),
-      source: "Reuters",
-      region: "South America",
-      summary: "Santos Basin operations drive highest quarterly earnings in company history as Brent crude averages $85/barrel..."
-    },
-    {
-      title: "Argentina Launches $30B Vaca Muerta Export Pipeline Project",
-      url: "https://www.bnamericas.com/en/news/energy",
-      publishedAt: new Date(now.getTime() - 3.8 * 60 * 60 * 1000).toISOString(),
-      source: "BNamericas",
-      region: "South America",
-      summary: "1,400km pipeline will connect Neuquén shale fields to new Atlantic coast terminals, boosting export capacity..."
-    },
-
-    // MIDDLE EAST
-    {
-      title: "Saudi Aramco's Ghawar Field Production Reaches 5.8M bpd Capacity",
-      url: "https://www.spglobal.com/commodityinsights/",
-      publishedAt: new Date(now.getTime() - 2.7 * 60 * 60 * 1000).toISOString(),
-      source: "S&P Global",
-      region: "Middle East",
-      summary: "World's largest oil field undergoes major infrastructure upgrade, maintaining Saudi Arabia's swing producer status..."
-    },
-    {
-      title: "UAE's ADNOC Commits $15B to Blue Hydrogen Development",
-      url: "https://www.meed.com/",
-      publishedAt: new Date(now.getTime() - 4.5 * 60 * 60 * 1000).toISOString(),
-      source: "MEED",
-      region: "Middle East",
-      summary: "Abu Dhabi National Oil Company plans world's largest carbon capture and hydrogen production facility..."
-    },
-
-    // RUSSIA/EASTERN EUROPE  
-    {
-      title: "Gazprom's Power of Siberia Pipeline Reaches Full 38 bcm Capacity",
-      url: "https://www.naturalgasintel.com/",
-      publishedAt: new Date(now.getTime() - 3.5 * 60 * 60 * 1000).toISOString(),
-      source: "Natural Gas Intelligence", 
-      region: "Russia/CIS",
-      summary: "Russian gas exports to China hit maximum flow rate as European demand shifts to Asian markets..."
-    },
-    {
-      title: "Rosneft Discovers 400M Barrel Arctic Oil Field in Laptev Sea",
-      url: "https://www.offshore-technology.com/",
-      publishedAt: new Date(now.getTime() - 5.1 * 60 * 60 * 1000).toISOString(),
-      source: "Offshore Technology",
-      region: "Russia/CIS",
-      summary: "Major discovery in challenging Arctic waters could reshape Russia's long-term production profile..."
-    },
-
-    // AFRICA
-    {
-      title: "Nigeria's NNPC Finalizes $20B Gas Pipeline Deal with Morocco",
-      url: "https://www.offshore-technology.com/",
-      publishedAt: new Date(now.getTime() - 3.9 * 60 * 60 * 1000).toISOString(),
-      source: "Offshore Technology",
-      region: "Africa",
-      summary: "Trans-Saharan gas pipeline extension will supply European markets via Morocco, reducing Russian dependency..."
-    },
-    {
-      title: "Angola's Sonangol Discovers 600M Barrel Deepwater Oil Field",
-      url: "https://www.energyvoice.com/",
-      publishedAt: new Date(now.getTime() - 4.8 * 60 * 60 * 1000).toISOString(),
-      source: "Energy Voice",
-      region: "Africa", 
-      summary: "Major pre-salt discovery in Kwanza Basin could reverse Angola's production decline trend..."
-    }
-  ];
-}
-
-// Ensure we have at least one article from each major region
-function ensureRegionalCoverage(articles: GlobalEnergyNewsArticle[]): GlobalEnergyNewsArticle[] {
-  const requiredRegions = ['North America', 'Europe', 'Asia', 'South America', 'Middle East', 'Russia/CIS', 'Africa'];
-  const result: GlobalEnergyNewsArticle[] = [];
-  
-  // Add at least one article from each region
-  for (const region of requiredRegions) {
-    const regionArticle = articles.find(a => a.region === region && !result.includes(a));
-    if (regionArticle) {
-      result.push(regionArticle);
-    }
-  }
-  
-  // Fill remaining slots with best articles regardless of region
-  const remaining = articles.filter(a => !result.includes(a));
-  remaining.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-  
-  while (result.length < 12 && remaining.length > 0) {
-    result.push(remaining.shift()!);
-  }
-  
-  return result.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-}
-
-// Try to fetch live data from major energy RSS feeds
+// REAL RSS feeds only - NO MOCK DATA
 async function fetchLiveEnergyNews(): Promise<GlobalEnergyNewsArticle[]> {
   try {
-    // Attempt to fetch from major global energy sources
+    console.log('🔄 Attempting to fetch from REAL RSS sources');
+    
+    // Try multiple real RSS feeds in parallel
     const promises = [
       fetchReutersEnergyRSS(),
-      fetchBloombergEnergyRSS(),
-      fetchOilGasJournalRSS()
+      fetchAPNewsRSS(), 
+      fetchBBCBusinessRSS(),
+      fetchCNNBusinessRSS(),
+      fetchYahooFinanceRSS(),
+      fetchMarketWatchRSS()
     ];
     
     const results = await Promise.allSettled(promises);
     const liveArticles: GlobalEnergyNewsArticle[] = [];
     
     results.forEach((result, index) => {
-      if (result.status === 'fulfilled') {
+      if (result.status === 'fulfilled' && result.value.length > 0) {
+        console.log(`✅ Source ${index + 1}: ${result.value.length} real articles`);
         liveArticles.push(...result.value);
+      } else {
+        console.log(`❌ Source ${index + 1}: failed`);
       }
     });
     
-    return liveArticles.slice(0, 6); // Limit live articles to prevent overwhelm
+    // Remove duplicates and sort by date
+    const uniqueArticles = removeDuplicates(liveArticles);
+    uniqueArticles.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+    
+    console.log(`🎯 Final count: ${uniqueArticles.length} unique real articles`);
+    
+    return uniqueArticles.slice(0, 20); // Return top 20 real articles
     
   } catch (error) {
     console.error('Live energy news fetch failed:', error);
@@ -199,138 +58,348 @@ async function fetchLiveEnergyNews(): Promise<GlobalEnergyNewsArticle[]> {
 
 async function fetchReutersEnergyRSS(): Promise<GlobalEnergyNewsArticle[]> {
   try {
+    console.log('🔄 Fetching Reuters Business RSS...');
     const response = await fetch('https://feeds.reuters.com/reuters/business', {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
-      signal: AbortSignal.timeout(8000)
+      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
+      signal: AbortSignal.timeout(10000)
     });
     
-    if (!response.ok) throw new Error('Reuters fetch failed');
+    if (!response.ok) {
+      console.log(`❌ Reuters failed: HTTP ${response.status}`);
+      return [];
+    }
     
     const xmlText = await response.text();
     const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
     const articles: GlobalEnergyNewsArticle[] = [];
     
-    const energyKeywords = ['oil', 'gas', 'energy', 'petroleum', 'lng', 'crude', 'renewable', 'nuclear', 'coal', 'pipeline'];
+    const energyKeywords = ['oil', 'gas', 'energy', 'petroleum', 'lng', 'crude', 'renewable', 'nuclear', 'coal', 'pipeline', 'refinery', 'drilling', 'opec', 'aramco', 'exxon', 'chevron', 'bp'];
     
-    for (const item of items.slice(0, 15)) {
-      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/);
+    for (const item of items.slice(0, 20)) {
+      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
       const linkMatch = item.match(/<link>(.*?)<\/link>/);
       const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
-      const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/);
+      const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/);
+      
+      if (titleMatch && linkMatch && pubDateMatch) {
+        const title = titleMatch[1].trim();
+        const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
+        const content = (title + ' ' + description).toLowerCase();
+        const url = linkMatch[1].trim();
+        
+        // Filter for energy-related content
+        if (energyKeywords.some(keyword => content.includes(keyword))) {
+          articles.push({
+            title: title,
+            url: url,
+            publishedAt: new Date(pubDateMatch[1]).toISOString(),
+            source: 'Reuters',
+            region: 'Global',
+            summary: description.slice(0, 200)
+          });
+        }
+      }
+    }
+    
+    console.log(`✅ Reuters: Found ${articles.length} energy articles`);
+    return articles;
+    
+  } catch (error) {
+    console.error('❌ Reuters energy RSS fetch error:', error);
+    return [];
+  }
+}
+
+async function fetchAPNewsRSS(): Promise<GlobalEnergyNewsArticle[]> {
+  try {
+    console.log('🔄 Fetching AP Business RSS...');
+    const response = await fetch('https://feeds.apnews.com/rss/apf-business.rss', {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
+      signal: AbortSignal.timeout(10000)
+    });
+    
+    if (!response.ok) {
+      console.log(`❌ AP News failed: HTTP ${response.status}`);
+      return [];
+    }
+    
+    const xmlText = await response.text();
+    const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
+    const articles: GlobalEnergyNewsArticle[] = [];
+    
+    const energyKeywords = ['oil', 'gas', 'energy', 'petroleum', 'lng', 'crude', 'renewable', 'nuclear', 'coal', 'pipeline', 'refinery', 'drilling', 'opec'];
+    
+    for (const item of items.slice(0, 20)) {
+      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
+      const linkMatch = item.match(/<link>(.*?)<\/link>/);
+      const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
+      const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
         const title = titleMatch[1].trim();
         const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
         const content = (title + ' ' + description).toLowerCase();
         
-        // Filter for energy-related content
         if (energyKeywords.some(keyword => content.includes(keyword))) {
           articles.push({
-            title: title.length > 120 ? title.slice(0, 120) + '...' : title,
+            title: title,
             url: linkMatch[1].trim(),
             publishedAt: new Date(pubDateMatch[1]).toISOString(),
-            source: 'Reuters',
+            source: 'AP News',
             region: 'Global',
-            summary: description.slice(0, 180) + (description.length > 180 ? '...' : '')
+            summary: description.slice(0, 200)
           });
         }
       }
     }
     
+    console.log(`✅ AP News: Found ${articles.length} energy articles`);
     return articles;
     
   } catch (error) {
-    console.error('Reuters energy RSS fetch error:', error);
+    console.error('❌ AP News RSS fetch error:', error);
     return [];
   }
 }
 
-async function fetchBloombergEnergyRSS(): Promise<GlobalEnergyNewsArticle[]> {
+async function fetchBBCBusinessRSS(): Promise<GlobalEnergyNewsArticle[]> {
   try {
-    // Use Google News for Bloomberg energy content
-    const response = await fetch('https://news.google.com/rss/search?q=bloomberg+energy+oil+gas&hl=en-US&gl=US&ceid=US:en', {
-      headers: { 'User-Agent': 'Mozilla/5.0' },
-      signal: AbortSignal.timeout(8000)
+    console.log('🔄 Fetching BBC Business RSS...');
+    const response = await fetch('http://feeds.bbci.co.uk/news/business/rss.xml', {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
+      signal: AbortSignal.timeout(10000)
     });
     
-    if (!response.ok) throw new Error('Bloomberg fetch failed');
+    if (!response.ok) {
+      console.log(`❌ BBC Business failed: HTTP ${response.status}`);
+      return [];
+    }
     
     const xmlText = await response.text();
     const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
     const articles: GlobalEnergyNewsArticle[] = [];
     
-    for (const item of items.slice(0, 10)) {
-      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/);
+    const energyKeywords = ['oil', 'gas', 'energy', 'petroleum', 'lng', 'crude', 'renewable', 'nuclear', 'coal', 'pipeline', 'opec', 'shell', 'bp'];
+    
+    for (const item of items.slice(0, 20)) {
+      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
       const linkMatch = item.match(/<link>(.*?)<\/link>/);
       const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
+      const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
         const title = titleMatch[1].trim();
+        const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
+        const content = (title + ' ' + description).toLowerCase();
         
-        if (title.toLowerCase().includes('bloomberg')) {
+        if (energyKeywords.some(keyword => content.includes(keyword))) {
           articles.push({
-            title: title.length > 120 ? title.slice(0, 120) + '...' : title,
+            title: title,
             url: linkMatch[1].trim(),
             publishedAt: new Date(pubDateMatch[1]).toISOString(),
-            source: 'Bloomberg',
+            source: 'BBC Business',
             region: 'Global',
-            summary: 'Global energy markets and commodity analysis...'
+            summary: description.slice(0, 200)
           });
         }
       }
     }
     
+    console.log(`✅ BBC Business: Found ${articles.length} energy articles`);
     return articles;
     
   } catch (error) {
-    console.error('Bloomberg energy RSS fetch error:', error);
+    console.error('❌ BBC Business RSS fetch error:', error);
     return [];
   }
 }
 
-async function fetchOilGasJournalRSS(): Promise<GlobalEnergyNewsArticle[]> {
+async function fetchCNNBusinessRSS(): Promise<GlobalEnergyNewsArticle[]> {
   try {
-    // Use general energy industry news search  
-    const response = await fetch('https://news.google.com/rss/search?q=oil+gas+energy+industry+news&hl=en-US&gl=US&ceid=US:en', {
-      headers: { 'User-Agent': 'Mozilla/5.0' },
-      signal: AbortSignal.timeout(8000)
+    console.log('🔄 Fetching CNN Business RSS...');
+    const response = await fetch('http://rss.cnn.com/rss/money_latest.rss', {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
+      signal: AbortSignal.timeout(10000)
     });
     
-    if (!response.ok) throw new Error('Oil & Gas Journal fetch failed');
+    if (!response.ok) {
+      console.log(`❌ CNN Business failed: HTTP ${response.status}`);
+      return [];
+    }
     
     const xmlText = await response.text();
     const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
     const articles: GlobalEnergyNewsArticle[] = [];
     
-    const energyKeywords = ['oil', 'gas', 'energy', 'petroleum', 'lng', 'crude', 'refinery', 'drilling'];
+    const energyKeywords = ['oil', 'gas', 'energy', 'petroleum', 'lng', 'crude', 'renewable', 'nuclear', 'coal', 'opec', 'exxon', 'chevron'];
     
-    for (const item of items.slice(0, 10)) {
-      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/);
+    for (const item of items.slice(0, 20)) {
+      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
       const linkMatch = item.match(/<link>(.*?)<\/link>/);
       const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
+      const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
         const title = titleMatch[1].trim();
+        const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
+        const content = (title + ' ' + description).toLowerCase();
         
-        if (energyKeywords.some(keyword => title.toLowerCase().includes(keyword))) {
+        if (energyKeywords.some(keyword => content.includes(keyword))) {
           articles.push({
-            title: title.length > 120 ? title.slice(0, 120) + '...' : title,
+            title: title,
             url: linkMatch[1].trim(),
             publishedAt: new Date(pubDateMatch[1]).toISOString(),
-            source: 'Energy Industry News',
+            source: 'CNN Business',
             region: 'Global',
-            summary: 'Energy industry developments and market updates...'
+            summary: description.slice(0, 200)
           });
         }
       }
     }
     
+    console.log(`✅ CNN Business: Found ${articles.length} energy articles`);
     return articles;
     
   } catch (error) {
-    console.error('Oil & Gas Journal RSS fetch error:', error);
+    console.error('❌ CNN Business RSS fetch error:', error);
     return [];
   }
+}
+
+async function fetchYahooFinanceRSS(): Promise<GlobalEnergyNewsArticle[]> {
+  try {
+    console.log('🔄 Fetching Yahoo Finance RSS...');
+    const response = await fetch('https://feeds.finance.yahoo.com/rss/2.0/headline', {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
+      signal: AbortSignal.timeout(10000)
+    });
+    
+    if (!response.ok) {
+      console.log(`❌ Yahoo Finance failed: HTTP ${response.status}`);
+      return [];
+    }
+    
+    const xmlText = await response.text();
+    const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
+    const articles: GlobalEnergyNewsArticle[] = [];
+    
+    const energyKeywords = ['oil', 'gas', 'energy', 'petroleum', 'lng', 'crude', 'renewable', 'nuclear', 'opec', 'aramco', 'exxon', 'chevron', 'bp', 'shell'];
+    
+    for (const item of items.slice(0, 20)) {
+      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
+      const linkMatch = item.match(/<link>(.*?)<\/link>/);
+      const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
+      const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/);
+      
+      if (titleMatch && linkMatch && pubDateMatch) {
+        const title = titleMatch[1].trim();
+        const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
+        const content = (title + ' ' + description).toLowerCase();
+        
+        if (energyKeywords.some(keyword => content.includes(keyword))) {
+          articles.push({
+            title: title,
+            url: linkMatch[1].trim(),
+            publishedAt: new Date(pubDateMatch[1]).toISOString(),
+            source: 'Yahoo Finance',
+            region: 'Global',
+            summary: description.slice(0, 200)
+          });
+        }
+      }
+    }
+    
+    console.log(`✅ Yahoo Finance: Found ${articles.length} energy articles`);
+    return articles;
+    
+  } catch (error) {
+    console.error('❌ Yahoo Finance RSS fetch error:', error);
+    return [];
+  }
+}
+
+async function fetchMarketWatchRSS(): Promise<GlobalEnergyNewsArticle[]> {
+  try {
+    console.log('🔄 Fetching MarketWatch RSS...');
+    const response = await fetch('http://feeds.marketwatch.com/marketwatch/marketpulse/', {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
+      signal: AbortSignal.timeout(10000)
+    });
+    
+    if (!response.ok) {
+      console.log(`❌ MarketWatch failed: HTTP ${response.status}`);
+      return [];
+    }
+    
+    const xmlText = await response.text();
+    const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
+    const articles: GlobalEnergyNewsArticle[] = [];
+    
+    const energyKeywords = ['oil', 'gas', 'energy', 'petroleum', 'lng', 'crude', 'renewable', 'nuclear', 'opec', 'exxon', 'chevron', 'bp', 'shell'];
+    
+    for (const item of items.slice(0, 20)) {
+      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
+      const linkMatch = item.match(/<link>(.*?)<\/link>/);
+      const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
+      const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/);
+      
+      if (titleMatch && linkMatch && pubDateMatch) {
+        const title = titleMatch[1].trim();
+        const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
+        const content = (title + ' ' + description).toLowerCase();
+        
+        if (energyKeywords.some(keyword => content.includes(keyword))) {
+          articles.push({
+            title: title,
+            url: linkMatch[1].trim(),
+            publishedAt: new Date(pubDateMatch[1]).toISOString(),
+            source: 'MarketWatch',
+            region: 'Global',
+            summary: description.slice(0, 200)
+          });
+        }
+      }
+    }
+    
+    console.log(`✅ MarketWatch: Found ${articles.length} energy articles`);
+    return articles;
+    
+  } catch (error) {
+    console.error('❌ MarketWatch RSS fetch error:', error);
+    return [];
+  }
+}
+
+// Remove duplicate articles based on title similarity
+function removeDuplicates(articles: GlobalEnergyNewsArticle[]): GlobalEnergyNewsArticle[] {
+  const unique: GlobalEnergyNewsArticle[] = [];
+  
+  for (const article of articles) {
+    const isDuplicate = unique.some(existing => {
+      const similarity = calculateStringSimilarity(
+        article.title.toLowerCase(), 
+        existing.title.toLowerCase()
+      );
+      return similarity > 0.7; // 70% similarity threshold
+    });
+    
+    if (!isDuplicate) {
+      unique.push(article);
+    }
+  }
+  
+  return unique;
+}
+
+// Calculate string similarity (simple Jaccard similarity)
+function calculateStringSimilarity(str1: string, str2: string): number {
+  const words1 = new Set(str1.split(' '));
+  const words2 = new Set(str2.split(' '));
+  
+  const intersection = new Set([...words1].filter(word => words2.has(word)));
+  const union = new Set([...words1, ...words2]);
+  
+  return intersection.size / union.size;
 }
 
 export async function GET() {
@@ -340,32 +409,27 @@ export async function GET() {
       return NextResponse.json(cache.data);
     }
 
-    console.log('🌍 GLOBAL ENERGY NEWS: Fetching from multiple continents');
+    console.log('🌍 GLOBAL ENERGY NEWS: Fetching REAL RSS feeds only');
     
-    // Get high-quality mock articles from all regions
-    const mockArticles = getGlobalEnergyNews();
-    
-    // Try to fetch some live articles to supplement
+    // ONLY fetch real articles - NO MOCK DATA EVER
     const liveArticles = await fetchLiveEnergyNews();
     
-    // Combine mock and live articles
-    const allArticles = [...mockArticles, ...liveArticles];
+    console.log(`🎯 GLOBAL ENERGY NEWS: ${liveArticles.length} REAL articles found`);
     
-    // Ensure coverage from all major regions
-    const finalArticles = ensureRegionalCoverage(allArticles);
-    
-    console.log(`🎯 GLOBAL ENERGY NEWS: ${finalArticles.length} articles from ${finalArticles.map(a => a.region).filter((r, i, arr) => arr.indexOf(r) === i).length} regions`);
+    if (liveArticles.length === 0) {
+      console.log('🚫 NO REAL ARTICLES AVAILABLE - returning empty array');
+      return NextResponse.json([]);
+    }
     
     // Cache the results
-    cache = { data: finalArticles.slice(0, 12), ts: Date.now() };
+    cache = { data: liveArticles.slice(0, 12), ts: Date.now() };
     
-    return NextResponse.json(finalArticles.slice(0, 12));
+    return NextResponse.json(liveArticles.slice(0, 12));
     
   } catch (error) {
     console.error('Global energy news API error:', error);
     
-    // Ultimate fallback - just use mock data
-    const fallbackArticles = getGlobalEnergyNews();
-    return NextResponse.json(fallbackArticles.slice(0, 12));
+    // NO FALLBACK TO FAKE DATA - return empty array
+    return NextResponse.json([]);
   }
 }
