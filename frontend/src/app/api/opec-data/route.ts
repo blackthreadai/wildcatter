@@ -94,33 +94,32 @@ async function fetchEIAProduction(): Promise<{ data: Record<string, { production
   return { data: {}, debug: 'all strategies failed' };
 }
 
+// Collect debug errors for diagnosis
+const debugErrors: string[] = [];
+
 async function fetchInternational(apiKey: string): Promise<Record<string, { production: number; period: string }>> {
-  // productId=57 = crude oil incl lease condensate
-  // activityId=1 = production
-  // unitId=2 = thousand barrels per day
   const countries = OPEC_MEMBERS.map(m => m.iso);
   const countryFacets = countries.map(c => `&facets[countryRegionId][]=${c}`).join('');
   
   const url = `https://api.eia.gov/v2/international/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[productId][]=57&facets[activityId][]=1&facets[unitId][]=2${countryFacets}&sort[0][column]=period&sort[0][direction]=desc&length=200`;
-
-  console.log('🌐 OPEC: Fetching EIA International:', url.replace(apiKey, '[KEY]').substring(0, 200));
 
   const resp = await fetch(url, {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
     signal: AbortSignal.timeout(15000),
   });
 
-  console.log('📡 OPEC International response:', resp.status);
-  
   if (!resp.ok) {
     const text = await resp.text();
-    console.log('❌ OPEC International error body:', text.substring(0, 200));
+    debugErrors.push(`intl:${resp.status}:${text.substring(0, 100)}`);
     return {};
   }
 
   const json = await resp.json();
+  if (json?.error) {
+    debugErrors.push(`intl:api_error:${JSON.stringify(json.error).substring(0, 100)}`);
+    return {};
+  }
   const records = json?.response?.data || [];
-  console.log(`📊 OPEC International: ${records.length} records`);
 
   const latest: Record<string, { production: number; period: string }> = {};
   for (const rec of records) {
@@ -151,11 +150,15 @@ async function fetchSTEO(apiKey: string): Promise<Record<string, { production: n
 
   if (!resp.ok) {
     const text = await resp.text();
-    console.log('❌ OPEC STEO error body:', text.substring(0, 200));
+    debugErrors.push(`steo:${resp.status}:${text.substring(0, 100)}`);
     return {};
   }
 
   const json = await resp.json();
+  if (json?.error) {
+    debugErrors.push(`steo:api_error:${JSON.stringify(json.error).substring(0, 100)}`);
+    return {};
+  }
   const records = json?.response?.data || [];
   console.log(`📊 OPEC STEO: ${records.length} records`);
 
@@ -289,9 +292,9 @@ export async function GET() {
     const { data: prodData, debug } = await fetchEIAProduction();
     console.log(`🛢️ OPEC: Got production data for ${Object.keys(prodData).length} countries via ${debug}`);
 
-    const data = buildOPECData(prodData, debug);
+    const data = buildOPECData(prodData, debug + (debugErrors.length > 0 ? ` | errors: ${debugErrors.join('; ')}` : ''));
+    debugErrors.length = 0; // clear for next request
     
-    // Only cache if we have real data
     if (Object.keys(prodData).length > 0) {
       cache = { data, ts: Date.now() };
     }
