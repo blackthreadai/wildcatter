@@ -15,33 +15,33 @@ export default function SPRChartWidget() {
   useEffect(() => {
     const fetchSPRData = async () => {
       try {
+        console.log('📡 Fetching SPR data from EIA API...');
         const response = await fetch('/api/spr-data');
         const sprData = await response.json();
-        setData(sprData.historical || []);
-        setCurrentLevel(sprData.current || null);
+        
+        console.log('📊 SPR API Response:', { 
+          current: sprData.current, 
+          historical: sprData.historical?.length || 0,
+          error: sprData.error 
+        });
+        
+        if (sprData.error || !sprData.historical || sprData.historical.length === 0) {
+          console.log('❌ No real SPR data available');
+          setData([]);
+          setCurrentLevel(null);
+        } else {
+          console.log('✅ Real SPR data loaded successfully');
+          setData(sprData.historical);
+          setCurrentLevel(sprData.current);
+        }
+        
         setLoading(false);
       } catch (error) {
-        console.error('Failed to fetch SPR data:', error);
+        console.error('❌ Failed to fetch SPR data:', error);
         
-        // Fallback historical data (approximate from the chart you showed)
-        const fallbackData: SPRData[] = [
-          { date: '2020-01', value: 635 },
-          { date: '2020-06', value: 656 },
-          { date: '2021-01', value: 638 },
-          { date: '2021-06', value: 621 },
-          { date: '2022-01', value: 594 },
-          { date: '2022-06', value: 493 },
-          { date: '2022-12', value: 387 },
-          { date: '2023-06', value: 359 },
-          { date: '2023-12', value: 383 },
-          { date: '2024-06', value: 394 },
-          { date: '2024-12', value: 408 },
-          { date: '2025-06', value: 389 },
-          { date: '2025-12', value: 402 },
-        ];
-        
-        setData(fallbackData);
-        setCurrentLevel(402);
+        // NO FALLBACK DATA - show empty state
+        setData([]);
+        setCurrentLevel(null);
         setLoading(false);
       }
     };
@@ -156,10 +156,20 @@ export default function SPRChartWidget() {
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>STRATEGIC RESERVE</h3>
       </div>
       <div className="flex-1 p-1 overflow-hidden bg-black">
-        {/* Chart */}
-        <div className="w-full flex justify-center mb-2">
-          {renderChart()}
-        </div>
+        {data.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <div className="text-red-400 text-xs font-bold mb-2">EIA API UNAVAILABLE</div>
+              <div className="text-gray-500 text-xs">Real SPR data requires EIA API key</div>
+              <div className="text-gray-600 text-xs mt-1">Check API configuration</div>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Chart */}
+            <div className="w-full flex justify-center mb-2">
+              {renderChart()}
+            </div>
         
         {/* Enhanced Stats */}
         {latestData && (
@@ -204,9 +214,11 @@ export default function SPRChartWidget() {
             </div>
             
             <div className="text-xs text-gray-500 text-center">
-              Source: U.S. Energy Information Administration
+              Source: U.S. Energy Information Administration (REAL-TIME)
             </div>
           </div>
+        )}
+          </>
         )}
       </div>
     </div>
