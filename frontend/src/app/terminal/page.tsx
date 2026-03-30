@@ -281,7 +281,7 @@ function DraggableWidget({
         </div>
       )}
       
-      <div className="h-full w-full relative">
+      <div className="h-full w-full overflow-hidden relative">
         {renderWidget()}
       </div>
     </div>
