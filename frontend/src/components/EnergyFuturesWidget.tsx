@@ -191,7 +191,7 @@ export default function EnergyFuturesWidget() {
               <div className="flex items-center justify-between mb-1">
                 <div className="text-white text-xs font-medium">{contract.expiry}</div>
                 <div className="text-white text-xs font-bold">
-                  ${contract.price.toFixed(2)}{activeCurve.unit ? activeCurve.unit.replace('$', '') : ''}
+                  ${contract.price.toFixed(2)}
                 </div>
               </div>
               
