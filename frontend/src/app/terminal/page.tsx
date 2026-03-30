@@ -1,19 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import NewsWidget from '@/components/NewsWidget';
 import YouTubeWidget from '@/components/YouTubeWidget';
 import WildcatterWidget from '@/components/IntelFeedWidget';
-import GreedFearWidget from '@/components/GreedFearWidget';
-import StockWidget from '@/components/StockWidget';
-import AsianStockWidget from '@/components/AsianStockWidget';
 import WorldClockWidget from '@/components/WorldClockWidget';
 import TravelAdvisoryWidget from '@/components/TravelAdvisoryWidget';
 import PredictionMarketsWidget from '@/components/PredictionMarketsWidget';
 import PreciousMetalsWidget from '@/components/PreciousMetalsWidget';
 import CryptocurrencyWidget from '@/components/CryptocurrencyWidget';
-import EuropeanEnergyMarketsWidget from '@/components/EuropeanEnergyMarketsWidget';
 import GlobalEnergyMarketsWidget from '@/components/GlobalEnergyMarketsWidget';
 import EconomicIndicatorsWidget from '@/components/EconomicIndicatorsWidget';
 import ClimateExtremesWidget from '@/components/ClimateExtremesWidget';
@@ -32,7 +27,6 @@ import GlobalFuelDemandWidget from '@/components/GlobalFuelDemandWidget';
 import PositionMonitorWidget from '@/components/PositionMonitorWidget';
 import AIPriceForecastWidget from '@/components/AIPriceForecastWidget';
 import EventCalendarWidget from '@/components/EventCalendarWidget';
-import TradeSignalsWidget from '@/components/TradeSignalsWidget';
 import WorldMapWidget from '@/components/WorldMapWidget';
 
 // Drag and drop imports
@@ -56,20 +50,18 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-// WorldMap is now a modular widget component
-
-// Widget configuration - defines all widgets in the grid
+// Widget configuration types
 type Widget = {
   id: string;
-  type: 'news' | 'youtube' | 'stock' | 'asian-stock' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'european-energy-markets' | 'global-energy-markets' | 'economic-indicators' | 'climate-extremes' | 'global-oil-tracker' | 'opec' | 'natural-gas' | 'oil-rig-tracker' | 'power-grid-stress' | 'refinery-outages' | 'sanctions' | 'energy-futures' | 'crack-spread' | 'global-lng' | 'carbon-credit' | 'global-fuel-demand' | 'position-monitor' | 'ai-price-forecast' | 'event-calendar' | 'trade-signals' | 'world-map';
+  type: 'news' | 'youtube' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'global-energy-markets' | 'economic-indicators' | 'climate-extremes' | 'global-oil-tracker' | 'opec' | 'natural-gas' | 'oil-rig-tracker' | 'power-grid-stress' | 'refinery-outages' | 'sanctions' | 'energy-futures' | 'crack-spread' | 'global-lng' | 'carbon-credit' | 'global-fuel-demand' | 'position-monitor' | 'ai-price-forecast' | 'event-calendar' | 'world-map';
   title: string;
   span?: { col: number; row: number };
-  region?: 'US' | 'RUSSIAN' | 'SOUTH AMERICAN' | 'AFRICAN' | 'ASIAN' | 'CLIMATE EXTREMES' | 'EUROPEAN ENERGY' | 'MIDDLE EAST ENERGY' | 'PRECIOUS METALS' | 'ECONOMIC INDICATORS' | 'CRYPTOCURRENCY' | 'EUROPEAN ENERGY MARKETS' | 'STRATEGIC RESERVE' | 'GLOBAL';
-  activeLayers?: string[]; // For world map widget
+  region?: 'STRATEGIC RESERVE' | 'GLOBAL';
+  activeLayers?: string[];
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '18.5-REORDERED-MODULES';
+const WIDGET_VERSION = '18.6-CLEANED-UP';
 
 const defaultWidgets: Widget[] = [
   // NEW CUSTOM ORDER AS REQUESTED
@@ -124,7 +116,6 @@ function DraggableWidget({
     isDragging,
   } = useSortable({ 
     id: widget.id,
-    // Only allow dragging from the drag handle, not the entire widget
     disabled: false
   });
 
@@ -143,10 +134,6 @@ function DraggableWidget({
         return <YouTubeWidget />;
       case 'intel-feed':
         return <WildcatterWidget />;
-      case 'stock':
-        return <StockWidget />;
-      case 'asian-stock':
-        return <AsianStockWidget />;
       case 'world-clock':
         return <WorldClockWidget />;
       case 'travel':
@@ -157,8 +144,6 @@ function DraggableWidget({
         return <PreciousMetalsWidget />;
       case 'cryptocurrency':
         return <CryptocurrencyWidget />;
-      case 'european-energy-markets':
-        return <EuropeanEnergyMarketsWidget />;
       case 'global-energy-markets':
         return <GlobalEnergyMarketsWidget />;
       case 'economic-indicators':
@@ -195,12 +180,10 @@ function DraggableWidget({
         return <AIPriceForecastWidget />;
       case 'event-calendar':
         return <EventCalendarWidget />;
-      case 'trade-signals':
-        return <TradeSignalsWidget />;
       case 'world-map':
         return <WorldMapWidget initialLayers={widget.activeLayers || ['geopolitical']} />;
       default:
-        return <NewsWidget region="US" title="US NEWS" />;
+        return <NewsWidget region="GLOBAL" title="NEWS" />;
     }
   };
 
@@ -233,7 +216,6 @@ function DraggableWidget({
     >
       {/* Control buttons in top-right */}
       <div className="absolute top-1 right-1 z-50 flex items-center gap-1 bg-black/80 rounded px-1 opacity-60 group-hover:opacity-100 transition-opacity">
-        {/* Eye icon button */}
         <div className="relative">
           <button
             onClick={(e) => {
@@ -263,7 +245,6 @@ function DraggableWidget({
           )}
         </div>
 
-        {/* Drag handle - 4-directional arrows */}
         <div 
           className="relative"
           onMouseEnter={() => setWidgetTooltip('drag')}
@@ -278,9 +259,7 @@ function DraggableWidget({
               stroke="currentColor" 
               viewBox="0 0 24 24"
             >
-              {/* Up and down arrows */}
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4M8 15l4 4 4-4" />
-              {/* Left and right arrows */}
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 8l-4 4 4 4M15 8l4 4-4 4" />
             </svg>
           </div>
@@ -292,8 +271,6 @@ function DraggableWidget({
           )}
         </div>
       </div>
-      
-      {/* Removed drag hint overlay per user request */}
       
       {/* Dragging overlay */}
       {isDragging && (
@@ -312,8 +289,6 @@ function DraggableWidget({
 }
 
 export default function TerminalPage() {
-  const [selectedRegion, setSelectedRegion] = useState('global');
-  const [searchQuery, setSearchQuery] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [marketData, setMarketData] = useState<{label: string; value: string; change: number}[]>([]);
   const [defconStatus, setDefconStatus] = useState<{level: number; description: string; color: string}>({
@@ -326,28 +301,6 @@ export default function TerminalPage() {
   const [showHidden, setShowHidden] = useState(false);
   const [showHomepagePopup, setShowHomepagePopup] = useState(false);
   const [hoveredTooltip, setHoveredTooltip] = useState<string | null>(null);
-
-  // Debug: Log when component renders
-  console.log('🦝 Terminal component render - Beta banner should be visible');
-
-  // Debug: Monitor banner visibility
-  useEffect(() => {
-    console.log('🚨 BETA BANNER: Component mounted, banner should be visible');
-    
-    // Check if banner exists in DOM after 3 seconds
-    const checkBanner = setTimeout(() => {
-      const banner = document.querySelector('.beta-warning-banner');
-      if (banner) {
-        console.log('✅ BETA BANNER: Still visible in DOM after 3s');
-      } else {
-        console.error('❌ BETA BANNER: MISSING FROM DOM after 3s!');
-      }
-    }, 3000);
-
-    return () => clearTimeout(checkBanner);
-  }, []);
-
-  // Remove the localStorage clearing to prevent interference
 
   // Tailwind safelist for dynamic classes (ensures they're not purged)
   // col-span-2 row-span-2 col-span-3
@@ -364,29 +317,22 @@ export default function TerminalPage() {
     })
   );
 
-  // Handle homepage setting
   const handleSetHomepage = () => {
     const url = window.location.origin + '/terminal';
     
-    // Try different browser methods
     try {
-      // For IE and older browsers
       if ((window as any).external && 'AddFavorite' in (window as any).external) {
         (window as any).external.AddFavorite(url, 'Wildcatter Energy Terminal');
       } else {
-        // For modern browsers, we can't set homepage directly
-        // Show instructions instead
         alert(`To set as homepage:\n\nChrome: Settings → On startup → Open specific page → Add: ${url}\nFirefox: Preferences → Home → Homepage → Use current page\nSafari: Preferences → General → Homepage`);
       }
     } catch (e) {
-      // Fallback to instructions
       alert(`To set as homepage:\n\nChrome: Settings → On startup → Open specific page → Add: ${url}\nFirefox: Preferences → Home → Homepage → Use current page\nSafari: Preferences → General → Homepage`);
     }
     
     setShowHomepagePopup(false);
   };
 
-  // Handle drag end
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
@@ -394,12 +340,9 @@ export default function TerminalPage() {
       setWidgets((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over?.id);
-
         const newOrder = arrayMove(items, oldIndex, newIndex);
         
-        // Save to localStorage
         localStorage.setItem('terminal-widget-order', JSON.stringify(newOrder));
-        
         return newOrder;
       });
     }
@@ -407,12 +350,10 @@ export default function TerminalPage() {
 
   // Load saved widget order and hidden widgets from localStorage
   useEffect(() => {
-    // Check version to force updates when we add new widgets
     const savedVersion = localStorage.getItem('terminal-widget-version');
     const shouldReset = savedVersion !== WIDGET_VERSION;
     
     if (shouldReset) {
-      // Clear old data and use new defaults
       localStorage.removeItem('terminal-widget-order');
       localStorage.removeItem('terminal-hidden-widgets');
       localStorage.setItem('terminal-widget-version', WIDGET_VERSION);
@@ -444,16 +385,13 @@ export default function TerminalPage() {
     }
   }, []);
 
-  // Toggle widget visibility
   const toggleWidgetVisibility = (widgetId: string) => {
     setHiddenWidgets(prev => {
       const newHidden = prev.includes(widgetId)
         ? prev.filter(id => id !== widgetId)
         : [...prev, widgetId];
       
-      // Save to localStorage
       localStorage.setItem('terminal-hidden-widgets', JSON.stringify(newHidden));
-      
       return newHidden;
     });
   };
@@ -463,8 +401,6 @@ export default function TerminalPage() {
     showHidden || !hiddenWidgets.includes(widget.id)
   );
 
-  // Removed regions and layers arrays - now handled per widget instance
-
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -473,12 +409,10 @@ export default function TerminalPage() {
   }, []);
 
   useEffect(() => {
-    // Fetch market data
     const fetchMarketData = async () => {
       try {
         const response = await fetch('/api/market');
         const data = await response.json();
-        // Filter for WTI, Brent, and Gasoline
         const filtered = data.filter((item: any) => 
           item.label === 'WTI' || 
           item.label === 'BRENT' || 
@@ -490,7 +424,6 @@ export default function TerminalPage() {
       }
     };
 
-    // Fetch DEFCON status
     const fetchDefconStatus = async () => {
       try {
         const response = await fetch('/api/defcon');
@@ -504,16 +437,14 @@ export default function TerminalPage() {
     fetchMarketData();
     fetchDefconStatus();
     
-    const marketInterval = setInterval(fetchMarketData, 60000); // Update every minute
-    const defconInterval = setInterval(fetchDefconStatus, 12 * 60 * 60000); // Update every 12 hours
+    const marketInterval = setInterval(fetchMarketData, 60000);
+    const defconInterval = setInterval(fetchDefconStatus, 12 * 60 * 60000);
     
     return () => {
       clearInterval(marketInterval);
       clearInterval(defconInterval);
     };
   }, []);
-
-  // Layer control moved to individual map widget instances
 
   const formatDateTime = (date: Date) => {
     return date.toLocaleDateString('en-US', {
@@ -530,7 +461,6 @@ export default function TerminalPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Leaflet CSS overrides for dark theme + Masonry Layout Styles */}
       <style jsx global>{`
         /* FORCE BETA BANNER TO ALWAYS STAY VISIBLE */
         .beta-warning-banner {
@@ -651,7 +581,6 @@ export default function TerminalPage() {
         }
       `}</style>
 
-      {/* Beta Warning Banner - FORCED ALWAYS VISIBLE */}
       <div className="beta-warning-banner bg-red-600 border-b border-red-500 px-6 py-2 sticky top-0 z-[99999] w-full">
         <div className="flex items-center justify-center text-center">
           <div className="flex items-center gap-3">
@@ -666,24 +595,16 @@ export default function TerminalPage() {
         </div>
       </div>
 
-      {/* Header Bar */}
       <header className="bg-black border-b border-gray-800 px-6 py-4">
         <div className="flex items-center justify-between">
-          {/* Left Side - Logo + Version + Market Data */}
           <div className="flex items-center gap-6">
-            {/* Logo */}
             <div className="flex items-center gap-3">
               <img src="/w-icon.svg" alt="W" className="w-8 h-8" />
               <span className="text-[#DAA520] text-sm font-light tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>TERMINAL</span>
             </div>
 
-            {/* Version */}
             <span className="text-gray-400 text-sm">v1.1</span>
-
-            {/* Separator */}
             <span className="text-gray-400 text-sm">|</span>
-
-            {/* Market Snapshot */}
             <div className="flex items-center gap-4 text-sm">
               <span className="text-gray-400 tracking-wider">MARKET SNAPSHOT</span>
               {marketData.map((item, i) => (
@@ -698,13 +619,8 @@ export default function TerminalPage() {
             </div>
           </div>
 
-          {/* Right Side - DEFCON + Control Buttons */}
           <div className="flex items-center gap-4">
-            {/* DEFCON Status moved to subheader */}
-
-            {/* Control Buttons Group */}
             <div className="flex items-center gap-1 relative">
-              {/* Homepage Button */}
               <div className="relative">
                 <button 
                   onClick={() => setShowHomepagePopup(true)}
@@ -724,7 +640,6 @@ export default function TerminalPage() {
                 )}
               </div>
 
-              {/* View Hidden Widgets Button */}
               <div className="relative">
                 <button 
                   onClick={() => setShowHidden(!showHidden)}
@@ -749,7 +664,6 @@ export default function TerminalPage() {
                       <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                     </svg>
                   )}
-                  {/* Hidden Widget Counter */}
                   {hiddenWidgets.length > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                       {hiddenWidgets.length}
@@ -764,7 +678,6 @@ export default function TerminalPage() {
                 )}
               </div>
 
-              {/* Reset Widgets Button */}
               <div className="relative">
                 <button 
                   onClick={() => {
@@ -791,7 +704,6 @@ export default function TerminalPage() {
                 )}
               </div>
 
-              {/* Settings Gear */}
               <div className="relative">
                 <button 
                   onMouseEnter={() => setHoveredTooltip('settings')}
@@ -815,9 +727,7 @@ export default function TerminalPage() {
         </div>
       </header>
 
-      {/* Main Content */}
       <div className="h-[calc(100vh-115px)] relative">
-        {/* Status Bar with Date/Time and DEFCON Status */}
         <div className="bg-gray-800 border-b border-gray-700 py-2 px-6 pb-3">
           <div className="flex items-center justify-center gap-8">
             <span className="text-white text-sm font-thin tracking-[0.1em] uppercase" style={{ fontStretch: 'condensed' }}>
@@ -835,8 +745,7 @@ export default function TerminalPage() {
               <span>DEFCON {defconStatus.level}</span>
             </div>
             
-            {/* iOS App Promotion Link */}
-            <a 
+            < 
               href="https://apps.apple.com/app/wildcatter-energy-intelligence/id123456789" 
               target="_blank" 
               rel="noopener noreferrer"
@@ -851,7 +760,6 @@ export default function TerminalPage() {
           </div>
         </div>
 
-        {/* Full Height - Draggable Widget Grid */}
         <div className="flex-1 bg-black p-2 min-h-0">
           <DndContext 
             sensors={sensors}
@@ -883,7 +791,6 @@ export default function TerminalPage() {
         </div>
       </div>
 
-      {/* Homepage Popup */}
       {showHomepagePopup && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
           <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 max-w-md w-full mx-4">
