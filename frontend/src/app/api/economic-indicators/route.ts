@@ -75,8 +75,18 @@ const CACHE_MS = 4 * 60 * 60 * 1000;
 
 async function fetchFREDSeries(seriesId: string, limit: number = 2): Promise<any[]> {
   try {
-    // FRED API - No API key required for basic usage
-    const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&file_type=json&limit=${limit}&sort_order=desc`;
+    const fredApiKey = process.env.FRED_API_KEY;
+    
+    console.log(`🔑 FRED API Key available for ${seriesId}:`, !!fredApiKey);
+    
+    if (!fredApiKey || fredApiKey === 'your_fred_key_here') {
+      console.log(`❌ No valid FRED API key configured for ${seriesId}`);
+      return [];
+    }
+    
+    const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${fredApiKey}&file_type=json&limit=${limit}&sort_order=desc`;
+    
+    console.log(`🌐 Calling FRED API for ${seriesId}:`, url.replace(fredApiKey, '[REDACTED]'));
     
     const response = await fetch(url, {
       headers: {
@@ -85,16 +95,31 @@ async function fetchFREDSeries(seriesId: string, limit: number = 2): Promise<any
       signal: AbortSignal.timeout(10000)
     });
     
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    console.log(`📡 FRED Response Status for ${seriesId}:`, response.status);
+    
+    if (!response.ok) {
+      console.log(`❌ FRED API failed for ${seriesId}:`, response.status, response.statusText);
+      return [];
+    }
     
     const data = await response.json();
+    
+    if (data.error_code) {
+      console.log(`❌ FRED API error for ${seriesId}:`, data.error_message);
+      return [];
+    }
+    
     const observations = data?.observations || [];
+    console.log(`📊 FRED data for ${seriesId}: ${observations.length} observations received`);
     
     // Filter out missing data points (marked with ".")
-    return observations.filter((obs: any) => obs.value && obs.value !== '.' && !isNaN(parseFloat(obs.value)));
+    const validObservations = observations.filter((obs: any) => obs.value && obs.value !== '.' && !isNaN(parseFloat(obs.value)));
+    console.log(`✅ Valid data points for ${seriesId}: ${validObservations.length}`);
+    
+    return validObservations;
     
   } catch (error) {
-    console.error(`FRED API error for ${seriesId}:`, error);
+    console.error(`❌ FRED API fetch error for ${seriesId}:`, error);
     return [];
   }
 }
