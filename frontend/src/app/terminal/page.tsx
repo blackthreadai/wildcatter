@@ -61,7 +61,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '18.6-CLEANED-UP';
+const WIDGET_VERSION = '18.7-FEDERAL-RESERVE-STYLING';
 
 const defaultWidgets: Widget[] = [
   // NEW CUSTOM ORDER AS REQUESTED
