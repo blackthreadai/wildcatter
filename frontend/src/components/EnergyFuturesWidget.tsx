@@ -215,7 +215,7 @@ export default function EnergyFuturesWidget() {
               </div>
               
               <div className="text-xs text-gray-500 mt-1">
-                OI: {(contract.openInterest / 1000).toFixed(0)}K
+                Vol: {(contract.volume / 1000).toFixed(0)}K
               </div>
             </div>
           ))}
