@@ -49,35 +49,21 @@ export default function EconomicIndicatorsWidget() {
   }
 
   return (
-    <div className="w-full flex flex-col bg-black border-2 min-h-[400px] max-h-[500px] relative overflow-hidden" 
-         style={{
-           borderImageSource: 'linear-gradient(45deg, #1e40af, #3b82f6, #1e40af)',
-           borderImageSlice: 1,
-           boxShadow: '0 0 20px rgba(59, 130, 246, 0.3), inset 0 0 20px rgba(59, 130, 246, 0.1)'
-         }}>
-      {/* Federal Reserve Seal/Indicator */}
-      <div className="absolute top-1 left-1 z-10">
-        <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center border border-blue-400">
-          <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2L3.09 8.26l1.14 12.28L12 22l7.77-1.46L20.91 8.26L12 2zm-1 15.92V9.5L5.18 7.63l6.82-4.13v14.42zm2 0V3.5l6.82 4.13L14 9.5v8.42z"/>
-          </svg>
+    <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
+      <div className="bg-gray-800 p-2 flex-shrink-0 relative">
+        {/* Small Federal Reserve indicator */}
+        <div className="absolute top-1 right-1">
+          <div className="w-4 h-4 rounded-full bg-blue-600/20 flex items-center justify-center border border-blue-600/40">
+            <svg className="w-2 h-2 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
         </div>
+        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>ECONOMIC INDICATORS</h3>
+        <div className="text-blue-400 text-xs opacity-75">FED DATA</div>
       </div>
       
-      {/* Unique header with gradient */}
-      <div className="bg-gradient-to-r from-gray-800 via-blue-900 to-gray-800 p-2 flex-shrink-0 relative">
-        <h3 className="text-white text-xs font-bold tracking-[0.2em] text-center" style={{ fontStretch: 'condensed' }}>
-          ECONOMIC INDICATORS
-        </h3>
-        <div className="text-blue-300 text-xs text-center mt-1 opacity-75">FEDERAL RESERVE DATA</div>
-      </div>
-      
-      <div className="flex-1 bg-gradient-to-b from-black to-gray-900 px-3 py-1 relative">
-        {/* Subtle background pattern */}
-        <div className="absolute inset-0 opacity-5" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%233b82f6' fill-opacity='0.3'%3E%3Ccircle cx='3' cy='3' r='1'/%3E%3C/g%3E%3C/svg%3E")`
-        }}></div>
-        
+      <div className="flex-1 bg-black px-3 py-1">
         {indicators.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
@@ -89,9 +75,9 @@ export default function EconomicIndicatorsWidget() {
         ) : (
           <>
             {indicators.map((indicator, i) => (
-              <div key={indicator.name} className="flex items-center justify-between py-1 border-b border-blue-800/30 last:border-b-0 relative">
+              <div key={indicator.name} className="flex items-center justify-between py-1 border-b border-gray-700 last:border-b-0 relative">
                 <div className="min-w-0 flex-1">
-                  <div className="text-blue-300 text-xs font-semibold">{indicator.name}</div>
+                  <div className="text-[#DAA520] text-xs font-semibold">{indicator.name}</div>
                   <div className="text-gray-400 text-xs">{indicator.period}</div>
                 </div>
                 <div className="text-right ml-1">
@@ -101,13 +87,13 @@ export default function EconomicIndicatorsWidget() {
                     {indicator.name.includes('Treasury') || indicator.name.includes('Rate') || indicator.name.includes('Unemployment') ? 'bp' : '%'}
                   </div>
                 </div>
-                {/* Subtle indicator glow */}
-                <div className="absolute left-0 w-1 h-full bg-gradient-to-b from-transparent via-blue-500/20 to-transparent"></div>
+                {/* Subtle blue accent line */}
+                <div className="absolute left-0 w-1 h-full bg-gradient-to-b from-transparent via-blue-500/30 to-transparent"></div>
               </div>
             ))}
             
             {/* Source attribution */}
-            <div className="text-xs text-blue-400 text-center mt-2 pt-2 border-t border-blue-800/30">
+            <div className="text-xs text-gray-500 text-center mt-2 pt-2 border-t border-gray-700">
               Source: Federal Reserve Economic Data (FRED API)
             </div>
           </>
