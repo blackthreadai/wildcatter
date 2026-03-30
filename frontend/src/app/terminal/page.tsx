@@ -69,31 +69,29 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '18.4-BETA-WARNING-BANNER-FIXED';
+const WIDGET_VERSION = '18.5-REORDERED-MODULES';
 
 const defaultWidgets: Widget[] = [
-  // NEW DEFAULT ORDER - Consolidated global modules
+  // NEW CUSTOM ORDER AS REQUESTED
   { id: 'world-map', type: 'world-map', title: 'GLOBAL ENERGY MAP', span: { col: 3, row: 1 }, activeLayers: [] },
   { id: 'youtube', type: 'youtube', title: 'LIVE NEWS', span: { col: 2, row: 1 } },
-  { id: 'energy-news', type: 'news', title: 'ENERGY NEWS', region: 'GLOBAL' },
-  { id: 'global-energy-markets', type: 'global-energy-markets', title: 'ENERGY MARKETS' },
-  { id: 'position-monitor', type: 'position-monitor', title: 'POSITION MONITOR' },
-  { id: 'energy-futures', type: 'energy-futures', title: 'ENERGY FUTURES' },
-  { id: 'strategic-reserve', type: 'news', title: 'STRATEGIC RESERVE', region: 'STRATEGIC RESERVE' },
   { id: 'world-clock', type: 'world-clock', title: 'WORLD CLOCK' },
-  { id: 'opec', type: 'opec', title: 'OPEC' },
-  { id: 'travel', type: 'travel', title: 'TRAVEL ADVISORIES' },
-  { id: 'economic-indicators', type: 'economic-indicators', title: 'ECONOMIC INDICATORS' },
+  { id: 'energy-news', type: 'news', title: 'ENERGY NEWS', region: 'GLOBAL' },
+  { id: 'strategic-reserve', type: 'news', title: 'STRATEGIC RESERVE', region: 'STRATEGIC RESERVE' },
+  { id: 'global-energy-markets', type: 'global-energy-markets', title: 'ENERGY MARKETS' },
   { id: 'precious-metals', type: 'precious-metals', title: 'PRECIOUS METALS' },
-  
-  // Secondary modules (streamlined layout)
-  { id: 'global-oil-tracker', type: 'global-oil-tracker', title: 'GLOBAL O/G TRACKER' },
+  { id: 'economic-indicators', type: 'economic-indicators', title: 'ECONOMIC INDICATORS' },
+  { id: 'energy-futures', type: 'energy-futures', title: 'ENERGY FUTURES' },
   { id: 'predictions', type: 'prediction', title: 'PREDICTION MARKETS' },
+  { id: 'position-monitor', type: 'position-monitor', title: 'POSITION MONITOR' },
+  { id: 'opec', type: 'opec', title: 'OPEC' },
   { id: 'natural-gas', type: 'natural-gas', title: 'NATURAL GAS' },
+  { id: 'travel', type: 'travel', title: 'TRAVEL ADVISORIES' },
+  { id: 'cryptocurrency', type: 'cryptocurrency', title: 'CRYPTOCURRENCY' },
+  { id: 'global-oil-tracker', type: 'global-oil-tracker', title: 'GLOBAL O/G TRACKER' },
   { id: 'intel-feed', type: 'intel-feed', title: 'WILDCATTER' },
   { id: 'power-grid-stress', type: 'power-grid-stress', title: 'POWER GRID STRESS' },
   { id: 'climate-extremes', type: 'climate-extremes', title: 'CLIMATE EXTREMES' },
-  { id: 'cryptocurrency', type: 'cryptocurrency', title: 'CRYPTOCURRENCY' },
   { id: 'oil-rig-tracker', type: 'oil-rig-tracker', title: 'OIL RIG TRACKER' },
   { id: 'refinery-outages', type: 'refinery-outages', title: 'REFINERY OUTAGES' },
   { id: 'sanctions', type: 'sanctions', title: 'SANCTIONS' },
