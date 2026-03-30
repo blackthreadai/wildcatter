@@ -79,75 +79,7 @@ async function fetchGoldAPIMetals(): Promise<PreciousMetal[]> {
   }
 }
 
-async function fetchMetalFromYahoo(symbol: string): Promise<PreciousMetal | null> {
-  try {
-    const url = `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=2d&includePrePost=false`;
-    const response = await fetch(url, {
-      headers: { 
-        'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
-        'Accept': 'application/json'
-      },
-      signal: AbortSignal.timeout(8000)
-    }).catch(() => null);
-    
-    if (!response || !response.ok) {
-      throw new Error(`HTTP ${response?.status || 'Network Error'}`);
-    }
-    
-    const data = await response.json().catch(() => null);
-    const meta = data?.chart?.result?.[0]?.meta;
-    
-    if (!meta?.regularMarketPrice || !meta?.chartPreviousClose || 
-        isNaN(meta.regularMarketPrice) || isNaN(meta.chartPreviousClose)) {
-      throw new Error('Invalid or missing data structure');
-    }
-    
-    const price = parseFloat(meta.regularMarketPrice);
-    const previousClose = parseFloat(meta.chartPreviousClose);
-    const change = price - previousClose;
-    const changePercent = (change / previousClose) * 100;
-    
-    // Map Yahoo symbols to metal info
-    let name = 'Unknown';
-    let metalSymbol = symbol;
-    
-    switch (symbol) {
-      case 'GC=F':
-        name = 'Gold';
-        metalSymbol = 'XAU';
-        break;
-      case 'SI=F':
-        name = 'Silver';
-        metalSymbol = 'XAG';
-        break;
-      case 'PL=F':
-        name = 'Platinum';
-        metalSymbol = 'XPT';
-        break;
-      case 'PA=F':
-        name = 'Palladium';
-        metalSymbol = 'XPD';
-        break;
-      case 'HG=F':
-        name = 'Copper';
-        metalSymbol = 'XCU';
-        break;
-    }
-    
-    return {
-      symbol: metalSymbol,
-      name,
-      price: parseFloat(price.toFixed(2)),
-      change: parseFloat(change.toFixed(2)),
-      changePercent: parseFloat(changePercent.toFixed(2)),
-      unit: 'USD/oz'
-    };
-    
-  } catch (error) {
-    console.error(`Failed to fetch ${symbol}:`, error);
-    return null;
-  }
-}
+// REMOVED YAHOO METALS FUNCTION - ONLY USING GOLDAPI.IO
 
 // NO MOCK DATA ALLOWED - REMOVED ENTIRELY
 
