@@ -192,6 +192,11 @@ export default function EnergyFuturesWidget() {
                 <div className="text-white text-xs font-medium">{contract.expiry}</div>
                 <div className="text-white text-xs font-bold">
                   ${contract.price ? contract.price.toFixed(2) : 'N/A'}
+                  <span className="text-gray-400 text-xs ml-1">
+                    {activeCurve.commodity === 'WTI Crude' || activeCurve.commodity === 'Brent Crude' ? '/bbl' :
+                     activeCurve.commodity === 'RBOB Gasoline' || activeCurve.commodity === 'Heating Oil' ? '/gal' :
+                     activeCurve.commodity === 'Natural Gas' ? '/MMBtu' : ''}
+                  </span>
                 </div>
               </div>
               
