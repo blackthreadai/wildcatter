@@ -534,7 +534,7 @@ export default function TerminalPage() {
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
-        /* Scrollbar styles */
+        /* Scrollbar styles - SQUARE ENDS */
         .scrollbar-thin {
           scrollbar-width: thin;
         }
@@ -546,10 +546,15 @@ export default function TerminalPage() {
         }
         .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb {
           background: #4b5563;
-          border-radius: 6px;
+          border-radius: 0px; /* SQUARE CORNERS */
         }
         .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb:hover {
           background: #6b7280;
+          border-radius: 0px; /* SQUARE CORNERS */
+        }
+        /* Square scrollbar buttons */
+        .scrollbar-thumb-gray-600::-webkit-scrollbar-button {
+          border-radius: 0px; /* SQUARE CORNERS */
         }
         /* Geopolitical alert pulse animation */
         @keyframes pulse {
@@ -574,10 +579,11 @@ export default function TerminalPage() {
         }
         .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb {
           background: #4b5563;
-          border-radius: 2px;
+          border-radius: 0px; /* SQUARE CORNERS */
         }
         .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb:hover {
           background: #6b7280;
+          border-radius: 0px; /* SQUARE CORNERS */
         }
         .leaflet-popup-content-wrapper {
           background: #1f2937 !important;

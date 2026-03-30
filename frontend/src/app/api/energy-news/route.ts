@@ -18,28 +18,28 @@ async function fetchLiveEnergyNews(): Promise<GlobalEnergyNewsArticle[]> {
   try {
     console.log('🔄 Attempting to fetch from REAL RSS sources');
     
-    // Focus on WORKING sources + Google News searches for comprehensive energy coverage
+    // Mix mainstream sources with industry sources for comprehensive coverage
     const promises = [
-      fetchOilPriceRSS(),                // ✅ CONFIRMED WORKING
-      fetchGoogleNewsEnergyRSS(),        // Google News: "oil gas energy"
-      fetchGoogleNewsOilCompaniesRSS(),  // Google News: oil company news  
-      fetchGoogleNewsPipelineRSS(),      // Google News: pipeline energy
-      fetchGoogleNewsOPECRSS(),          // Google News: OPEC energy
-      fetchGoogleNewsLNGRSS(),           // Google News: LNG natural gas
-      fetchGoogleNewsRenewableRSS(),     // Google News: renewable energy
-      fetchGoogleNewsEnergyStocksRSS(),  // Google News: energy stocks
-      fetchGoogleNewsEnergyMarketsRSS(), // Google News: energy markets
-      fetchGoogleNewsGlobalEnergyRSS(),  // Google News: global energy news
-      fetchReutersEnergySearchRSS()      // Google News: Reuters energy
+      fetchOilPriceRSS(),                    // Industry source (confirmed working)
+      fetchGoogleNewsReutersEnergyRSS(),     // Reuters energy coverage  
+      fetchGoogleNewsBloombergEnergyRSS(),   // Bloomberg energy coverage
+      fetchGoogleNewsAPEnergyRSS(),          // AP energy coverage
+      fetchGoogleNewsGeneralEnergyRSS(),     // General energy from all sources
+      fetchGoogleNewsOilCompaniesRSS(),      // Oil company news from mainstream outlets
+      fetchGoogleNewsEnergyMarketsRSS(),     // Energy markets from financial press
+      fetchGoogleNewsOPECRSS(),              // OPEC coverage from major outlets
+      fetchGoogleNewsLNGRSS(),               // LNG coverage from mainstream sources
+      fetchGoogleNewsEnergyStocksRSS(),      // Energy stocks from financial news
+      fetchGoogleNewsGlobalEnergyRSS()       // Global energy from international outlets
     ];
     
     const results = await Promise.allSettled(promises);
     const liveArticles: GlobalEnergyNewsArticle[] = [];
     
     const sourceNames = [
-      'Oilprice.com', 'General Energy', 'Oil Companies', 'Pipelines', 'OPEC',
-      'LNG Markets', 'Renewable Energy', 'Energy Stocks', 'Energy Markets', 
-      'Global Energy', 'Reuters Energy'
+      'Oilprice.com', 'Reuters Energy', 'Bloomberg Energy', 'AP Energy', 'General Energy',
+      'Oil Companies', 'Energy Markets', 'OPEC Coverage', 'LNG Markets', 
+      'Energy Stocks', 'Global Energy'
     ];
     
     results.forEach((result, index) => {
@@ -69,13 +69,38 @@ async function fetchLiveEnergyNews(): Promise<GlobalEnergyNewsArticle[]> {
   }
 }
 
-// Extract source name from Google News title (e.g. "Title - Reuters" -> "Reuters")
+// Decode HTML entities in titles and descriptions
+function decodeHtmlEntities(text: string): string {
+  const entities: { [key: string]: string } = {
+    '&#039;': "'",
+    '&#8217;': "'", 
+    '&#8216;': "'",
+    '&#8220;': '"',
+    '&#8221;': '"',
+    '&quot;': '"',
+    '&amp;': '&',
+    '&lt;': '<',
+    '&gt;': '>',
+    '&nbsp;': ' ',
+    '&#8211;': '–',
+    '&#8212;': '—',
+    '&#8230;': '…'
+  };
+  
+  let decoded = text;
+  for (const [entity, char] of Object.entries(entities)) {
+    decoded = decoded.replace(new RegExp(entity, 'g'), char);
+  }
+  return decoded;
+}
+
+// Extract source name from Google News title (e.g. "Title - Reuters" -> "Reuters") 
 function extractSourceFromTitle(title: string): string {
   const parts = title.split(' - ');
   if (parts.length > 1) {
     const lastPart = parts[parts.length - 1].trim();
     // Common news sources
-    if (['Reuters', 'Bloomberg', 'AP', 'BBC', 'CNN', 'WSJ', 'MarketWatch', 'Yahoo', 'Forbes'].some(src => lastPart.includes(src))) {
+    if (['Reuters', 'Bloomberg', 'AP', 'BBC', 'CNN', 'WSJ', 'MarketWatch', 'Yahoo', 'Forbes', 'Financial Times'].some(src => lastPart.includes(src))) {
       return lastPart;
     }
   }
@@ -106,7 +131,7 @@ async function fetchOilPriceRSS(): Promise<GlobalEnergyNewsArticle[]> {
       const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
-        const title = titleMatch[1].trim();
+        const title = decodeHtmlEntities(titleMatch[1].trim());
         const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
         
         articles.push({
@@ -115,7 +140,7 @@ async function fetchOilPriceRSS(): Promise<GlobalEnergyNewsArticle[]> {
           publishedAt: new Date(pubDateMatch[1]).toISOString(),
           source: 'Oilprice.com',
           region: 'Global',
-          summary: description.slice(0, 200)
+          summary: decodeHtmlEntities(description.slice(0, 200))
         });
       }
     }
@@ -129,16 +154,157 @@ async function fetchOilPriceRSS(): Promise<GlobalEnergyNewsArticle[]> {
   }
 }
 
-async function fetchGoogleNewsEnergyRSS(): Promise<GlobalEnergyNewsArticle[]> {
+async function fetchGoogleNewsReutersEnergyRSS(): Promise<GlobalEnergyNewsArticle[]> {
   try {
-    console.log('🔄 Fetching Google News: General Energy...');
-    const response = await fetch('https://news.google.com/rss/search?q=oil+gas+energy+industry+petroleum&hl=en-US&gl=US&ceid=US:en', {
+    console.log('🔄 Fetching Google News: Reuters Energy...');
+    const response = await fetch('https://news.google.com/rss/search?q=site:reuters.com+(oil+OR+gas+OR+energy+OR+petroleum+OR+crude+OR+pipeline)&hl=en-US&gl=US&ceid=US:en', {
       headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
       signal: AbortSignal.timeout(10000)
     });
     
     if (!response.ok) {
-      console.log(`❌ Google Energy News failed: HTTP ${response.status}`);
+      console.log(`❌ Reuters Energy failed: HTTP ${response.status}`);
+      return [];
+    }
+    
+    const xmlText = await response.text();
+    const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
+    const articles: GlobalEnergyNewsArticle[] = [];
+    
+    for (const item of items.slice(0, 6)) {
+      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
+      const linkMatch = item.match(/<link>(.*?)<\/link>/);
+      const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
+      const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/);
+      
+      if (titleMatch && linkMatch && pubDateMatch) {
+        const title = decodeHtmlEntities(titleMatch[1].trim());
+        const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
+        
+        articles.push({
+          title: title,
+          url: linkMatch[1].trim(),
+          publishedAt: new Date(pubDateMatch[1]).toISOString(),
+          source: 'Reuters',
+          region: 'Global',
+          summary: decodeHtmlEntities(description.slice(0, 200))
+        });
+      }
+    }
+    
+    console.log(`✅ Reuters Energy: Found ${articles.length} articles`);
+    return articles;
+    
+  } catch (error) {
+    console.error('❌ Reuters Energy fetch error:', error);
+    return [];
+  }
+}
+
+async function fetchGoogleNewsBloombergEnergyRSS(): Promise<GlobalEnergyNewsArticle[]> {
+  try {
+    console.log('🔄 Fetching Google News: Bloomberg Energy...');
+    const response = await fetch('https://news.google.com/rss/search?q=site:bloomberg.com+(oil+OR+gas+OR+energy+OR+petroleum+OR+crude+OR+commodities)&hl=en-US&gl=US&ceid=US:en', {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
+      signal: AbortSignal.timeout(10000)
+    });
+    
+    if (!response.ok) {
+      console.log(`❌ Bloomberg Energy failed: HTTP ${response.status}`);
+      return [];
+    }
+    
+    const xmlText = await response.text();
+    const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
+    const articles: GlobalEnergyNewsArticle[] = [];
+    
+    for (const item of items.slice(0, 6)) {
+      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
+      const linkMatch = item.match(/<link>(.*?)<\/link>/);
+      const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
+      const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/);
+      
+      if (titleMatch && linkMatch && pubDateMatch) {
+        const title = decodeHtmlEntities(titleMatch[1].trim());
+        const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
+        
+        articles.push({
+          title: title,
+          url: linkMatch[1].trim(),
+          publishedAt: new Date(pubDateMatch[1]).toISOString(),
+          source: 'Bloomberg',
+          region: 'Global',
+          summary: decodeHtmlEntities(description.slice(0, 200))
+        });
+      }
+    }
+    
+    console.log(`✅ Bloomberg Energy: Found ${articles.length} articles`);
+    return articles;
+    
+  } catch (error) {
+    console.error('❌ Bloomberg Energy fetch error:', error);
+    return [];
+  }
+}
+
+async function fetchGoogleNewsAPEnergyRSS(): Promise<GlobalEnergyNewsArticle[]> {
+  try {
+    console.log('🔄 Fetching Google News: AP Energy...');
+    const response = await fetch('https://news.google.com/rss/search?q=site:apnews.com+(oil+OR+gas+OR+energy+OR+petroleum+OR+crude+OR+pipeline)&hl=en-US&gl=US&ceid=US:en', {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
+      signal: AbortSignal.timeout(10000)
+    });
+    
+    if (!response.ok) {
+      console.log(`❌ AP Energy failed: HTTP ${response.status}`);
+      return [];
+    }
+    
+    const xmlText = await response.text();
+    const items = xmlText.match(/<item>[\s\S]*?<\/item>/g) || [];
+    const articles: GlobalEnergyNewsArticle[] = [];
+    
+    for (const item of items.slice(0, 5)) {
+      const titleMatch = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/) || item.match(/<title>(.*?)<\/title>/);
+      const linkMatch = item.match(/<link>(.*?)<\/link>/);
+      const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
+      const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/);
+      
+      if (titleMatch && linkMatch && pubDateMatch) {
+        const title = decodeHtmlEntities(titleMatch[1].trim());
+        const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
+        
+        articles.push({
+          title: title,
+          url: linkMatch[1].trim(),
+          publishedAt: new Date(pubDateMatch[1]).toISOString(),
+          source: 'AP News',
+          region: 'Global',
+          summary: decodeHtmlEntities(description.slice(0, 200))
+        });
+      }
+    }
+    
+    console.log(`✅ AP Energy: Found ${articles.length} articles`);
+    return articles;
+    
+  } catch (error) {
+    console.error('❌ AP Energy fetch error:', error);
+    return [];
+  }
+}
+
+async function fetchGoogleNewsGeneralEnergyRSS(): Promise<GlobalEnergyNewsArticle[]> {
+  try {
+    console.log('🔄 Fetching Google News: General Energy...');
+    const response = await fetch('https://news.google.com/rss/search?q=(oil+OR+gas+OR+energy)+AND+(reuters+OR+bloomberg+OR+wsj+OR+cnn+OR+bbc)&hl=en-US&gl=US&ceid=US:en', {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
+      signal: AbortSignal.timeout(10000)
+    });
+    
+    if (!response.ok) {
+      console.log(`❌ General Energy failed: HTTP ${response.status}`);
       return [];
     }
     
@@ -153,7 +319,7 @@ async function fetchGoogleNewsEnergyRSS(): Promise<GlobalEnergyNewsArticle[]> {
       const descMatch = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/) || item.match(/<description>(.*?)<\/description>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
-        const title = titleMatch[1].trim();
+        const title = decodeHtmlEntities(titleMatch[1].trim());
         const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
         
         articles.push({
@@ -162,16 +328,16 @@ async function fetchGoogleNewsEnergyRSS(): Promise<GlobalEnergyNewsArticle[]> {
           publishedAt: new Date(pubDateMatch[1]).toISOString(),
           source: extractSourceFromTitle(title),
           region: 'Global',
-          summary: description.slice(0, 200)
+          summary: decodeHtmlEntities(description.slice(0, 200))
         });
       }
     }
     
-    console.log(`✅ Google Energy News: Found ${articles.length} articles`);
+    console.log(`✅ General Energy: Found ${articles.length} articles`);
     return articles;
     
   } catch (error) {
-    console.error('❌ Google Energy News fetch error:', error);
+    console.error('❌ General Energy fetch error:', error);
     return [];
   }
 }
@@ -199,7 +365,7 @@ async function fetchGoogleNewsOilCompaniesRSS(): Promise<GlobalEnergyNewsArticle
       const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
-        const title = titleMatch[1].trim();
+        const title = decodeHtmlEntities(titleMatch[1].trim());
         articles.push({
           title: title,
           url: linkMatch[1].trim(),
@@ -243,7 +409,7 @@ async function fetchGoogleNewsPipelineRSS(): Promise<GlobalEnergyNewsArticle[]> 
       const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
-        const title = titleMatch[1].trim();
+        const title = decodeHtmlEntities(titleMatch[1].trim());
         articles.push({
           title: title,
           url: linkMatch[1].trim(),
@@ -287,7 +453,7 @@ async function fetchGoogleNewsOPECRSS(): Promise<GlobalEnergyNewsArticle[]> {
       const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
-        const title = titleMatch[1].trim();
+        const title = decodeHtmlEntities(titleMatch[1].trim());
         articles.push({
           title: title,
           url: linkMatch[1].trim(),
@@ -331,7 +497,7 @@ async function fetchGoogleNewsLNGRSS(): Promise<GlobalEnergyNewsArticle[]> {
       const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
-        const title = titleMatch[1].trim();
+        const title = decodeHtmlEntities(titleMatch[1].trim());
         articles.push({
           title: title,
           url: linkMatch[1].trim(),
@@ -375,7 +541,7 @@ async function fetchGoogleNewsRenewableRSS(): Promise<GlobalEnergyNewsArticle[]>
       const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
-        const title = titleMatch[1].trim();
+        const title = decodeHtmlEntities(titleMatch[1].trim());
         articles.push({
           title: title,
           url: linkMatch[1].trim(),
@@ -419,7 +585,7 @@ async function fetchGoogleNewsEnergyStocksRSS(): Promise<GlobalEnergyNewsArticle
       const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
-        const title = titleMatch[1].trim();
+        const title = decodeHtmlEntities(titleMatch[1].trim());
         articles.push({
           title: title,
           url: linkMatch[1].trim(),
@@ -463,7 +629,7 @@ async function fetchGoogleNewsEnergyMarketsRSS(): Promise<GlobalEnergyNewsArticl
       const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
-        const title = titleMatch[1].trim();
+        const title = decodeHtmlEntities(titleMatch[1].trim());
         articles.push({
           title: title,
           url: linkMatch[1].trim(),
@@ -507,7 +673,7 @@ async function fetchGoogleNewsGlobalEnergyRSS(): Promise<GlobalEnergyNewsArticle
       const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
-        const title = titleMatch[1].trim();
+        const title = decodeHtmlEntities(titleMatch[1].trim());
         articles.push({
           title: title,
           url: linkMatch[1].trim(),
@@ -551,7 +717,7 @@ async function fetchReutersEnergySearchRSS(): Promise<GlobalEnergyNewsArticle[]>
       const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
       
       if (titleMatch && linkMatch && pubDateMatch) {
-        const title = titleMatch[1].trim();
+        const title = decodeHtmlEntities(titleMatch[1].trim());
         articles.push({
           title: title,
           url: linkMatch[1].trim(),
