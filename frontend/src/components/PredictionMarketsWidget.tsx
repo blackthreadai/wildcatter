@@ -74,7 +74,7 @@ export default function PredictionMarketsWidget() {
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>PREDICTION MARKETS</h3>
       </div>
       
-      <div className="flex-1 bg-black p-3 space-y-3 overflow-y-auto">
+      <div className="flex-1 bg-black p-3 space-y-3 overflow-y-auto min-h-0" style={{ scrollbarWidth: 'thin', scrollbarColor: '#4a5568 #1a202c' }}>
         {predictions.length === 0 ? (
           <div className="flex items-center justify-center h-full min-h-[200px]">
             <div className="text-center">
@@ -88,7 +88,7 @@ export default function PredictionMarketsWidget() {
             </div>
           </div>
         ) : (
-          predictions.slice(0, 3).map((prediction, i) => (
+          predictions.map((prediction, i) => (
           <div key={prediction.id} className="bg-gray-900 rounded-lg border border-gray-700 hover:border-[#DAA520] transition-all duration-200">
             <a 
               href={prediction.url} 
