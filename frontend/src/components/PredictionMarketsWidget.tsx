@@ -57,11 +57,11 @@ export default function PredictionMarketsWidget() {
 
   if (loading) {
     return (
-      <div className="w-full bg-black h-full">
-        <div className="bg-gray-800 p-2">
+      <div className="w-full bg-black h-full flex flex-col">
+        <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>PREDICTION MARKETS</h3>
         </div>
-        <div className="bg-black p-3 space-y-3" style={{ height: '340px', overflowY: 'scroll', scrollbarWidth: 'thin', scrollbarColor: '#4a5568 #1a202c' }}>
+        <div className="flex-1 bg-black p-3 space-y-3 overflow-y-auto min-h-0" style={{ scrollbarWidth: 'thin', scrollbarColor: '#4a5568 #1a202c' }}>
           <div className="flex items-center justify-center h-full">
             <div className="text-gray-500 text-xs">Loading...</div>
           </div>
@@ -71,12 +71,12 @@ export default function PredictionMarketsWidget() {
   }
 
   return (
-    <div className="w-full bg-black h-full">
-      <div className="bg-gray-800 p-2">
+    <div className="w-full bg-black h-full flex flex-col">
+      <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>PREDICTION MARKETS</h3>
       </div>
       
-      <div className="bg-black p-3 space-y-3" style={{ height: '340px', overflowY: 'scroll', scrollbarWidth: 'thin', scrollbarColor: '#4a5568 #1a202c' }}>
+      <div className="flex-1 bg-black p-3 space-y-3 overflow-y-auto min-h-0" style={{ scrollbarWidth: 'thin', scrollbarColor: '#4a5568 #1a202c' }}>
         {predictions.length === 0 ? (
           <div className="flex items-center justify-center h-full min-h-[200px]">
             <div className="text-center">
