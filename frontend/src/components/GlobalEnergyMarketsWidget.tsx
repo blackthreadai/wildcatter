@@ -63,9 +63,7 @@ export default function GlobalEnergyMarketsWidget() {
     return '●';
   };
 
-  const handleStockClick = (stock: GlobalEnergyStock) => {
-    window.open(stock.chartUrl, '_blank');
-  };
+  // REMOVED CLICK FUNCTIONALITY
 
   if (loading) {
     return (
@@ -102,8 +100,7 @@ export default function GlobalEnergyMarketsWidget() {
             {stocks.map((stock, i) => (
               <div
                 key={`${stock.symbol}-${i}`}
-                onClick={() => handleStockClick(stock)}
-                className="flex items-center justify-between py-1 px-2 hover:bg-gray-800 cursor-pointer transition-colors group border-b border-gray-800 last:border-b-0"
+                className="flex items-center justify-between py-1 px-2 hover:bg-gray-800 transition-colors border-b border-gray-800 last:border-b-0"
               >
                 {/* Left side - Symbol and name */}
                 <div className="flex-1 min-w-0">
