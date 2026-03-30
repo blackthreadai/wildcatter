@@ -201,7 +201,7 @@ function DraggableWidget({
   return (
     <div 
       ref={setNodeRef}
-      className={`relative group ${getSpanClasses()} border-b border-gray-700`}
+      className={`relative group ${getSpanClasses()} border border-gray-700 rounded-sm`}
       style={{
         ...style,
         opacity: isHidden ? 0.5 : 1,

@@ -48,7 +48,7 @@ export default function WorldMapWidget({ initialLayers = [] }: WorldMapWidgetPro
   };
 
   return (
-    <div className="w-full flex flex-col bg-black border border-gray-700 h-[400px]">
+    <div className="w-full flex flex-col bg-black h-full">
       <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-semibold tracking-wider">GLOBAL ENERGY MAP</h3>
       </div>

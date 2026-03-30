@@ -89,7 +89,7 @@ export default function TravelAdvisoryWidget() {
 
   if (loading) {
     return (
-      <div className="w-full flex flex-col bg-black border border-gray-700 h-full">
+      <div className="w-full flex flex-col bg-black h-full">
         <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-semibold tracking-wider">TRAVEL ADVISORIES</h3>
         </div>
@@ -101,7 +101,7 @@ export default function TravelAdvisoryWidget() {
   }
 
   return (
-    <div className="w-full flex flex-col bg-black border border-gray-700 h-full">
+    <div className="w-full flex flex-col bg-black h-full">
       <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-semibold tracking-wider">TRAVEL ADVISORIES</h3>
       </div>

@@ -13,7 +13,7 @@ export default function YouTubeWidget() {
   ];
 
   return (
-    <div className="w-full flex flex-col bg-black border border-gray-700 h-full">
+    <div className="w-full flex flex-col bg-black h-full">
       {/* Header */}
       <div className="bg-gray-800 p-2 flex-shrink-0 flex items-center justify-center relative">
         <h3 className="text-white text-xs font-bold tracking-[0.2em] absolute left-2" style={{ fontStretch: 'condensed' }}>LIVE NEWS</h3>

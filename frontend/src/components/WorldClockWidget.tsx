@@ -155,7 +155,7 @@ export default function WorldClockWidget() {
 
   if (loading) {
     return (
-      <div className="w-full flex flex-col bg-black border border-gray-700 h-full">
+      <div className="w-full flex flex-col bg-black h-full">
         <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>WORLD CLOCK</h3>
         </div>
@@ -167,7 +167,7 @@ export default function WorldClockWidget() {
   }
 
   return (
-    <div className="w-full flex flex-col bg-black border border-gray-700 h-full">
+    <div className="w-full flex flex-col bg-black h-full">
       <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>WORLD CLOCK</h3>
       </div>

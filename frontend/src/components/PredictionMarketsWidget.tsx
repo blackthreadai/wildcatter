@@ -57,7 +57,7 @@ export default function PredictionMarketsWidget() {
 
   if (loading) {
     return (
-      <div className="w-full bg-black border border-gray-700">
+      <div className="w-full bg-black h-full">
         <div className="bg-gray-800 p-2">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>PREDICTION MARKETS</h3>
         </div>
@@ -71,7 +71,7 @@ export default function PredictionMarketsWidget() {
   }
 
   return (
-    <div className="w-full bg-black border border-gray-700">
+    <div className="w-full bg-black h-full">
       <div className="bg-gray-800 p-2">
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>PREDICTION MARKETS</h3>
       </div>
