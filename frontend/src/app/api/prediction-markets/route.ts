@@ -15,13 +15,38 @@ interface PredictionMarket {
 let cache: { data: PredictionMarket[]; ts: number } | null = null;
 const CACHE_MS = 15 * 60 * 1000;
 
+// Filter for energy and geopolitical markets only
+function isEnergyGeopoliticalMarket(question: string): boolean {
+  const q = question.toLowerCase();
+  
+  // Core energy keywords - direct energy market relevance
+  const energyTerms = [
+    'oil', 'gas', 'energy', 'crude', 'brent', 'wti', 'opec', 'gasoline',
+    'petroleum', 'fuel', 'pipeline', 'refinery'
+  ];
+  
+  // Key geopolitical events that move energy markets
+  const geopoliticalTerms = [
+    'iran', 'russia', 'ukraine', 'china', 'war', 'strike', 'strikes',
+    'israel', 'saudi', 'venezuela', 'iraq', 'sanctions', 'invasion',
+    'conflict', 'embargo', 'middle east', 'persian gulf'
+  ];
+  
+  // Check if question contains any relevant terms
+  const allTerms = [...energyTerms, ...geopoliticalTerms];
+  const hasMatch = allTerms.some(term => q.includes(term));
+  
+  console.log(`🔍 Checking: "${question}" → ${hasMatch}`);
+  return hasMatch;
+}
+
 async function fetchRealPredictionMarkets(): Promise<PredictionMarket[]> {
   try {
     console.log('🔮 Fetching real Polymarket data...');
     
-    // Fetch top active prediction markets by volume from Polymarket
+    // Fetch more markets to filter for energy/geopolitical relevance
     const response = await fetch(
-      'https://gamma-api.polymarket.com/events?limit=10&order=volume&ascending=false', 
+      'https://gamma-api.polymarket.com/events?limit=50&order=volume&ascending=false', 
       {
         headers: {
           'User-Agent': 'Wildcatter-Terminal/1.0'
@@ -44,8 +69,17 @@ async function fetchRealPredictionMarkets(): Promise<PredictionMarket[]> {
     
     const markets: PredictionMarket[] = [];
     
-    // Process up to 3 top markets for the widget
-    for (const event of events.slice(0, 3)) {
+    // Filter for energy/geopolitical markets only
+    const relevantEvents = events.filter(event => {
+      if (!event.markets || !event.markets[0]) return false;
+      const question = event.markets[0].question || '';
+      return isEnergyGeopoliticalMarket(question);
+    });
+    
+    console.log(`🔍 Found ${relevantEvents.length} energy/geopolitical markets out of ${events.length} total`);
+    
+    // Process up to 3 top relevant markets for the widget
+    for (const event of relevantEvents.slice(0, 3)) {
       if (!event.markets || !event.markets[0]) continue;
       
       const market = event.markets[0];
@@ -75,17 +109,21 @@ async function fetchRealPredictionMarkets(): Promise<PredictionMarket[]> {
         volumeFormatted = `$${Math.round(volumeNum)}`;
       }
       
-      // Determine category from question content
-      let category = 'Politics';
+      // Determine category from question content (energy/geopolitical focus)
+      let category = 'Geopolitical';
       const question = market.question?.toLowerCase() || '';
-      if (question.includes('nba') || question.includes('nfl') || question.includes('sports')) {
-        category = 'Sports';
-      } else if (question.includes('bitcoin') || question.includes('crypto')) {
-        category = 'Crypto';
-      } else if (question.includes('election') || question.includes('president')) {
-        category = 'Politics';
-      } else if (question.includes('fed') || question.includes('rate') || question.includes('economy')) {
-        category = 'Economics';
+      if (question.includes('oil') || question.includes('gas') || question.includes('energy') || 
+          question.includes('crude') || question.includes('pipeline') || question.includes('opec')) {
+        category = 'Energy';
+      } else if (question.includes('war') || question.includes('strike') || question.includes('invasion') || 
+                 question.includes('sanctions') || question.includes('conflict')) {
+        category = 'Geopolitical';
+      } else if (question.includes('fed') || question.includes('rate') || question.includes('recession') ||
+                 question.includes('inflation') || question.includes('dollar')) {
+        category = 'Economic';
+      } else if (question.includes('iran') || question.includes('russia') || question.includes('ukraine') ||
+                 question.includes('china') || question.includes('israel') || question.includes('saudi')) {
+        category = 'Geopolitical';
       }
       
       markets.push({
