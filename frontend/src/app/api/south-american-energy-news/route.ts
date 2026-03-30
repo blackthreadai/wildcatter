@@ -12,66 +12,66 @@ interface SouthAmericanEnergyNewsArticle {
 let cache: { data: SouthAmericanEnergyNewsArticle[]; ts: number } | null = null;
 const CACHE_MS = 25 * 60 * 1000;
 
-// High-quality mock data for major South American energy news
+// Enhanced high-quality mock data for South American energy news
 function getMockSouthAmericanEnergyNews(): SouthAmericanEnergyNewsArticle[] {
   const now = new Date();
   
   return [
     {
-      title: "Brazil's Petrobras Discovers Massive Pre-Salt Oil Field in Santos Basin",
+      title: "Brazil's Petrobras Reports Record Q4 Profits of $12.8B from Pre-Salt Operations",
       url: "https://www.reuters.com/business/energy/",
-      publishedAt: new Date(now.getTime() - 1.5 * 60 * 60 * 1000).toISOString(),
+      publishedAt: new Date(now.getTime() - 1.2 * 60 * 60 * 1000).toISOString(),
       source: "Reuters",
-      summary: "Brazilian state oil company Petrobras announced a significant discovery in the Santos Basin pre-salt layer, estimated to contain over 1 billion barrels..."
+      summary: "Brazilian state oil giant Petrobras announces highest quarterly earnings in company history, driven by Santos Basin pre-salt production surge..."
     },
     {
-      title: "Venezuela Resumes Oil Exports to US Under New Sanctions Relief",
+      title: "Venezuela's Oil Production Doubles to 1.5M bpd Following Infrastructure Repairs",
       url: "https://www.bloomberg.com/news/americas",
-      publishedAt: new Date(now.getTime() - 2.5 * 60 * 60 * 1000).toISOString(),
+      publishedAt: new Date(now.getTime() - 2.3 * 60 * 60 * 1000).toISOString(),
       source: "Bloomberg",
-      summary: "Venezuela's state-owned PDVSA has resumed limited crude oil shipments to US refineries following partial sanctions relief..."
+      summary: "Venezuela's PDVSA restores key refineries and pipelines with Iranian technical assistance, marking fastest production recovery since 2019..."
     },
     {
-      title: "Argentina's Vaca Muerta Shale Production Reaches Record Highs",
+      title: "Argentina Launches $25B Vaca Muerta Mega-Pipeline to Atlantic Coast",
       url: "https://www.bnamericas.com/en/news/energy",
-      publishedAt: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString(),
+      publishedAt: new Date(now.getTime() - 3.1 * 60 * 60 * 1000).toISOString(),
       source: "BNamericas",
-      summary: "Argentina's Vaca Muerta shale formation produced a record 140,000 barrels per day in November, marking a 25% increase from the previous year..."
+      summary: "Argentina breaks ground on 1,400km pipeline connecting Vaca Muerta shale fields to new export terminals near Bahía Blanca..."
     },
     {
-      title: "Chile Awards 25 GW Solar Energy Projects in Atacama Desert",
+      title: "Chile's Green Hydrogen Corridor Attracts $30B in International Investment",
       url: "https://www.pv-magazine.com/",
-      publishedAt: new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString(),
+      publishedAt: new Date(now.getTime() - 4.4 * 60 * 60 * 1000).toISOString(),
       source: "PV Magazine",
-      summary: "Chilean government announced the approval of massive solar installations in the Atacama Desert, representing $18 billion in renewable energy investment..."
+      summary: "Chilean desert regions secure massive funding from European, Japanese, and Australian investors for world's largest green hydrogen hub..."
     },
     {
-      title: "Colombia's Pacific Coast Oil Exploration Faces Environmental Opposition",
+      title: "Colombia's Ecopetrol Discovers 800M Barrel Offshore Oil Field",
       url: "https://www.spglobal.com/commodityinsights/",
-      publishedAt: new Date(now.getTime() - 5 * 60 * 60 * 1000).toISOString(),
+      publishedAt: new Date(now.getTime() - 5.2 * 60 * 60 * 1000).toISOString(),
       source: "S&P Global",
-      summary: "Environmental groups challenge Ecopetrol's offshore exploration plans along Colombia's Pacific coast, citing biodiversity concerns..."
+      summary: "Colombian national oil company confirms major deepwater discovery in Caribbean Sea, potentially doubling country's proven reserves..."
     },
     {
-      title: "Peru's Natural Gas Exports to Argentina Surge Amid Energy Crisis",
+      title: "Peru Signs Historic LNG Supply Deal with Germany Worth $15B",
+      url: "https://www.naturalgasintel.com/",
+      publishedAt: new Date(now.getTime() - 6.6 * 60 * 60 * 1000).toISOString(),
+      source: "Natural Gas Intelligence",
+      summary: "Peru's Camisea gas project secures 15-year export contract with German utilities as Europe diversifies energy supply sources..."
+    },
+    {
+      title: "Brazil Ethanol Exports to Europe Surge 200% Amid Biofuel Mandate",
+      url: "https://www.biofuelsdigest.com/",
+      publishedAt: new Date(now.getTime() - 7.3 * 60 * 60 * 1000).toISOString(),
+      source: "Biofuels Digest",
+      summary: "Brazilian ethanol producers capitalize on EU renewable fuel requirements, shipping record volumes to Netherlands and Germany..."
+    },
+    {
+      title: "Guyana Starts Production at Third Oil Platform, Output Hits 650K bpd",
       url: "https://www.energyvoice.com/",
-      publishedAt: new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString(),
+      publishedAt: new Date(now.getTime() - 8.1 * 60 * 60 * 1000).toISOString(),
       source: "Energy Voice",
-      summary: "Peru increased natural gas exports to Argentina by 40% as neighboring country faces energy shortages during peak summer demand..."
-    },
-    {
-      title: "Brazil's Ethanol Production Hits 10-Year High Amid Global Demand",
-      url: "https://www.agrimoney.com/news/",
-      publishedAt: new Date(now.getTime() - 7 * 60 * 60 * 1000).toISOString(),
-      source: "Agrimoney",
-      summary: "Brazilian ethanol production reached 32 billion liters in 2025, driven by strong domestic demand and increased exports to Europe and Asia..."
-    },
-    {
-      title: "Ecuador Negotiates New Chinese Loan for Oil Infrastructure Development",
-      url: "https://www.upstreamonline.com/",
-      publishedAt: new Date(now.getTime() - 8 * 60 * 60 * 1000).toISOString(),
-      source: "Upstream Online",
-      summary: "Ecuador's government is finalizing a $3.5 billion loan from Chinese banks to modernize oil production facilities and boost daily output..."
+      summary: "ExxonMobil's Payara project comes online in Stabroek Block, establishing Guyana as South America's fastest-growing oil producer..."
     }
   ];
 }
@@ -97,7 +97,7 @@ export async function GET() {
     // Cache the results
     cache = { data: articles, ts: Date.now() };
     
-    // Return top 3 most recent articles
+    // Return top 8 most recent articles for consistent display
     return NextResponse.json(articles.slice(0, 8));
     
   } catch (error) {
