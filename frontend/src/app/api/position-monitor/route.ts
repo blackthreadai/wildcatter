@@ -1,286 +1,246 @@
 import { NextResponse } from 'next/server';
 
-interface PositionData {
-  instrument: string;
-  category: 'Crude Oil' | 'Natural Gas' | 'Refined Products' | 'Renewable Energy';
-  longPositions: number; // contracts or notional
-  shortPositions: number; // contracts or notional
-  netPositions: number; // net long/short
-  openInterest: number; // total open interest
-  positionChange: number; // weekly change in net positions
-  sentiment: 'Bullish' | 'Bearish' | 'Neutral';
-  unit: string;
-  lastUpdated: string;
+// Cache for 4 hours (COT data updates weekly on Fridays)
+let cache: { data: any; ts: number } | null = null;
+const CACHE_MS = 4 * 60 * 60 * 1000;
+
+// CFTC contract market codes for key energy commodities
+const ENERGY_CONTRACTS = [
+  { code: '067651', name: 'WTI Crude Oil', category: 'Crude Oil' },
+  { code: '023651', name: 'Natural Gas (Henry Hub)', category: 'Natural Gas' },
+  { code: '111659', name: 'RBOB Gasoline', category: 'Refined Products' },
+  { code: '022651', name: 'Heating Oil', category: 'Refined Products' },
+];
+
+interface COTRecord {
+  commodity_name: string;
+  market_and_exchange_names: string;
+  cftc_contract_market_code: string;
+  report_date_as_yyyy_mm_dd: string;
+  open_interest_all: string;
+  noncomm_positions_long_all: string;
+  noncomm_positions_short_all: string;
+  comm_positions_long_all: string;
+  comm_positions_short_all: string;
+  nonrept_positions_long_all: string;
+  nonrept_positions_short_all: string;
+  change_in_open_interest_all: string;
+  change_in_noncomm_long_all: string;
+  change_in_noncomm_short_all: string;
+  change_in_comm_long_all: string;
+  change_in_comm_short_all: string;
 }
 
-interface TraderClass {
-  name: string;
-  description: string;
-  longPositions: number;
-  shortPositions: number;
-  netPositions: number;
-  weeklyChange: number;
-  marketShare: number; // percentage of total OI
+async function fetchCOTData() {
+  const codes = ENERGY_CONTRACTS.map(c => `'${c.code}'`).join(',');
+  
+  // Fetch latest 2 reports for each contract to calculate weekly changes
+  const url = `https://publicreporting.cftc.gov/resource/6dca-aqww.json?$where=cftc_contract_market_code in(${codes})&$order=report_date_as_yyyy_mm_dd DESC&$limit=10&$select=commodity_name,market_and_exchange_names,cftc_contract_market_code,report_date_as_yyyy_mm_dd,open_interest_all,noncomm_positions_long_all,noncomm_positions_short_all,comm_positions_long_all,comm_positions_short_all,nonrept_positions_long_all,nonrept_positions_short_all,change_in_open_interest_all,change_in_noncomm_long_all,change_in_noncomm_short_all,change_in_comm_long_all,change_in_comm_short_all`;
+
+  console.log('📊 POSITION MONITOR: Fetching real CFTC COT data...');
+
+  const resp = await fetch(url, {
+    headers: { 'User-Agent': 'Wildcatter-Terminal/1.0' },
+    signal: AbortSignal.timeout(15000),
+  });
+
+  if (!resp.ok) throw new Error(`CFTC API error: ${resp.status}`);
+  
+  const records: COTRecord[] = await resp.json();
+  console.log(`✅ Received ${records.length} COT records from CFTC`);
+  return records;
 }
 
-interface SentimentIndicator {
-  name: string;
-  value: number; // 0-100 scale
-  interpretation: string;
-  trend: 'Rising' | 'Falling' | 'Stable';
-  lastUpdated: string;
-}
+function buildPositionData(records: COTRecord[]) {
+  const positions: any[] = [];
+  const traderClasses: any[] = [];
 
-interface PositionMonitorData {
-  positions: PositionData[];
-  traderClasses: {
-    instrument: string;
-    classes: TraderClass[];
-  }[];
-  sentimentIndicators: SentimentIndicator[];
-  marketSummary: {
-    overallSentiment: 'Risk On' | 'Risk Off' | 'Mixed';
-    specNetLong: number; // speculators net long percentage
-    commercialNetShort: number; // commercials net short percentage
-    extremePositions: string[]; // list of instruments at extreme levels
-  };
-  lastUpdated: string;
-}
+  for (const contract of ENERGY_CONTRACTS) {
+    // Get latest report for this contract
+    const latest = records.find(r => r.cftc_contract_market_code === contract.code);
+    if (!latest) continue;
 
-// Cache for 1 hour (COT data weekly but sentiment changes more frequently)
-let cache: { data: PositionMonitorData; ts: number } | null = null;
-const CACHE_MS = 60 * 60 * 1000;
+    const noncommLong = parseInt(latest.noncomm_positions_long_all) || 0;
+    const noncommShort = parseInt(latest.noncomm_positions_short_all) || 0;
+    const commLong = parseInt(latest.comm_positions_long_all) || 0;
+    const commShort = parseInt(latest.comm_positions_short_all) || 0;
+    const nonreptLong = parseInt(latest.nonrept_positions_long_all) || 0;
+    const nonreptShort = parseInt(latest.nonrept_positions_short_all) || 0;
+    const oi = parseInt(latest.open_interest_all) || 1;
+    const netNoncomm = noncommLong - noncommShort;
+    const changeInNet = (parseInt(latest.change_in_noncomm_long_all) || 0) - (parseInt(latest.change_in_noncomm_short_all) || 0);
 
-async function fetchPositionMonitorData(): Promise<PositionMonitorData> {
-  try {
-    // In production, this would fetch from CFTC COT reports, prime brokerage data, sentiment APIs
-    // For now, return realistic mock data based on typical positioning patterns
-    
-    const mockPositions: PositionData[] = [
-      {
-        instrument: 'WTI Crude Oil',
-        category: 'Crude Oil',
-        longPositions: 485000,
-        shortPositions: 398000,
-        netPositions: 87000,
-        openInterest: 2150000,
-        positionChange: 15000,
-        sentiment: 'Bullish',
-        unit: 'contracts',
-        lastUpdated: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() // COT is weekly
-      },
-      {
-        instrument: 'Brent Crude Oil',
-        category: 'Crude Oil',
-        longPositions: 287000,
-        shortPositions: 325000,
-        netPositions: -38000,
-        openInterest: 1450000,
-        positionChange: -8000,
-        sentiment: 'Bearish',
-        unit: 'contracts',
-        lastUpdated: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        instrument: 'Natural Gas',
-        category: 'Natural Gas',
-        longPositions: 125000,
-        shortPositions: 180000,
-        netPositions: -55000,
-        openInterest: 850000,
-        positionChange: -12000,
-        sentiment: 'Bearish',
-        unit: 'contracts',
-        lastUpdated: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        instrument: 'RBOB Gasoline',
-        category: 'Refined Products',
-        longPositions: 98000,
-        shortPositions: 85000,
-        netPositions: 13000,
-        openInterest: 420000,
-        positionChange: 5000,
-        sentiment: 'Bullish',
-        unit: 'contracts',
-        lastUpdated: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        instrument: 'Heating Oil',
-        category: 'Refined Products',
-        longPositions: 76000,
-        shortPositions: 92000,
-        netPositions: -16000,
-        openInterest: 280000,
-        positionChange: -3000,
-        sentiment: 'Neutral',
-        unit: 'contracts',
-        lastUpdated: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
-      }
-    ];
+    // Determine sentiment from speculator positioning
+    const specRatio = noncommLong / (noncommLong + noncommShort || 1);
+    let sentiment: 'Bullish' | 'Bearish' | 'Neutral' = 'Neutral';
+    if (specRatio > 0.55) sentiment = 'Bullish';
+    else if (specRatio < 0.45) sentiment = 'Bearish';
 
-    const mockTraderClasses = [
-      {
-        instrument: 'WTI Crude Oil',
-        classes: [
-          {
-            name: 'Non-Commercial (Speculators)',
-            description: 'Hedge funds, investment funds, and other large speculators',
-            longPositions: 485000,
-            shortPositions: 398000,
-            netPositions: 87000,
-            weeklyChange: 15000,
-            marketShare: 41.2
-          },
-          {
-            name: 'Commercial (Hedgers)',
-            description: 'Oil companies, refiners, airlines and other commercial hedgers',
-            longPositions: 780000,
-            shortPositions: 925000,
-            netPositions: -145000,
-            weeklyChange: -8000,
-            marketShare: 79.3
-          },
-          {
-            name: 'Non-Reportable',
-            description: 'Small traders below reporting thresholds',
-            longPositions: 185000,
-            shortPositions: 127000,
-            netPositions: 58000,
-            weeklyChange: 3000,
-            marketShare: 14.5
-          }
-        ]
-      }
-    ];
+    positions.push({
+      instrument: contract.name,
+      category: contract.category,
+      longPositions: noncommLong,
+      shortPositions: noncommShort,
+      netPositions: netNoncomm,
+      openInterest: oi,
+      positionChange: changeInNet,
+      sentiment,
+      unit: 'contracts',
+      lastUpdated: latest.report_date_as_yyyy_mm_dd,
+    });
 
-    const mockSentimentIndicators: SentimentIndicator[] = [
-      {
-        name: 'Fear & Greed Index (Energy)',
-        value: 65,
-        interpretation: 'Greed - Bullish sentiment dominating',
-        trend: 'Rising',
-        lastUpdated: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        name: 'VIX Energy ETF',
-        value: 28,
-        interpretation: 'Moderate volatility - Some uncertainty',
-        trend: 'Falling',
-        lastUpdated: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        name: 'Oil Options Skew',
-        value: 42,
-        interpretation: 'Slight put skew - Modest downside hedging',
-        trend: 'Stable',
-        lastUpdated: new Date(Date.now() - 30 * 60 * 1000).toISOString()
-      },
-      {
-        name: 'COT Speculative Ratio',
-        value: 73,
-        interpretation: 'High spec positioning - Potential reversal risk',
-        trend: 'Rising',
-        lastUpdated: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
-      }
-    ];
-
-    // Calculate aggregate metrics
-    const totalSpecNet = mockPositions.reduce((sum, pos) => 
-      pos.category === 'Crude Oil' ? sum + pos.netPositions : sum, 0
-    );
-    const totalOI = mockPositions.reduce((sum, pos) => sum + pos.openInterest, 0);
-    const specNetLong = (totalSpecNet / totalOI) * 100;
-
-    const extremePositions = mockPositions
-      .filter(pos => Math.abs(pos.netPositions / pos.openInterest) > 0.15)
-      .map(pos => pos.instrument);
-
-    const mockData: PositionMonitorData = {
-      positions: mockPositions,
-      traderClasses: mockTraderClasses,
-      sentimentIndicators: mockSentimentIndicators,
-      marketSummary: {
-        overallSentiment: 'Mixed',
-        specNetLong: Math.abs(specNetLong),
-        commercialNetShort: 67.8,
-        extremePositions
-      },
-      lastUpdated: new Date().toISOString()
-    };
-
-    return mockData;
-    
-  } catch (error) {
-    console.error('Position monitor data fetch error:', error);
-    
-    // Fallback data
-    return {
-      positions: [
+    // Trader class breakdown
+    const totalPositions = noncommLong + noncommShort + commLong + commShort + nonreptLong + nonreptShort;
+    traderClasses.push({
+      instrument: contract.name,
+      classes: [
         {
-          instrument: 'WTI Crude Oil',
-          category: 'Crude Oil',
-          longPositions: 485000,
-          shortPositions: 398000,
-          netPositions: 87000,
-          openInterest: 2150000,
-          positionChange: 15000,
-          sentiment: 'Bullish',
-          unit: 'contracts',
-          lastUpdated: new Date().toISOString()
-        }
-      ],
-      traderClasses: [],
-      sentimentIndicators: [
+          name: 'Non-Commercial (Speculators)',
+          description: 'Hedge funds, managed money, and other large speculators',
+          longPositions: noncommLong,
+          shortPositions: noncommShort,
+          netPositions: netNoncomm,
+          weeklyChange: changeInNet,
+          marketShare: totalPositions > 0 ? ((noncommLong + noncommShort) / totalPositions * 100) : 0,
+        },
         {
-          name: 'Fear & Greed Index (Energy)',
-          value: 65,
-          interpretation: 'Greed - Bullish sentiment dominating',
-          trend: 'Rising',
-          lastUpdated: new Date().toISOString()
-        }
+          name: 'Commercial (Hedgers)',
+          description: 'Producers, refiners, merchants, and other commercial hedgers',
+          longPositions: commLong,
+          shortPositions: commShort,
+          netPositions: commLong - commShort,
+          weeklyChange: (parseInt(latest.change_in_comm_long_all) || 0) - (parseInt(latest.change_in_comm_short_all) || 0),
+          marketShare: totalPositions > 0 ? ((commLong + commShort) / totalPositions * 100) : 0,
+        },
+        {
+          name: 'Non-Reportable (Small Traders)',
+          description: 'Small traders below CFTC reporting thresholds',
+          longPositions: nonreptLong,
+          shortPositions: nonreptShort,
+          netPositions: nonreptLong - nonreptShort,
+          weeklyChange: 0,
+          marketShare: totalPositions > 0 ? ((nonreptLong + nonreptShort) / totalPositions * 100) : 0,
+        },
       ],
-      marketSummary: {
-        overallSentiment: 'Mixed',
-        specNetLong: 4.0,
-        commercialNetShort: 67.8,
-        extremePositions: []
-      },
-      lastUpdated: new Date().toISOString()
-    };
+    });
+
+    console.log(`✅ ${contract.name}: Spec Net ${netNoncomm >= 0 ? '+' : ''}${netNoncomm} | OI: ${oi} | ${sentiment}`);
   }
+
+  // Calculate aggregate metrics
+  const oilPositions = positions.filter(p => p.category === 'Crude Oil');
+  const totalSpecNet = positions.reduce((sum, p) => sum + p.netPositions, 0);
+  const totalOI = positions.reduce((sum, p) => sum + p.openInterest, 0);
+  const specNetPct = totalOI > 0 ? Math.abs((totalSpecNet / totalOI) * 100) : 0;
+
+  // Commercial net short as percentage
+  const totalCommNet = traderClasses.reduce((sum, tc) => {
+    const comm = tc.classes.find((c: any) => c.name.includes('Commercial'));
+    return sum + (comm ? comm.netPositions : 0);
+  }, 0);
+  const commNetShortPct = totalOI > 0 ? Math.abs((totalCommNet / totalOI) * 100) : 0;
+
+  // Extreme positions (net > 15% of OI)
+  const extremePositions = positions
+    .filter(p => Math.abs(p.netPositions / p.openInterest) > 0.10)
+    .map(p => p.instrument);
+
+  // Overall sentiment
+  const bullishCount = positions.filter(p => p.sentiment === 'Bullish').length;
+  const bearishCount = positions.filter(p => p.sentiment === 'Bearish').length;
+  let overallSentiment: 'Risk On' | 'Risk Off' | 'Mixed' = 'Mixed';
+  if (bullishCount > bearishCount + 1) overallSentiment = 'Risk On';
+  else if (bearishCount > bullishCount + 1) overallSentiment = 'Risk Off';
+
+  // Sentiment indicators derived from real COT data
+  const sentimentIndicators = [];
+
+  // Spec ratio for oil
+  if (oilPositions.length > 0) {
+    const oilSpecLong = oilPositions.reduce((s, p) => s + p.longPositions, 0);
+    const oilSpecShort = oilPositions.reduce((s, p) => s + p.shortPositions, 0);
+    const oilSpecRatio = Math.round((oilSpecLong / (oilSpecLong + oilSpecShort || 1)) * 100);
+    sentimentIndicators.push({
+      name: 'Oil Speculator Long Ratio',
+      value: oilSpecRatio,
+      interpretation: oilSpecRatio > 65 ? 'Heavy long positioning - crowded trade risk' :
+                      oilSpecRatio > 55 ? 'Moderate bullish positioning' :
+                      oilSpecRatio > 45 ? 'Balanced positioning' :
+                      'Net short - bearish positioning',
+      trend: positions[0]?.positionChange > 0 ? 'Rising' as const : positions[0]?.positionChange < 0 ? 'Falling' as const : 'Stable' as const,
+      lastUpdated: positions[0]?.lastUpdated || new Date().toISOString(),
+    });
+  }
+
+  // Gas spec ratio
+  const gasPos = positions.find(p => p.instrument.includes('Natural Gas'));
+  if (gasPos) {
+    const gasSpecRatio = Math.round((gasPos.longPositions / (gasPos.longPositions + gasPos.shortPositions || 1)) * 100);
+    sentimentIndicators.push({
+      name: 'Gas Speculator Long Ratio',
+      value: gasSpecRatio,
+      interpretation: gasSpecRatio > 55 ? 'Speculators net long gas' :
+                      gasSpecRatio > 45 ? 'Balanced gas positioning' :
+                      'Heavy short positioning in gas',
+      trend: gasPos.positionChange > 0 ? 'Rising' as const : gasPos.positionChange < 0 ? 'Falling' as const : 'Stable' as const,
+      lastUpdated: gasPos.lastUpdated,
+    });
+  }
+
+  // Commercial hedging pressure
+  sentimentIndicators.push({
+    name: 'Commercial Hedging Pressure',
+    value: Math.min(100, Math.round(commNetShortPct * 2)),
+    interpretation: commNetShortPct > 40 ? 'Heavy commercial hedging - producers locking in prices' :
+                    commNetShortPct > 25 ? 'Moderate hedging activity' :
+                    'Light hedging - producers not rushing to sell forward',
+    trend: 'Stable' as const,
+    lastUpdated: positions[0]?.lastUpdated || new Date().toISOString(),
+  });
+
+  return {
+    positions,
+    traderClasses,
+    sentimentIndicators,
+    marketSummary: {
+      overallSentiment,
+      specNetLong: specNetPct,
+      commercialNetShort: commNetShortPct,
+      extremePositions,
+    },
+    lastUpdated: positions[0]?.lastUpdated || new Date().toISOString(),
+  };
 }
 
 export async function GET() {
   try {
-    // Return cached data if fresh
     if (cache && Date.now() - cache.ts < CACHE_MS) {
       return NextResponse.json(cache.data);
     }
 
-    // Fetch fresh data
-    const data = await fetchPositionMonitorData();
+    const records = await fetchCOTData();
     
-    // Cache the results
+    if (!records || records.length === 0) {
+      console.log('❌ No COT data returned from CFTC');
+      return NextResponse.json({
+        positions: [], traderClasses: [], sentimentIndicators: [],
+        marketSummary: { overallSentiment: 'Mixed', specNetLong: 0, commercialNetShort: 0, extremePositions: [] },
+        lastUpdated: new Date().toISOString(),
+      });
+    }
+
+    const data = buildPositionData(records);
     cache = { data, ts: Date.now() };
     
+    console.log(`✅ Position Monitor: ${data.positions.length} instruments from real CFTC COT data`);
     return NextResponse.json(data);
-    
+
   } catch (error) {
-    console.error('Position monitor API error:', error);
-    
-    // Ultimate fallback
+    console.error('❌ Position monitor API error:', error);
     return NextResponse.json({
-      positions: [],
-      traderClasses: [],
-      sentimentIndicators: [],
-      marketSummary: {
-        overallSentiment: 'Mixed',
-        specNetLong: 0,
-        commercialNetShort: 0,
-        extremePositions: []
-      },
-      lastUpdated: new Date().toISOString()
+      positions: [], traderClasses: [], sentimentIndicators: [],
+      marketSummary: { overallSentiment: 'Mixed', specNetLong: 0, commercialNetShort: 0, extremePositions: [] },
+      lastUpdated: new Date().toISOString(),
     });
   }
 }
