@@ -46,37 +46,8 @@ export default function EnergyFuturesWidget() {
       } catch (error) {
         console.error('Failed to fetch energy futures data:', error);
         
-        // Fallback data
-        const fallbackData: EnergyFuturesData = {
-          curves: [
-            {
-              commodity: 'WTI Crude',
-              unit: '$/barrel',
-              contracts: [
-                {
-                  symbol: 'WTI0326',
-                  expiry: '2026-03',
-                  price: 73.45,
-                  change: -0.85,
-                  volume: 150000,
-                  openInterest: 400000,
-                  lastUpdated: new Date().toISOString()
-                }
-              ],
-              contango: true,
-              curveSlope: 2.8,
-              lastUpdated: new Date().toISOString()
-            }
-          ],
-          marketSentiment: {
-            oilSentiment: 'Neutral',
-            gasSentiment: 'Bearish',
-            refinedSentiment: 'Bullish'
-          },
-          lastUpdated: new Date().toISOString()
-        };
-        
-        setData(fallbackData);
+        // NO FALLBACK DATA - show empty state when real data unavailable
+        setData(null);
         setLoading(false);
       }
     };
@@ -117,14 +88,18 @@ export default function EnergyFuturesWidget() {
     );
   }
 
-  if (!data) {
+  if (!data || data.curves.length === 0) {
     return (
       <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
         <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>ENERGY FUTURES</h3>
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
-          <div className="text-gray-500 text-xs">No data available</div>
+          <div className="text-center">
+            <div className="text-red-400 text-xs font-bold mb-2">ALPHA VANTAGE API UNAVAILABLE</div>
+            <div className="text-gray-500 text-xs">Real futures data requires Alpha Vantage API</div>
+            <div className="text-gray-600 text-xs mt-1">Check API connection</div>
+          </div>
         </div>
       </div>
     );
@@ -236,6 +211,11 @@ export default function EnergyFuturesWidget() {
               </div>
             </div>
           ))}
+          
+          {/* Source attribution */}
+          <div className="text-xs text-gray-500 text-center mt-3 pt-2 border-t border-gray-700">
+            Source: Alpha Vantage Commodity Data
+          </div>
         </div>
       </div>
     </div>
