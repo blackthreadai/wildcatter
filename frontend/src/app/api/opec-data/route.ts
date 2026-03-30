@@ -101,7 +101,7 @@ async function fetchInternational(apiKey: string): Promise<Record<string, { prod
   const countries = OPEC_MEMBERS.map(m => m.iso);
   const countryFacets = countries.map(c => `&facets[countryRegionId][]=${c}`).join('');
   
-  const url = `https://api.eia.gov/v2/international/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[productId][]=57&facets[activityId][]=1&facets[unitId][]=2${countryFacets}&sort[0][column]=period&sort[0][direction]=desc&length=200`;
+  const url = `https://api.eia.gov/v2/international/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[productId][]=57&facets[activityId][]=1${countryFacets}&sort[0][column]=period&sort[0][direction]=desc&length=200`;
 
   const resp = await fetch(url, {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
@@ -188,7 +188,7 @@ async function fetchIndividualCountries(apiKey: string): Promise<Record<string, 
 
   for (const iso of topCountries) {
     try {
-      const url = `https://api.eia.gov/v2/international/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[productId][]=57&facets[activityId][]=1&facets[unitId][]=2&facets[countryRegionId][]=${iso}&sort[0][column]=period&sort[0][direction]=desc&length=1`;
+      const url = `https://api.eia.gov/v2/international/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[productId][]=57&facets[activityId][]=1&facets[countryRegionId][]=${iso}&sort[0][column]=period&sort[0][direction]=desc&length=1`;
       
       const resp = await fetch(url, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
