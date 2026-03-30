@@ -60,7 +60,6 @@ export default function EconomicIndicatorsWidget() {
           </div>
         </div>
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>ECONOMIC INDICATORS</h3>
-        <div className="text-blue-400 text-xs opacity-75">FED DATA</div>
       </div>
       
       <div className="flex-1 bg-black px-3 py-1">
