@@ -78,12 +78,12 @@ export default function PredictionMarketsWidget() {
         {predictions.length === 0 ? (
           <div className="flex items-center justify-center h-full min-h-[200px]">
             <div className="text-center">
-              <div className="text-gray-500 text-sm mb-2">Real-time data unavailable</div>
+              <div className="text-gray-500 text-sm mb-2">No active markets</div>
               <div className="text-gray-600 text-xs">
-                Prediction market APIs require authentication
+                Check back soon for live prediction data
               </div>
               <div className="text-[#DAA520] text-xs mt-2">
-                Kalshi • Polymarket • Manifold
+                Powered by Polymarket
               </div>
             </div>
           </div>
@@ -137,7 +137,7 @@ export default function PredictionMarketsWidget() {
               {/* External link indicator */}
               <div className="flex items-center justify-end mt-2">
                 <div className="text-[#DAA520] text-xs flex items-center gap-1">
-                  <span>Trade on Kalshi</span>
+                  <span>Trade on Polymarket</span>
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                   </svg>
