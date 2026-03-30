@@ -9,6 +9,12 @@ interface StrategicReserveData {
   changePercent: number;
 }
 
+interface StrategicReserveResponse {
+  data: StrategicReserveData[];
+  news: any[];
+  lastUpdated: string;
+}
+
 interface EIAResponse {
   request: {
     series_id: string;
@@ -24,7 +30,7 @@ interface EIAResponse {
 }
 
 // Cache for 24 hours (EIA data updates daily)
-let cache: { data: StrategicReserveData[]; ts: number } | null = null;
+let cache: { data: StrategicReserveResponse[]; ts: number } | null = null;
 const CACHE_MS = 24 * 60 * 60 * 1000;
 
 async function fetchEIAStrategicReserveData(): Promise<StrategicReserveData[]> {
@@ -193,7 +199,7 @@ export async function GET() {
     }
     
     // Combine data and news
-    const combinedData = {
+    const combinedData: StrategicReserveResponse = {
       data: reserveData,
       news: reserveNews,
       lastUpdated: new Date().toISOString()
