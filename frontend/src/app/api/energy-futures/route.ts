@@ -33,13 +33,6 @@ interface EnergyFuturesData {
 let cache: { data: EnergyFuturesData; ts: number } | null = null;
 const CACHE_MS = 30 * 60 * 1000;
 
-// Fallback prices to ensure consistent display when APIs fail
-const FALLBACK_PRICES = {
-  WTI: 75.50,
-  BRENT: 80.25, 
-  NATURAL_GAS: 3.20
-};
-
 async function fetchRealCommodityDataWithRetry(commodity: string, maxRetries: number = 2): Promise<{ name: string; price: number; date: string; isReal: boolean }> {
   let lastError;
   
@@ -101,20 +94,8 @@ async function fetchRealCommodityDataWithRetry(commodity: string, maxRetries: nu
     }
   }
   
-  // If all attempts failed, use fallback price
-  const fallbackPrice = FALLBACK_PRICES[commodity as keyof typeof FALLBACK_PRICES];
-  if (fallbackPrice) {
-    console.log(`🔄 Using fallback price for ${commodity}: $${fallbackPrice}`);
-    return {
-      name: commodity,
-      price: fallbackPrice,
-      date: new Date().toISOString().split('T')[0],
-      isReal: false
-    };
-  }
-  
-  // Ultimate fallback
-  console.error(`💥 Complete failure for ${commodity}:`, lastError);
+  // NO FALLBACK DATA - return zero when real data fails
+  console.error(`💥 Complete failure for ${commodity} - NO MOCK DATA FALLBACK:`, lastError);
   return { 
     name: commodity, 
     price: 0, 
@@ -137,24 +118,33 @@ async function fetchFuturesData(): Promise<EnergyFuturesData> {
     const natGasData = await fetchRealCommodityDataWithRetry('NATURAL_GAS');
     
     const realDataCount = [wtiData, brentData, natGasData].filter(d => d.isReal).length;
-    console.log(`📈 Prices fetched: WTI=$${wtiData.price}${wtiData.isReal ? ' (real)' : ' (fallback)'}, ` +
-               `BRENT=$${brentData.price}${brentData.isReal ? ' (real)' : ' (fallback)'}, ` +
-               `NATGAS=$${natGasData.price}${natGasData.isReal ? ' (real)' : ' (fallback)'} ` +
+    console.log(`📈 Prices fetched: WTI=$${wtiData.price}${wtiData.isReal ? ' (real)' : ' (FAILED)'}, ` +
+               `BRENT=$${brentData.price}${brentData.isReal ? ' (real)' : ' (FAILED)'}, ` +
+               `NATGAS=$${natGasData.price}${natGasData.isReal ? ' (real)' : ' (FAILED)'} ` +
                `(${realDataCount}/3 real)`);
     
-    // Ensure we have at least fallback data for core commodities
-    if (wtiData.price === 0) wtiData.price = FALLBACK_PRICES.WTI;
-    if (brentData.price === 0) brentData.price = FALLBACK_PRICES.BRENT;
-    if (natGasData.price === 0) natGasData.price = FALLBACK_PRICES.NATURAL_GAS;
+    // NO MOCK DATA - if no real data available, return empty curves
+    if (realDataCount === 0) {
+      console.log('🚫 NO REAL COMMODITY DATA AVAILABLE - returning empty curves (NO MOCK DATA)');
+      return {
+        curves: [],
+        marketSentiment: {
+          oilSentiment: 'Neutral',
+          gasSentiment: 'Neutral',
+          refinedSentiment: 'Neutral'
+        },
+        lastUpdated: new Date().toISOString()
+      };
+    }
     
     const now = new Date();
     const currentMonth = now.getMonth() + 1;
     const currentYear = now.getFullYear();
     
     const generateContracts = (basePrice: number, commodity: string, realDate: string): FuturesContract[] => {
-      // Always generate contracts - we have fallback prices
+      // Only generate contracts for real data (no mock/fallback prices)
       if (basePrice <= 0) {
-        console.error(`Invalid base price for ${commodity}: ${basePrice}`);
+        console.log(`❌ No real price data for ${commodity} - skipping curve generation`);
         return [];
       }
       
@@ -192,7 +182,7 @@ async function fetchFuturesData(): Promise<EnergyFuturesData> {
       return contracts;
     };
 
-    // Create curves from data - guaranteed to have 5 curves consistently
+    // Create curves ONLY from real data - NO MOCK DATA
     const curves: FuturesCurve[] = [];
     
     // Helper function to create curve
@@ -216,26 +206,32 @@ async function fetchFuturesData(): Promise<EnergyFuturesData> {
       return null;
     };
     
-    // Always create WTI Crude (guaranteed to have price)
-    const wtiCurve = createCurve('WTI Crude', '$/barrel', wtiData.price, wtiData.date);
-    if (wtiCurve) curves.push(wtiCurve);
+    // Only create curves when we have REAL data (price > 0)
+    if (wtiData.price > 0 && wtiData.isReal) {
+      const wtiCurve = createCurve('WTI Crude', '$/barrel', wtiData.price, wtiData.date);
+      if (wtiCurve) curves.push(wtiCurve);
+      
+      // Create refined products only if WTI is real
+      const gasolinePrice = (wtiData.price / 42) + 0.4; 
+      const gasolineCurve = createCurve('RBOB Gasoline', '$/gallon', gasolinePrice, wtiData.date);
+      if (gasolineCurve) curves.push(gasolineCurve);
+      
+      const heatingOilPrice = (wtiData.price / 42) + 0.3;  
+      const heatingOilCurve = createCurve('Heating Oil', '$/gallon', heatingOilPrice, wtiData.date);
+      if (heatingOilCurve) curves.push(heatingOilCurve);
+    }
     
-    // Always create Brent Crude (guaranteed to have price)
-    const brentCurve = createCurve('Brent Crude', '$/barrel', brentData.price, brentData.date);
-    if (brentCurve) curves.push(brentCurve);
+    // Only create Brent if we have real data
+    if (brentData.price > 0 && brentData.isReal) {
+      const brentCurve = createCurve('Brent Crude', '$/barrel', brentData.price, brentData.date);
+      if (brentCurve) curves.push(brentCurve);
+    }
     
-    // Always create Natural Gas (guaranteed to have price)
-    const natGasCurve = createCurve('Natural Gas', '$/MMBtu', natGasData.price, natGasData.date);
-    if (natGasCurve) curves.push(natGasCurve);
-    
-    // Always create refined products based on WTI (guaranteed to have WTI price)
-    const gasolinePrice = (wtiData.price / 42) + 0.4; // Crack spread estimate
-    const gasolineCurve = createCurve('RBOB Gasoline', '$/gallon', gasolinePrice, wtiData.date);
-    if (gasolineCurve) curves.push(gasolineCurve);
-    
-    const heatingOilPrice = (wtiData.price / 42) + 0.3; // Crack spread estimate  
-    const heatingOilCurve = createCurve('Heating Oil', '$/gallon', heatingOilPrice, wtiData.date);
-    if (heatingOilCurve) curves.push(heatingOilCurve);
+    // Only create Natural Gas if we have real data
+    if (natGasData.price > 0 && natGasData.isReal) {
+      const natGasCurve = createCurve('Natural Gas', '$/MMBtu', natGasData.price, natGasData.date);
+      if (natGasCurve) curves.push(natGasCurve);
+    }
 
     // Determine market sentiment based on real prices and curves
     let oilSentiment: 'Bullish' | 'Bearish' | 'Neutral' = 'Neutral';
@@ -283,12 +279,8 @@ async function fetchFuturesData(): Promise<EnergyFuturesData> {
       lastUpdated: new Date().toISOString()
     };
 
-    console.log(`✅ Energy Futures: ${curves.length}/5 curves generated (${realDataCount}/3 from real API data)`);
-    
-    // Ensure we always have exactly 5 curves for consistency
-    if (curves.length !== 5) {
-      console.warn(`⚠️ Expected 5 curves, got ${curves.length}. This should not happen with fallback prices.`);
-    }
+    console.log(`✅ Energy Futures: ${curves.length} curves generated from ${realDataCount}/3 real API data sources`);
+    console.log(`🚫 NO MOCK DATA - only showing curves with real commodity prices`);
     
     return realData;
     

@@ -61,7 +61,7 @@ type Widget = {
 };
 
 // Widget version to force updates when we add new widgets  
-const WIDGET_VERSION = '18.14-CONSISTENT-ENERGY-FUTURES';
+const WIDGET_VERSION = '18.15-NO-MOCK-DATA-ENERGY-FUTURES';
 
 const defaultWidgets: Widget[] = [
   // NEW CUSTOM ORDER AS REQUESTED
