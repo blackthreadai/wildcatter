@@ -78,12 +78,12 @@ export default function PredictionMarketsWidget() {
         {predictions.length === 0 ? (
           <div className="flex items-center justify-center h-full min-h-[200px]">
             <div className="text-center">
-              <div className="text-gray-500 text-sm mb-2">No active energy markets</div>
+              <div className="text-gray-500 text-sm mb-2">No current energy markets</div>
               <div className="text-gray-600 text-xs">
-                Showing energy & geopolitical events only
+                Looking for active energy & geopolitical events
               </div>
               <div className="text-[#DAA520] text-xs mt-2">
-                Oil • Gas • Geopolitics • Conflicts
+                Future markets only • No historical data
               </div>
             </div>
           </div>

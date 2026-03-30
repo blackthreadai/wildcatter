@@ -46,14 +46,14 @@ async function fetchRealPredictionMarkets(): Promise<PredictionMarket[]> {
   try {
     console.log('🔮 Fetching real Polymarket data...');
     
-    // Fetch active markets to find energy/geopolitical ones (not just highest volume)
+    // Fetch markets by volume to get most liquid/current markets
     const response = await fetch(
-      'https://gamma-api.polymarket.com/events?limit=100&active=true', 
+      'https://gamma-api.polymarket.com/events?limit=100&order=volume&ascending=false', 
       {
         headers: {
           'User-Agent': 'Wildcatter-Terminal/1.0'
         },
-        // 20 second timeout for larger dataset
+        // 20 second timeout
         signal: AbortSignal.timeout(20000)
       }
     );
@@ -71,11 +71,40 @@ async function fetchRealPredictionMarkets(): Promise<PredictionMarket[]> {
     
     const markets: PredictionMarket[] = [];
     
-    // Filter for energy/geopolitical markets only
+    // Filter for energy/geopolitical markets only - AND future markets only
     const relevantEvents = events.filter(event => {
       if (!event.markets || !event.markets[0]) return false;
-      const question = event.markets[0].question || '';
-      return isEnergyGeopoliticalMarket(question);
+      
+      const market = event.markets[0];
+      const question = market.question || '';
+      
+      // Must be energy/geopolitical relevant
+      if (!isEnergyGeopoliticalMarket(question)) return false;
+      
+      // Must end in the future (not historical)
+      const endDate = new Date(market.endDate);
+      const now = new Date();
+      if (endDate <= now) {
+        console.log(`⏰ Skipping expired market: ${question} (ended ${market.endDate})`);
+        return false;
+      }
+      
+      // Skip obviously resolved markets (probabilities near 0% or 100%)
+      try {
+        const prices = JSON.parse(market.outcomePrices || '[0.5, 0.5]');
+        if (Array.isArray(prices) && prices.length >= 2) {
+          const prob = parseFloat(prices[0]);
+          if (prob <= 0.05 || prob >= 0.95) {
+            console.log(`📊 Skipping resolved market: ${question} (${Math.round(prob*100)}%)`);
+            return false;
+          }
+        }
+      } catch (e) {
+        // If we can't parse prices, include it
+      }
+      
+      console.log(`✅ Including active market: ${question} (ends ${market.endDate})`);
+      return true;
     });
     
     console.log(`🔍 Found ${relevantEvents.length} energy/geopolitical markets out of ${events.length} total`);
