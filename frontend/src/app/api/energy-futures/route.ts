@@ -85,7 +85,7 @@ async function fetchRealCommodityDataWithRetry(commodity: string, maxRetries: nu
       
     } catch (error) {
       lastError = error;
-      console.log(`❌ ${commodity} attempt ${attempt} failed:`, error.message);
+      console.log(`❌ ${commodity} attempt ${attempt} failed:`, error instanceof Error ? error.message : error);
       
       if (attempt < maxRetries) {
         // Wait before retry

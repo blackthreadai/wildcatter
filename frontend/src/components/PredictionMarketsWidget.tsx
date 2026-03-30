@@ -26,42 +26,8 @@ export default function PredictionMarketsWidget() {
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch prediction markets:', error);
-        
-        // Fallback data
-        const fallbackPredictions: PredictionMarket[] = [
-          {
-            id: 'FED-RATES-26',
-            question: "Will the Fed cut rates by March 2026?",
-            probability: 68,
-            volume: "$2.4M",
-            lastUpdated: new Date().toISOString(),
-            url: 'https://kalshi.com',
-            category: 'Economics',
-            endDate: '2026-03-15'
-          },
-          {
-            id: 'OIL-80-26',
-            question: "Will oil be above $80 by year end?",
-            probability: 42,
-            volume: "$890K", 
-            lastUpdated: new Date().toISOString(),
-            url: 'https://kalshi.com',
-            category: 'Energy',
-            endDate: '2026-12-31'
-          },
-          {
-            id: 'CLIMATE-RECORD',
-            question: "Will 2026 be warmest year on record?",
-            probability: 35,
-            volume: "$1.2M",
-            lastUpdated: new Date().toISOString(),
-            url: 'https://kalshi.com',
-            category: 'Climate',
-            endDate: '2026-12-31'
-          }
-        ];
-        
-        setPredictions(fallbackPredictions);
+        // No fallback data per no-mock-data policy - show empty state
+        setPredictions([]);
         setLoading(false);
       }
     };
@@ -109,7 +75,20 @@ export default function PredictionMarketsWidget() {
       </div>
       
       <div className="flex-1 bg-black p-3 space-y-3 overflow-y-auto">
-        {predictions.slice(0, 3).map((prediction, i) => (
+        {predictions.length === 0 ? (
+          <div className="flex items-center justify-center h-full min-h-[200px]">
+            <div className="text-center">
+              <div className="text-gray-500 text-sm mb-2">Real-time data unavailable</div>
+              <div className="text-gray-600 text-xs">
+                Prediction market APIs require authentication
+              </div>
+              <div className="text-[#DAA520] text-xs mt-2">
+                Kalshi • Polymarket • Manifold
+              </div>
+            </div>
+          </div>
+        ) : (
+          predictions.slice(0, 3).map((prediction, i) => (
           <div key={prediction.id} className="bg-gray-900 rounded-lg border border-gray-700 hover:border-[#DAA520] transition-all duration-200">
             <a 
               href={prediction.url} 
@@ -166,7 +145,8 @@ export default function PredictionMarketsWidget() {
               </div>
             </a>
           </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
