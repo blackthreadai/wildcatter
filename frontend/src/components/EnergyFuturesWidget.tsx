@@ -110,7 +110,7 @@ export default function EnergyFuturesWidget() {
   return (
     <div className="w-full flex flex-col bg-black border border-gray-700 min-h-[400px] max-h-[500px]">
       <div className="bg-gray-800 p-2 flex-shrink-0">
-        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>ENERGY FUTURES</h3>
+        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>ENERGY FUTURES - FIXED</h3>
       </div>
       
       <div className="flex-1 bg-black px-3 py-2 overflow-y-auto min-h-0" style={{ scrollbarWidth: 'thin', scrollbarColor: '#4a5568 #1a202c' }}>
@@ -191,7 +191,7 @@ export default function EnergyFuturesWidget() {
               <div className="flex items-center justify-between mb-1">
                 <div className="text-white text-xs font-medium">{contract.expiry}</div>
                 <div className="text-white text-xs font-bold">
-                  ${contract.price.toFixed(2)}
+                  ${contract.price ? contract.price.toFixed(2) : 'N/A'}
                 </div>
               </div>
               
