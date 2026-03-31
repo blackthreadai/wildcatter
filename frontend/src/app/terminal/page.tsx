@@ -64,7 +64,7 @@ const WIDGET_VERSION = '18.15-NO-MOCK-DATA-ENERGY-FUTURES';
 
 const defaultWidgets: Widget[] = [
   // NEW CUSTOM ORDER AS REQUESTED
-  { id: 'world-map', type: 'world-map', title: 'GLOBAL ENERGY MAP', span: { col: 3, row: 1 }, activeLayers: [] },
+  { id: 'world-map', type: 'world-map', title: 'GLOBAL ENERGY MAP', span: { col: 3, row: 1 }, activeLayers: ['geopolitical'] },
   { id: 'youtube', type: 'youtube', title: 'LIVE NEWS', span: { col: 2, row: 1 } },
   { id: 'global-energy-markets', type: 'global-energy-markets', title: 'ENERGY MARKETS' },
   { id: 'energy-futures', type: 'energy-futures', title: 'ENERGY FUTURES' },
