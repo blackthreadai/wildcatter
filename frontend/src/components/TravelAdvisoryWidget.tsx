@@ -11,52 +11,21 @@ interface TravelAdvisory {
 }
 
 export default function TravelAdvisoryWidget() {
-  const [advisories, setAdvisories] = useState<TravelAdvisory[]>([]);
+  const [advisories, setAdvisories] = useState<TravelAdvisory[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchTravelAdvisories = async () => {
       try {
         const response = await fetch('/api/travel-advisories');
+        if (!response.ok) throw new Error(`API returned ${response.status}`);
         const data = await response.json();
+        if (data.error) throw new Error(data.error);
         setAdvisories(data);
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch travel advisories:', error);
-        
-        // Fallback data
-        const fallbackAdvisories: TravelAdvisory[] = [
-          {
-            country: 'Iraq',
-            level: 'Level 4',
-            severity: 'critical',
-            lastUpdated: '2026-02-21T10:00:00Z',
-            reason: 'Terrorism, kidnapping'
-          },
-          {
-            country: 'Venezuela',
-            level: 'Level 4', 
-            severity: 'critical',
-            lastUpdated: '2026-02-21T08:30:00Z',
-            reason: 'Crime, civil unrest'
-          },
-          {
-            country: 'Nigeria',
-            level: 'Level 3',
-            severity: 'high',
-            lastUpdated: '2026-02-21T12:15:00Z',
-            reason: 'Terrorism, kidnapping'
-          },
-          {
-            country: 'Russia',
-            level: 'Level 4',
-            severity: 'critical', 
-            lastUpdated: '2026-02-21T14:45:00Z',
-            reason: 'Armed conflict'
-          }
-        ];
-        
-        setAdvisories(fallbackAdvisories);
+        setAdvisories(null);
         setLoading(false);
       }
     };
@@ -78,13 +47,15 @@ export default function TravelAdvisoryWidget() {
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString; // If can't parse, show raw
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     
-    if (diffHours < 1) return 'Updated now';
-    if (diffHours === 1) return 'Updated 1h ago';
-    return `Updated ${diffHours}h ago`;
+    if (diffDays < 1) return 'Today';
+    if (diffDays === 1) return '1d ago';
+    if (diffDays < 30) return `${diffDays}d ago`;
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
   if (loading) {
@@ -95,6 +66,19 @@ export default function TravelAdvisoryWidget() {
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
           <div className="text-gray-500 text-xs">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!advisories) {
+    return (
+      <div className="w-full flex flex-col bg-black h-full">
+        <div className="bg-gray-800 p-2 flex-shrink-0">
+          <h3 className="text-white text-xs font-semibold tracking-wider">TRAVEL ADVISORIES</h3>
+        </div>
+        <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
+          <div className="text-red-500 text-xs">Failed to load data</div>
         </div>
       </div>
     );
