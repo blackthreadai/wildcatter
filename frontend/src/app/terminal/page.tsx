@@ -78,7 +78,7 @@ const defaultWidgets: Widget[] = [
   { id: 'intel-feed', type: 'intel-feed', title: 'WILDCATTER' },
   { id: 'economic-indicators', type: 'economic-indicators', title: 'ECONOMIC INDICATORS' },
   { id: 'power-grid-stress', type: 'power-grid-stress', title: 'POWER GRID STRESS' },
-  { id: 'precious-metals', type: 'precious-metals', title: 'PRECIOUS METALS' },
+  { id: 'precious-metals', type: 'precious-metals', title: 'METALS' },
   { id: 'sanctions', type: 'sanctions', title: 'SANCTIONS MONITOR' },
   { id: 'refinery-outages', type: 'refinery-outages', title: 'REFINERY STATUS' },
   { id: 'predictions', type: 'prediction', title: 'PREDICTION MARKETS' },

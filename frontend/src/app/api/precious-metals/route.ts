@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-interface PreciousMetal {
+interface Metal {
   symbol: string;
   name: string;
   price: number;
@@ -9,132 +9,65 @@ interface PreciousMetal {
   unit: string;
 }
 
-// Cache for 10 minutes (metals prices don't change as frequently as stocks)
-let cache: { data: PreciousMetal[]; ts: number } | null = null;
+let cache: { data: Metal[]; ts: number } | null = null;
 const CACHE_MS = 10 * 60 * 1000;
 
-async function fetchYahooMetals(): Promise<PreciousMetal[]> {
-  try {
-    console.log('🔄 Fetching precious metals from Yahoo Finance...');
-    
-    const symbols = [
-      { yahoo: 'GC=F', symbol: 'XAU', name: 'Gold' },
-      { yahoo: 'SI=F', symbol: 'XAG', name: 'Silver' },
-      { yahoo: 'PL=F', symbol: 'XPT', name: 'Platinum' },
-      { yahoo: 'PA=F', symbol: 'XPD', name: 'Palladium' },
-      { yahoo: 'HG=F', symbol: 'XCU', name: 'Copper' }
-    ];
-    
-    const metals: PreciousMetal[] = [];
-    
-    for (const metal of symbols) {
-      try {
-        const url = `https://query2.finance.yahoo.com/v8/finance/chart/${metal.yahoo}?interval=1d&range=2d&includePrePost=false`;
-        const response = await fetch(url, {
-          headers: { 
-            'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
-            'Accept': 'application/json'
-          },
-          signal: AbortSignal.timeout(8000)
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          const meta = data?.chart?.result?.[0]?.meta;
-          
-          if (meta?.regularMarketPrice && meta?.chartPreviousClose) {
-            const price = parseFloat(meta.regularMarketPrice);
-            const previousClose = parseFloat(meta.chartPreviousClose);
-            const change = price - previousClose;
-            const changePercent = (change / previousClose) * 100;
-            
-            metals.push({
-              symbol: metal.symbol,
-              name: metal.name,
-              price: parseFloat(price.toFixed(2)),
-              change: parseFloat(change.toFixed(2)),
-              changePercent: parseFloat(changePercent.toFixed(2)),
-              unit: metal.symbol === 'XCU' ? 'USD/lb' : 'USD/oz'
-            });
-            
-            console.log(`✅ ${metal.name}: $${price.toFixed(2)}`);
-          }
-        }
-        
-        // Rate limiting
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-      } catch (error) {
-        console.error(`❌ Failed to fetch ${metal.name}:`, error);
-      }
-    }
-    
-    // Add rhodium using current real market reference price (APIs require paid keys)
-    // Current rhodium market price ~$4,800-5,200/oz (highly volatile specialty metal)
-    try {
-      console.log('💎 Adding Rhodium with current market reference price...');
-      
-      // Base on real current market conditions (March 2026 levels)
-      const baseRhodiumPrice = 4950.00; // Current approximate rhodium spot price
-      const dailyVolatility = (Math.random() - 0.5) * 300; // ±$150 daily variation (realistic for rhodium)
-      const rhodiumPrice = baseRhodiumPrice + dailyVolatility;
-      const changePercent = (dailyVolatility / baseRhodiumPrice) * 100;
-      
-      metals.push({
-        symbol: 'XRH',
-        name: 'Rhodium',
-        price: parseFloat(rhodiumPrice.toFixed(2)),
-        change: parseFloat(dailyVolatility.toFixed(2)),
-        changePercent: parseFloat(changePercent.toFixed(2)),
-        unit: 'USD/oz'
-      });
-      
-      console.log(`✅ Rhodium: $${rhodiumPrice.toFixed(2)} (market reference + daily variation)`);
-      
-    } catch (error) {
-      console.error('❌ Failed to add Rhodium:', error);
-    }
-    
-    console.log(`🎯 Total Metals: ${metals.length} metals fetched successfully`);
-    return metals;
-    
-  } catch (error) {
-    console.error('❌ Yahoo metals fetch error:', error);
-    return [];
-  }
-}
+const METALS = [
+  { yahoo: 'GC=F', symbol: 'XAU', name: 'Gold', unit: 'USD/oz' },
+  { yahoo: 'SI=F', symbol: 'XAG', name: 'Silver', unit: 'USD/oz' },
+  { yahoo: 'PL=F', symbol: 'XPT', name: 'Platinum', unit: 'USD/oz' },
+  { yahoo: 'HG=F', symbol: 'XCU', name: 'Copper', unit: 'USD/lb' },
+  { yahoo: 'SLX', symbol: 'SLX', name: 'Steel (ETF)', unit: 'USD' },
+  { yahoo: 'ALI=F', symbol: 'ALI', name: 'Aluminum', unit: 'USD/t' },
+];
 
-// NO MOCK DATA ALLOWED - REMOVED ENTIRELY
+async function fetchQuote(yahooSymbol: string) {
+  try {
+    const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol)}?interval=1d&range=2d&includePrePost=false`;
+    const resp = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    const meta = data?.chart?.result?.[0]?.meta;
+    if (!meta?.regularMarketPrice || !meta?.chartPreviousClose) return null;
+    const price = meta.regularMarketPrice;
+    const prev = meta.chartPreviousClose;
+    return { price, change: price - prev, changePercent: ((price - prev) / prev) * 100 };
+  } catch { return null; }
+}
 
 export async function GET() {
   try {
-    // Return cached data if fresh
     if (cache && Date.now() - cache.ts < CACHE_MS) {
       return NextResponse.json(cache.data);
     }
 
-    console.log('🏅 PRECIOUS METALS: Fetching REAL data from Yahoo Finance (temporary until goldapi.io key)');
-    
-    // Use Yahoo Finance until goldapi.io key is available
-    const metals = await fetchYahooMetals();
-    
-    console.log(`🎯 PRECIOUS METALS: ${metals.length} REAL metals found`);
-    
-    if (metals.length === 0) {
-      console.log('🚫 NO REAL PRECIOUS METALS DATA AVAILABLE - returning empty array');
-      return NextResponse.json([]);
+    const results = await Promise.all(METALS.map(m => fetchQuote(m.yahoo)));
+    const metals: Metal[] = [];
+
+    for (let i = 0; i < METALS.length; i++) {
+      const q = results[i];
+      if (!q) continue;
+      metals.push({
+        symbol: METALS[i].symbol,
+        name: METALS[i].name,
+        price: Math.round(q.price * 100) / 100,
+        change: Math.round(q.change * 100) / 100,
+        changePercent: Math.round(q.changePercent * 100) / 100,
+        unit: METALS[i].unit,
+      });
     }
-    
-    // Cache ONLY the real results
+
+    if (metals.length === 0) {
+      return NextResponse.json({ error: 'Failed to fetch metals data' }, { status: 502 });
+    }
+
     cache = { data: metals, ts: Date.now() };
-    
     return NextResponse.json(metals);
-    
   } catch (error) {
-    console.error('Precious metals API error:', error);
-    
-    // NO FALLBACK TO MOCK DATA - return empty array
-    console.log('💔 YAHOO METALS FAILED - returning empty array (NO MOCK DATA)');
-    return NextResponse.json([]);
+    console.error('Metals API error:', error);
+    return NextResponse.json({ error: 'Failed to fetch metals data' }, { status: 502 });
   }
 }

@@ -92,7 +92,7 @@ export default function PreciousMetalsWidget() {
     return (
       <div className="w-full flex flex-col bg-black h-full">
         <div className="bg-gray-800 p-2 flex-shrink-0">
-          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>PRECIOUS METALS</h3>
+          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>METALS</h3>
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
           <WidgetLoader />
@@ -105,7 +105,7 @@ export default function PreciousMetalsWidget() {
     return (
       <div className="w-full flex flex-col bg-black h-full">
         <div className="bg-gray-800 p-2 flex-shrink-0">
-          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>PRECIOUS METALS</h3>
+          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>METALS</h3>
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
           <div className="text-red-500 text-xs">{error}</div>
@@ -117,7 +117,7 @@ export default function PreciousMetalsWidget() {
   return (
     <div className="w-full flex flex-col bg-black h-full">
       <div className="bg-gray-800 p-2 flex-shrink-0">
-        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>PRECIOUS METALS</h3>
+        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>METALS</h3>
       </div>
       
       <div className="flex-1 bg-black p-2">
