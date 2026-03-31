@@ -4,7 +4,7 @@ export const maxDuration = 20;
 
 let cache: { data: unknown; ts: number; ver: number } | null = null;
 const CACHE_MS = 6 * 60 * 60 * 1000;
-const CACHE_VER = 2; // bump to bust cache on deploy
+const CACHE_VER = 3; // bump to bust cache on deploy
 
 const FRED_KEY = process.env.FRED_API_KEY || '61cf53e2891a727efe4e48f18f6545f2';
 
@@ -12,7 +12,7 @@ const FRED_KEY = process.env.FRED_API_KEY || '61cf53e2891a727efe4e48f18f6545f2';
 async function fetchUSProductSupplied(apiKey: string) {
   try {
     // Weekly US product supplied - key series for demand
-    const url = `https://api.eia.gov/v2/petroleum/sum/sndw/data/?api_key=${apiKey}&frequency=weekly&data[0]=value&facets[duoarea][]=NUS&sort[0][column]=period&sort[0][direction]=desc&length=80`;
+    const url = `https://api.eia.gov/v2/petroleum/sum/sndw/data/?api_key=${apiKey}&frequency=weekly&data[0]=value&facets[duoarea][]=NUS&sort[0][column]=period&sort[0][direction]=desc&length=120`;
     const resp = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
       signal: AbortSignal.timeout(10000),
