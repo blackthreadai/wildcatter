@@ -1,190 +1,147 @@
 import { NextResponse } from 'next/server';
 
-interface GridData {
-  region: string;
-  currentLoad: number; // MW
-  peakCapacity: number; // MW
-  utilizationRate: number; // percentage
-  status: 'Normal' | 'Watch' | 'Warning' | 'Emergency';
-  reserves: number; // MW
-  temperature: number; // Celsius
-  demandForecast: string;
-  lastUpdated: string;
+// Cache for 15 minutes (grid data is hourly)
+let cache: { data: unknown; ts: number } | null = null;
+const CACHE_MS = 15 * 60 * 1000;
+
+// Major US ISOs/RTOs with approximate peak capacity (MW)
+const GRID_REGIONS = [
+  { id: 'ERCO', name: 'ERCOT (Texas)', peakCapacity: 85000 },
+  { id: 'PJM', name: 'PJM (Mid-Atlantic)', peakCapacity: 165000 },
+  { id: 'MISO', name: 'MISO (Midwest)', peakCapacity: 127000 },
+  { id: 'CISO', name: 'CAISO (California)', peakCapacity: 52000 },
+  { id: 'NYIS', name: 'NYISO (New York)', peakCapacity: 33000 },
+  { id: 'ISNE', name: 'ISO-NE (New England)', peakCapacity: 26000 },
+  { id: 'SWPP', name: 'SPP (South Central)', peakCapacity: 54000 },
+];
+
+function getStatus(utilization: number): 'Normal' | 'Watch' | 'Warning' | 'Emergency' {
+  if (utilization >= 90) return 'Emergency';
+  if (utilization >= 80) return 'Warning';
+  if (utilization >= 70) return 'Watch';
+  return 'Normal';
 }
 
-interface PowerGridData {
-  grids: GridData[];
-  alerts: {
-    region: string;
-    severity: 'Low' | 'Medium' | 'High' | 'Critical';
-    message: string;
-    timestamp: string;
-  }[];
-  lastUpdated: string;
-}
+async function fetchGridData(apiKey: string) {
+  const respondentFacets = GRID_REGIONS.map(r => `&facets[respondent][]=${r.id}`).join('');
 
-// Cache for 30 minutes (grid data changes frequently)
-let cache: { data: PowerGridData; ts: number } | null = null;
-const CACHE_MS = 30 * 60 * 1000;
+  // Fetch demand (D), demand forecast (DF), and net generation (NG)
+  const url = `https://api.eia.gov/v2/electricity/rto/region-data/data/?api_key=${apiKey}&frequency=hourly&data[0]=value${respondentFacets}&sort[0][column]=period&sort[0][direction]=desc&length=100`;
 
-async function fetchPowerGridData(): Promise<PowerGridData> {
-  try {
-    // In production, this would fetch from ERCOT, ENTSO-E, and Chinese grid APIs
-    // For now, return realistic mock data based on actual grid stress patterns
-    
-    const mockGrids: GridData[] = [
-      {
-        region: 'ERCOT (Texas)',
-        currentLoad: 68420,
-        peakCapacity: 85000,
-        utilizationRate: 80.5,
-        status: 'Warning',
-        reserves: 6580,
-        temperature: 38.5,
-        demandForecast: 'High',
-        lastUpdated: new Date(Date.now() - 15 * 60 * 1000).toISOString()
-      },
-      {
-        region: 'European Grid',
-        currentLoad: 387200,
-        peakCapacity: 720000,
-        utilizationRate: 53.8,
-        status: 'Normal',
-        reserves: 142800,
-        temperature: 12.4,
-        demandForecast: 'Moderate',
-        lastUpdated: new Date(Date.now() - 20 * 60 * 1000).toISOString()
-      },
-      {
-        region: 'China Southern',
-        currentLoad: 156800,
-        peakCapacity: 280000,
-        utilizationRate: 56.0,
-        status: 'Watch',
-        reserves: 89200,
-        temperature: 28.7,
-        demandForecast: 'High',
-        lastUpdated: new Date(Date.now() - 25 * 60 * 1000).toISOString()
-      },
-      {
-        region: 'China Eastern',
-        currentLoad: 198400,
-        peakCapacity: 320000,
-        utilizationRate: 62.0,
-        status: 'Watch',
-        reserves: 76600,
-        temperature: 31.2,
-        demandForecast: 'Very High',
-        lastUpdated: new Date(Date.now() - 18 * 60 * 1000).toISOString()
-      },
-      {
-        region: 'Germany',
-        currentLoad: 58200,
-        peakCapacity: 89000,
-        utilizationRate: 65.4,
-        status: 'Normal',
-        reserves: 18800,
-        temperature: 8.9,
-        demandForecast: 'Moderate',
-        lastUpdated: new Date(Date.now() - 22 * 60 * 1000).toISOString()
+  const resp = await fetch(url, {
+    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
+    signal: AbortSignal.timeout(12000),
+  });
+
+  if (!resp.ok) throw new Error(`EIA RTO API returned ${resp.status}`);
+  const json = await resp.json();
+  const rows = json?.response?.data || [];
+
+  if (rows.length === 0) throw new Error('No grid data returned from EIA');
+
+  // Group by respondent, get latest D, DF, NG for each
+  const latest: Record<string, { D?: number; DF?: number; NG?: number; period?: string }> = {};
+
+  for (const row of rows) {
+    const resp = row.respondent;
+    const type = row.type; // D, DF, NG
+    const value = parseFloat(row.value);
+    if (isNaN(value)) continue;
+
+    if (!latest[resp]) latest[resp] = {};
+    // Only take the first (most recent) of each type
+    if (!latest[resp][type as 'D' | 'DF' | 'NG']) {
+      latest[resp][type as 'D' | 'DF' | 'NG'] = value;
+      if (!latest[resp].period || row.period > latest[resp].period!) {
+        latest[resp].period = row.period;
       }
-    ];
-
-    const mockAlerts = [
-      {
-        region: 'ERCOT (Texas)',
-        severity: 'High' as const,
-        message: 'High temperatures driving exceptional demand - conservation notice issued',
-        timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString()
-      },
-      {
-        region: 'China Eastern',
-        severity: 'Medium' as const,
-        message: 'Industrial demand surge in Shanghai region - monitoring reserves',
-        timestamp: new Date(Date.now() - 45 * 60 * 1000).toISOString()
-      },
-      {
-        region: 'European Grid',
-        severity: 'Low' as const,
-        message: 'Wind generation below forecast - gas plants compensating',
-        timestamp: new Date(Date.now() - 60 * 60 * 1000).toISOString()
-      }
-    ];
-
-    const mockData: PowerGridData = {
-      grids: mockGrids,
-      alerts: mockAlerts,
-      lastUpdated: new Date().toISOString()
-    };
-
-    return mockData;
-    
-  } catch (error) {
-    console.error('Power grid data fetch error:', error);
-    
-    // Fallback data
-    return {
-      grids: [
-        {
-          region: 'ERCOT (Texas)',
-          currentLoad: 68420,
-          peakCapacity: 85000,
-          utilizationRate: 80.5,
-          status: 'Warning',
-          reserves: 6580,
-          temperature: 38.5,
-          demandForecast: 'High',
-          lastUpdated: new Date().toISOString()
-        }
-      ],
-      alerts: [
-        {
-          region: 'ERCOT (Texas)',
-          severity: 'High',
-          message: 'High temperatures driving exceptional demand',
-          timestamp: new Date().toISOString()
-        }
-      ],
-      lastUpdated: new Date().toISOString()
-    };
+    }
   }
+
+  const grids = [];
+  const alerts = [];
+
+  for (const region of GRID_REGIONS) {
+    const data = latest[region.id];
+    if (!data) continue;
+
+    // Use actual demand if available, otherwise forecast
+    const currentLoad = data.D || data.DF || 0;
+    if (currentLoad === 0) continue;
+
+    const netGen = data.NG || 0;
+    const utilization = (currentLoad / region.peakCapacity) * 100;
+    const reserves = netGen > 0 ? netGen - currentLoad : region.peakCapacity - currentLoad;
+    const status = getStatus(utilization);
+
+    grids.push({
+      region: region.name,
+      currentLoad: Math.round(currentLoad),
+      peakCapacity: region.peakCapacity,
+      utilizationRate: Math.round(utilization * 10) / 10,
+      status,
+      reserves: Math.round(reserves),
+      netGeneration: netGen > 0 ? Math.round(netGen) : undefined,
+      forecast: data.DF ? Math.round(data.DF) : undefined,
+      lastUpdated: data.period || '',
+      dataType: data.D ? 'actual' : 'forecast',
+    });
+
+    // Generate alerts for stressed grids
+    if (status === 'Emergency') {
+      alerts.push({
+        region: region.name,
+        severity: 'Critical' as const,
+        message: `Grid utilization at ${utilization.toFixed(1)}% - emergency conditions`,
+        timestamp: data.period || '',
+      });
+    } else if (status === 'Warning') {
+      alerts.push({
+        region: region.name,
+        severity: 'High' as const,
+        message: `Grid utilization at ${utilization.toFixed(1)}% - conservation may be needed`,
+        timestamp: data.period || '',
+      });
+    }
+  }
+
+  // Sort by utilization (highest stress first)
+  grids.sort((a, b) => b.utilizationRate - a.utilizationRate);
+
+  return { grids, alerts };
 }
 
 export async function GET() {
   try {
-    // Return cached data if fresh
     if (cache && Date.now() - cache.ts < CACHE_MS) {
       return NextResponse.json(cache.data);
     }
 
-    // Fetch fresh data
-    const data = await fetchPowerGridData();
-    
-    // Cache the results
+    let eiaApiKey: string | undefined;
+    try { eiaApiKey = process.env.EIA_API_KEY; } catch { /* */ }
+
+    if (!eiaApiKey) {
+      return NextResponse.json({ error: 'EIA API key not configured' }, { status: 502 });
+    }
+
+    const { grids, alerts } = await fetchGridData(eiaApiKey);
+
+    if (grids.length === 0) {
+      return NextResponse.json({ error: 'No grid data available' }, { status: 502 });
+    }
+
+    const data = {
+      grids,
+      alerts,
+      lastUpdated: new Date().toISOString(),
+      source: 'EIA Electricity Grid Monitor (Hourly)',
+    };
+
     cache = { data, ts: Date.now() };
-    
     return NextResponse.json(data);
-    
+
   } catch (error) {
     console.error('Power grid stress API error:', error);
-    
-    // Ultimate fallback
-    return NextResponse.json({
-      grids: [
-        {
-          region: 'ERCOT (Texas)',
-          currentLoad: 68420,
-          peakCapacity: 85000,
-          utilizationRate: 80.5,
-          status: 'Warning',
-          reserves: 6580,
-          temperature: 38.5,
-          demandForecast: 'High',
-          lastUpdated: new Date().toISOString()
-        }
-      ],
-      alerts: [],
-      lastUpdated: new Date().toISOString()
-    });
+    return NextResponse.json({ error: 'Failed to fetch power grid data' }, { status: 502 });
   }
 }
