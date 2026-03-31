@@ -31,13 +31,13 @@ export default function WorldMapWidget({ initialLayers = ['geopolitical'] }: Wor
   console.log('🗺️ WorldMapWidget rendering with activeLayers:', activeLayers);
 
   const layers = [
-    { id: 'geopolitical', label: 'GEOPOLITICAL ALERTS', color: '#ef4444' },
-    { id: 'weather', label: 'WEATHER ALERTS', color: '#ef4444' },
-    { id: 'seismic-activity', label: 'SEISMIC ACTIVITY', color: '#ef4444' },
-    { id: 'drilling-rigs', label: 'ACTIVE DRILLING RIGS', color: '#4ade80' },
-    { id: 'pipelines', label: 'PIPELINE ROUTES', color: '#ef4444' },
-    { id: 'tanker-ships', label: 'TANKER SHIPS', color: '#3b82f6' },
-    { id: 'shipping-lanes', label: 'SHIPPING LANES', color: '#4ade80' },
+    { id: 'geopolitical', label: 'GEOPOLITICAL ALERTS', color: '#ef4444', disabled: false },
+    { id: 'weather', label: 'WEATHER ALERTS', color: '#ef4444', disabled: false },
+    { id: 'seismic-activity', label: 'SEISMIC ACTIVITY', color: '#ef4444', disabled: false },
+    { id: 'drilling-rigs', label: 'ACTIVE DRILLING RIGS', color: '#4ade80', disabled: true },
+    { id: 'pipelines', label: 'PIPELINE ROUTES', color: '#ef4444', disabled: true },
+    { id: 'tanker-ships', label: 'TANKER SHIPS', color: '#3b82f6', disabled: true },
+    { id: 'shipping-lanes', label: 'SHIPPING LANES', color: '#4ade80', disabled: true },
   ];
 
   const toggleLayer = (layerId: string) => {
@@ -75,13 +75,18 @@ export default function WorldMapWidget({ initialLayers = ['geopolitical'] }: Wor
               {layers.map(layer => (
                 <label
                   key={layer.id}
-                  className="flex items-center gap-2 p-1.5 rounded cursor-pointer hover:bg-gray-800 hover:bg-opacity-50 transition-all"
+                  className={`flex items-center gap-2 p-1.5 rounded transition-all ${
+                    layer.disabled 
+                      ? 'opacity-30 cursor-not-allowed' 
+                      : 'cursor-pointer hover:bg-gray-800 hover:bg-opacity-50'
+                  }`}
                 >
                   <input
                     type="checkbox"
-                    checked={activeLayers.includes(layer.id)}
-                    onChange={() => toggleLayer(layer.id)}
+                    checked={!layer.disabled && activeLayers.includes(layer.id)}
+                    onChange={() => !layer.disabled && toggleLayer(layer.id)}
                     className="sr-only"
+                    disabled={layer.disabled}
                   />
                   <div className={`w-3 h-3 border-2 rounded flex items-center justify-center transition-all ${
                     activeLayers.includes(layer.id) 
