@@ -1,0 +1,122 @@
+{
+  "sanctions": [
+    {
+      "target": "Russian Crude Oil Price Cap",
+      "country": "Russia",
+      "sanctioningBody": "G7, EU, Australia",
+      "type": "Oil Export",
+      "severity": "Heavy",
+      "status": "Active",
+      "implementedDate": "2022-12-05",
+      "description": "$60/bbl price cap on Russian seaborne crude oil. Western services (shipping, insurance, finance) prohibited above cap.",
+      "impact": "Critical",
+      "affectedVolume": "~3.5M bpd seaborne exports",
+      "programs": ["RUSSIA-EO14071"]
+    },
+    {
+      "target": "Russian Petroleum Products Price Cap",
+      "country": "Russia",
+      "sanctioningBody": "G7, EU, Australia",
+      "type": "Oil Export",
+      "severity": "Heavy",
+      "status": "Active",
+      "implementedDate": "2023-02-05",
+      "description": "Tiered price caps on Russian refined products: $100/bbl for premium (diesel, gasoline), $45/bbl for discounted (fuel oil).",
+      "impact": "High",
+      "affectedVolume": "~1.1M bpd",
+      "programs": ["RUSSIA-EO14071"]
+    },
+    {
+      "target": "Russian LNG Expansion",
+      "country": "Russia",
+      "sanctioningBody": "EU, US",
+      "type": "Gas Export",
+      "severity": "Moderate",
+      "status": "Active",
+      "implementedDate": "2024-06-24",
+      "description": "EU ban on re-exporting Russian LNG. US sanctions on Arctic LNG 2 project. Existing long-term contracts exempted.",
+      "impact": "Medium",
+      "affectedVolume": "~20 MTPA targeted capacity",
+      "programs": ["RUSSIA-EO14071"]
+    },
+    {
+      "target": "Iranian Oil & Petrochemical Exports",
+      "country": "Iran",
+      "sanctioningBody": "US (OFAC)",
+      "type": "Oil Export",
+      "severity": "Comprehensive",
+      "status": "Active",
+      "implementedDate": "2018-11-05",
+      "description": "Comprehensive sanctions on Iranian crude, condensate, and petrochemical exports. All sectors of petroleum industry targeted.",
+      "impact": "Critical",
+      "affectedVolume": "~2.5M bpd capacity",
+      "programs": ["IRAN", "IRAN-TRA"]
+    },
+    {
+      "target": "Venezuelan Oil Sector (PDVSA)",
+      "country": "Venezuela",
+      "sanctioningBody": "US (OFAC)",
+      "type": "Oil Export",
+      "severity": "Heavy",
+      "status": "Active",
+      "implementedDate": "2019-01-28",
+      "description": "Sanctions on PDVSA. General licenses issued/revoked periodically. Chevron license for limited operations.",
+      "impact": "High",
+      "affectedVolume": "~800K bpd",
+      "programs": ["VENEZUELA"]
+    },
+    {
+      "target": "Russian Shadow Fleet Tankers",
+      "country": "Russia",
+      "sanctioningBody": "US, UK, EU",
+      "type": "Shipping",
+      "severity": "Heavy",
+      "status": "Active",
+      "implementedDate": "2024-10-01",
+      "description": "Rolling designations of individual tankers in Russia's shadow fleet. 100+ vessels sanctioned to date.",
+      "impact": "High",
+      "affectedVolume": "Variable",
+      "programs": ["RUSSIA-EO14071"]
+    },
+    {
+      "target": "Russian Oil Services & Technology",
+      "country": "Russia",
+      "sanctioningBody": "EU, US, UK",
+      "type": "Technology",
+      "severity": "Moderate",
+      "status": "Active",
+      "implementedDate": "2022-04-08",
+      "description": "Export ban on oilfield equipment, drilling technology, and refining catalysts. Includes seismic and geological services.",
+      "impact": "Medium",
+      "affectedVolume": "N/A",
+      "programs": ["RUSSIA-EO14071"]
+    },
+    {
+      "target": "North Korea Energy Imports",
+      "country": "North Korea",
+      "sanctioningBody": "UN Security Council",
+      "type": "Oil Export",
+      "severity": "Comprehensive",
+      "status": "Active",
+      "implementedDate": "2017-12-22",
+      "description": "UN cap of 500K bbl/yr crude + 500K bbl/yr refined products. Near-total energy embargo.",
+      "impact": "Low",
+      "affectedVolume": "<1M bbl/yr cap",
+      "programs": ["DPRK"]
+    },
+    {
+      "target": "Syrian Oil Sector",
+      "country": "Syria",
+      "sanctioningBody": "US, EU",
+      "type": "Oil Export",
+      "severity": "Comprehensive",
+      "status": "Under Review",
+      "implementedDate": "2011-08-18",
+      "description": "Comprehensive ban on Syrian petroleum imports and investment in Syrian energy sector. Some relief under review post-Assad.",
+      "impact": "Low",
+      "affectedVolume": "~25K bpd (pre-war: 400K)",
+      "programs": ["SYRIA"]
+    }
+  ],
+  "lastCurated": "2026-03-31"
+}
