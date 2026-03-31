@@ -33,7 +33,7 @@ async function fetchYahooPrice(symbol: string): Promise<{ price: number; prevClo
 async function fetchLNGExports(apiKey: string) {
   // EIA US LNG exports by terminal/destination
   try {
-    const url = `https://api.eia.gov/v2/natural-gas/move/expc/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[process][]=ENG&sort[0][column]=period&sort[0][direction]=desc&length=30`;
+    const url = `https://api.eia.gov/v2/natural-gas/move/expc/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[process][]=ENG&sort[0][column]=period&sort[0][direction]=desc&length=200`;
     const resp = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
       signal: AbortSignal.timeout(8000),
@@ -73,7 +73,12 @@ function processExports(rows: Record<string, string>[]) {
   let totalMcf = 0;
 
   for (const row of latestRows) {
-    const country = row['destination-name'] || row.duoarea || 'Unknown';
+    // duoarea format: "NUS-NJA" means US to Japan. Extract destination.
+    const area = row.duoarea || '';
+    const areaName = row['area-name'] || row['duoarea-name'] || '';
+    // Skip the total row (Z00 = world)
+    if (area.includes('Z00')) continue;
+    const country = areaName || area;
     const val = parseFloat(row.value) || 0;
     if (val > 0) {
       byCountry[country] = (byCountry[country] || 0) + val;
