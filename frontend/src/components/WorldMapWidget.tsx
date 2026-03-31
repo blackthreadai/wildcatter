@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import WidgetLoader from '@/components/WidgetLoader';
 
@@ -21,12 +21,53 @@ const WorldMap = dynamic(() => import('@/components/WorldMap'), {
   )
 });
 
+interface AlertItem {
+  id: string;
+  lat: number;
+  lng: number;
+  title: string;
+  description: string;
+  severity: string;
+  source: string;
+  date: string;
+  category?: string;
+  type?: string;
+  location?: string;
+  countries?: string[];
+  confidence?: number;
+}
+
 interface WorldMapWidgetProps {
   initialLayers?: string[];
 }
 
 export default function WorldMapWidget({ initialLayers = [] }: WorldMapWidgetProps) {
   const [activeLayers, setActiveLayers] = useState<string[]>(initialLayers);
+  const [alertPanel, setAlertPanel] = useState<string | null>(null); // which layer's alert panel is open
+  const [alertData, setAlertData] = useState<Record<string, AlertItem[]>>({});
+  const [alertLoading, setAlertLoading] = useState<Record<string, boolean>>({});
+  
+  // Fetch alert data when panel is opened
+  const fetchAlertData = useCallback(async (layerId: string) => {
+    if (alertData[layerId]) return; // already loaded
+    setAlertLoading(prev => ({ ...prev, [layerId]: true }));
+    try {
+      let url = '';
+      if (layerId === 'geopolitical') url = '/api/geopolitical-events';
+      else if (layerId === 'weather') url = '/api/weather-alerts';
+      else if (layerId === 'seismic-activity') url = '/api/seismic-activity';
+      else return;
+      
+      const res = await fetch(url);
+      const data = await res.json();
+      const items = data.events || data.alerts || [];
+      setAlertData(prev => ({ ...prev, [layerId]: items }));
+    } catch {
+      setAlertData(prev => ({ ...prev, [layerId]: [] }));
+    } finally {
+      setAlertLoading(prev => ({ ...prev, [layerId]: false }));
+    }
+  }, [alertData]);
   
   console.log('🗺️ WorldMapWidget rendering with activeLayers:', activeLayers);
 
@@ -40,12 +81,27 @@ export default function WorldMapWidget({ initialLayers = [] }: WorldMapWidgetPro
     { id: 'shipping-lanes', label: 'SHIPPING LANES', color: '#4ade80' },
   ];
 
+  const alertLayers = ['geopolitical', 'weather', 'seismic-activity'];
+  
   const toggleLayer = (layerId: string) => {
+    const isActive = activeLayers.includes(layerId);
     setActiveLayers(prev => 
-      prev.includes(layerId) 
+      isActive 
         ? prev.filter(id => id !== layerId)
         : [...prev, layerId]
     );
+    
+    // For alert layers: toggle the panel and fetch data
+    if (alertLayers.includes(layerId)) {
+      if (isActive) {
+        // Turning off - close panel if it was showing this layer
+        if (alertPanel === layerId) setAlertPanel(null);
+      } else {
+        // Turning on - open the alert panel
+        setAlertPanel(layerId);
+        fetchAlertData(layerId);
+      }
+    }
   };
 
   return (
@@ -154,6 +210,115 @@ export default function WorldMapWidget({ initialLayers = [] }: WorldMapWidgetPro
             </div>
           </div>
         </div>
+
+        {/* Alert List Panel - Shows when an alert layer checkbox is active */}
+        {alertPanel && activeLayers.includes(alertPanel) && (
+          <div 
+            className="absolute top-0 left-64 w-80 border-r flex flex-col"
+            style={{ 
+              zIndex: 1000,
+              backgroundColor: 'rgba(0, 0, 0, 0.9)',
+              borderColor: '#333333',
+              height: '100%'
+            }}
+          >
+            {/* Panel Header */}
+            <div className="flex items-center justify-between p-3 border-b border-gray-700">
+              <h4 className="text-xs font-semibold tracking-wider text-white">
+                {alertPanel === 'geopolitical' ? 'GEOPOLITICAL ALERTS' : 
+                 alertPanel === 'weather' ? 'WEATHER ALERTS' : 'SEISMIC ACTIVITY'}
+              </h4>
+              <button 
+                onClick={() => setAlertPanel(null)}
+                className="text-gray-400 hover:text-white text-xs px-1"
+              >
+                ✕
+              </button>
+            </div>
+            
+            {/* Alert List */}
+            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600">
+              {alertLoading[alertPanel] ? (
+                <div className="p-4 text-center">
+                  <WidgetLoader />
+                </div>
+              ) : (alertData[alertPanel] || []).length === 0 ? (
+                <div className="p-4 text-center text-gray-500 text-xs">
+                  No active alerts
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-800">
+                  {(alertData[alertPanel] || []).map((alert: AlertItem) => {
+                    const severityColors: Record<string, string> = {
+                      critical: '#dc2626', extreme: '#dc2626',
+                      high: '#ef4444', severe: '#ef4444',
+                      moderate: '#f59e0b',
+                      low: '#eab308'
+                    };
+                    const color = severityColors[alert.severity] || '#f59e0b';
+                    
+                    return (
+                      <div 
+                        key={alert.id}
+                        className="p-3 hover:bg-gray-800/50 cursor-pointer transition-colors"
+                        onClick={() => {
+                          // Dispatch custom event to pan map to this alert
+                          window.dispatchEvent(new CustomEvent('map-pan-to', { 
+                            detail: { lat: alert.lat, lng: alert.lng, zoom: 5 } 
+                          }));
+                        }}
+                      >
+                        <div className="flex items-start gap-2">
+                          <div 
+                            className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
+                            style={{ backgroundColor: color }}
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className="text-xs font-medium text-gray-200 leading-tight">
+                              {alert.title}
+                            </div>
+                            <div className="text-[10px] text-gray-400 mt-1 leading-snug line-clamp-2">
+                              {alert.description}
+                            </div>
+                            <div className="flex items-center gap-2 mt-1.5">
+                              <span 
+                                className="text-[10px] font-bold uppercase"
+                                style={{ color }}
+                              >
+                                {alert.severity}
+                              </span>
+                              <span className="text-[10px] text-gray-500">
+                                {alert.location || alert.countries?.join(', ') || ''}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-[10px] text-gray-600">
+                                {alert.source}
+                              </span>
+                              <span className="text-[10px] text-gray-600">
+                                {new Date(alert.date).toLocaleString(undefined, { 
+                                  month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            
+            {/* Panel Footer */}
+            <div className="p-2 border-t border-gray-700 text-center">
+              <span className="text-[10px] text-gray-500">
+                {(alertData[alertPanel] || []).length} alert{(alertData[alertPanel] || []).length !== 1 ? 's' : ''} 
+                {' '} · Click to zoom
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

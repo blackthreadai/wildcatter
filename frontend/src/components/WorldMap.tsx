@@ -98,6 +98,13 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
 
     mapInstanceRef.current = map;
 
+    // Listen for pan-to events from alert panel
+    const handlePanTo = (e: Event) => {
+      const { lat, lng, zoom } = (e as CustomEvent).detail;
+      map.flyTo([lat, lng], zoom || 5, { duration: 1 });
+    };
+    window.addEventListener('map-pan-to', handlePanTo);
+
     // Initialize layer groups
     const layerGroups: Record<string, L.LayerGroup> = {
       'geopolitical': L.layerGroup(),
@@ -113,6 +120,7 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
 
     // Cleanup function
     return () => {
+      window.removeEventListener('map-pan-to', handlePanTo);
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
