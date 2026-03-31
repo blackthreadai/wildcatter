@@ -13,30 +13,39 @@ const CACHE_MS = 15 * 60 * 1000;
 const SYMBOLS = ['CL=F', 'BZ=F', 'RB=F', 'HO=F'];
 const GALLONS_PER_BARREL = 42;
 
-async function fetchPrices(): Promise<Record<string, { price: number; prevClose: number; name: string }>> {
-  const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${SYMBOLS.join(',')}&fields=regularMarketPrice,regularMarketPreviousClose,shortName`;
-
+async function fetchPrice(symbol: string): Promise<{ price: number; prevClose: number }> {
+  const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2d&includePrePost=false`;
   const resp = await fetch(url, {
-    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
-    signal: AbortSignal.timeout(8000),
+    headers: { 'User-Agent': 'Mozilla/5.0' },
+    signal: AbortSignal.timeout(6000),
   });
-
-  if (!resp.ok) throw new Error(`Yahoo Finance: ${resp.status}`);
+  if (!resp.ok) throw new Error(`Yahoo ${symbol}: ${resp.status}`);
   const json = await resp.json();
-  const quotes = json.quoteResponse?.result || [];
+  const result = json.chart?.result?.[0];
+  if (!result) throw new Error(`No data for ${symbol}`);
 
-  const prices: Record<string, { price: number; prevClose: number; name: string }> = {};
-  for (const q of quotes) {
-    prices[q.symbol] = {
-      price: q.regularMarketPrice || 0,
-      prevClose: q.regularMarketPreviousClose || 0,
-      name: q.shortName || q.symbol,
-    };
-  }
+  const meta = result.meta || {};
+  const price = meta.regularMarketPrice || 0;
+  const prevClose = meta.chartPreviousClose || meta.previousClose || 0;
+  return { price, prevClose };
+}
+
+async function fetchPrices(): Promise<Record<string, { price: number; prevClose: number }>> {
+  const results = await Promise.all(
+    SYMBOLS.map(async (sym) => {
+      try {
+        return { sym, data: await fetchPrice(sym) };
+      } catch {
+        return { sym, data: { price: 0, prevClose: 0 } };
+      }
+    })
+  );
+  const prices: Record<string, { price: number; prevClose: number }> = {};
+  for (const r of results) prices[r.sym] = r.data;
   return prices;
 }
 
-function calculateSpreads(prices: Record<string, { price: number; prevClose: number; name: string }>) {
+function calculateSpreads(prices: Record<string, { price: number; prevClose: number }>) {
   const wti = prices['CL=F']?.price || 0;
   const wtiPrev = prices['CL=F']?.prevClose || 0;
   const brent = prices['BZ=F']?.price || 0;
