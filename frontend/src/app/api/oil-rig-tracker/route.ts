@@ -1,72 +1,55 @@
 import { NextResponse } from 'next/server';
-import * as XLSX from 'xlsx';
 
-export const maxDuration = 30; // seconds (Pro plan)
+export const maxDuration = 30;
 
 // Cache for 12 hours
 let cache: { data: unknown; ts: number } | null = null;
 const CACHE_MS = 12 * 60 * 60 * 1000;
 
-// Cache the discovered UUID so we don't re-scrape every call
-let knownUUID: { uuid: string; ts: number } | null = null;
-const UUID_CACHE_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
+// Known latest BH report UUID - updated when discovery runs
+let knownUUID = '7569f402-d1c6-4b10-a66d-dba54a931178';
+let uuidTs = 0;
 
-async function downloadBHReport(): Promise<ArrayBuffer> {
-  const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
+const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
 
-  // If we have a known UUID from a previous discovery, try it first
-  if (knownUUID && Date.now() - knownUUID.ts < UUID_CACHE_MS) {
-    try {
-      const resp = await fetch(`https://rigcount.bakerhughes.com/static-files/${knownUUID.uuid}`, {
-        headers: { 'User-Agent': ua },
-        signal: AbortSignal.timeout(8000),
-      });
-      if (resp.ok) return resp.arrayBuffer();
-    } catch { /* fall through to discovery */ }
+// ── Discover the latest report UUID ─────────────────────────────────
+async function discoverUUID(): Promise<string> {
+  // Only re-discover once per week
+  if (uuidTs && Date.now() - uuidTs < 7 * 24 * 3600 * 1000) return knownUUID;
+
+  try {
+    const resp = await fetch('https://rigcount.bakerhughes.com/na-rig-count', {
+      headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(5000),
+    });
+    const html = await resp.text();
+    const uuids = [...new Set([...html.matchAll(/static-files\/([a-f0-9-]+)/g)].map(m => m[1]))];
+
+    const heads = uuids.map(async (uuid) => {
+      try {
+        const r = await fetch(`https://rigcount.bakerhughes.com/static-files/${uuid}`, {
+          method: 'HEAD', headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(2500),
+        });
+        const d = r.headers.get('content-disposition') || '';
+        if (d.includes('Rig_Count') && d.includes('Report') && d.includes('.xlsx')) return uuid;
+      } catch { /* */ }
+      return null;
+    });
+
+    const found = (await Promise.all(heads)).filter(Boolean);
+    if (found[0]) {
+      knownUUID = found[0] as string;
+      uuidTs = Date.now();
+    }
+  } catch {
+    // Use cached UUID
   }
-
-  // Discover: scrape page for UUIDs, HEAD them in parallel
-  const pageResp = await fetch('https://rigcount.bakerhughes.com/na-rig-count', {
-    headers: { 'User-Agent': ua },
-    signal: AbortSignal.timeout(5000),
-  });
-  if (!pageResp.ok) throw new Error('BH page fetch failed');
-  const html = await pageResp.text();
-
-  const uuids: string[] = [];
-  const re = /static-files\/([a-f0-9-]+)/g;
-  let m;
-  while ((m = re.exec(html)) !== null) {
-    if (!uuids.includes(m[1])) uuids.push(m[1]);
-  }
-
-  // HEAD all in parallel
-  const heads = uuids.map(async (uuid) => {
-    try {
-      const r = await fetch(`https://rigcount.bakerhughes.com/static-files/${uuid}`, {
-        method: 'HEAD', headers: { 'User-Agent': ua }, signal: AbortSignal.timeout(2000),
-      });
-      const d = r.headers.get('content-disposition') || '';
-      if (d.includes('Rig_Count') && d.includes('Report') && d.endsWith('.xlsx"')) return uuid;
-    } catch { /* */ }
-    return null;
-  });
-
-  const found = (await Promise.all(heads)).filter(Boolean) as string[];
-  if (found.length === 0) throw new Error('No BH report found');
-
-  const uuid = found[0];
-  knownUUID = { uuid, ts: Date.now() };
-
-  const resp = await fetch(`https://rigcount.bakerhughes.com/static-files/${uuid}`, {
-    headers: { 'User-Agent': ua },
-    signal: AbortSignal.timeout(8000),
-  });
-  if (!resp.ok) throw new Error('BH download failed');
-  return resp.arrayBuffer();
+  return knownUUID;
 }
 
-function parseBHExcel(buffer: ArrayBuffer) {
+// ── Parse CSV-like data from the XLSX using xlsx package (dynamic import) ──
+async function parseReport(buffer: ArrayBuffer) {
+  // Dynamic import to avoid bundling issues
+  const XLSX = await import('xlsx');
   const wb = XLSX.read(buffer, { type: 'array' });
 
   // Parse NAM Summary
@@ -75,7 +58,6 @@ function parseBHExcel(buffer: ArrayBuffer) {
 
   let usTotal = 0, usOil = 0, usGas = 0, usChange = 0;
   let caTotal = 0, caChange = 0;
-  let reportDate = '';
 
   for (const row of summary) {
     if (!row?.[0]) continue;
@@ -88,28 +70,20 @@ function parseBHExcel(buffer: ArrayBuffer) {
     else if (label === 'Gas' && !usGas) { usGas = val; }
   }
 
-  // Parse NAM Breakdown for basins + states
-  const breakdown: (string | number | null)[][] = wb.Sheets['NAM Breakdown']
+  // Parse NAM Breakdown
+  const bd: (string | number | null)[][] = wb.Sheets['NAM Breakdown']
     ? XLSX.utils.sheet_to_json(wb.Sheets['NAM Breakdown'], { header: 1 }) : [];
 
   const basins: { basin: string; rigs: number; change: number; percentage: number }[] = [];
   const states: { state: string; rigs: number; change: number }[] = [];
   let section = '';
+  let reportDate = '';
 
-  for (const row of breakdown) {
+  for (const row of bd) {
     if (!row) continue;
     const label = String(row[1] || '').trim();
 
-    // Detect section headers
-    if (label === 'Basin') { section = 'basin'; continue; }
-    if (label === 'State') { section = 'state'; continue; }
-    if (label === 'Location' || label === 'DrillFor' || label === 'Trajectory' || label === 'Country') {
-      section = ''; continue;
-    }
-    if (['United States', 'North America', 'Canada', ''].includes(label)) continue;
-
-    // Get report date from header
-    if (label === 'Basin' || label === 'Location') {
+    if (label === 'Location' || label === 'Basin') {
       const ds = String(row[2] || '');
       if (ds.includes('/')) {
         const p = ds.split('/');
@@ -120,34 +94,21 @@ function parseBHExcel(buffer: ArrayBuffer) {
       }
     }
 
+    if (label === 'Basin') { section = 'basin'; continue; }
+    if (label === 'State') { section = 'state'; continue; }
+    if (['Location', 'DrillFor', 'Trajectory', 'Country'].includes(label)) { section = ''; continue; }
+    if (['United States', 'North America', 'Canada', ''].includes(label)) continue;
+
     const rigs = Number(row[2]) || 0;
     const change = Math.round(Number(row[5]) || 0);
 
-    if (section === 'basin' && label !== 'Other') {
+    if (section === 'basin' && label !== 'Other' && rigs > 0) {
       basins.push({ basin: label, rigs, change, percentage: 0 });
     } else if (section === 'state' && rigs > 0) {
       states.push({ state: label, rigs, change });
     }
   }
 
-  // Also extract date from breakdown header row
-  if (!reportDate) {
-    for (const row of breakdown) {
-      if (row && String(row[1] || '').trim() === 'Location') {
-        const ds = String(row[2] || '');
-        if (ds.includes('/')) {
-          const p = ds.split('/');
-          if (p.length === 3) {
-            const mo: Record<string, string> = {Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'};
-            reportDate = `${p[2].length === 2 ? '20' + p[2] : p[2]}-${mo[p[1]] || '01'}-${p[0].padStart(2, '0')}`;
-          }
-        }
-        break;
-      }
-    }
-  }
-
-  // Calc percentages
   const totalBasin = basins.reduce((s, b) => s + b.rigs, 0);
   basins.forEach(b => { b.percentage = totalBasin > 0 ? Math.round((b.rigs / totalBasin) * 1000) / 10 : 0; });
   basins.sort((a, b) => b.rigs - a.rigs);
@@ -156,7 +117,7 @@ function parseBHExcel(buffer: ArrayBuffer) {
   return {
     usTotals: { total: usTotal, oil: usOil, gas: usGas, weeklyChange: usChange, period: reportDate },
     canada: { total: caTotal, weeklyChange: caChange },
-    basins: basins.filter(b => b.rigs > 0),
+    basins,
     topStates: states.slice(0, 8),
     reportDate,
   };
@@ -168,8 +129,14 @@ export async function GET() {
       return NextResponse.json(cache.data);
     }
 
-    const buffer = await downloadBHReport();
-    const parsed = parseBHExcel(buffer);
+    const uuid = await discoverUUID();
+    const resp = await fetch(`https://rigcount.bakerhughes.com/static-files/${uuid}`, {
+      headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(10000),
+    });
+    if (!resp.ok) throw new Error(`BH download failed: ${resp.status}`);
+
+    const buffer = await resp.arrayBuffer();
+    const parsed = await parseReport(buffer);
 
     if (parsed.usTotals.total === 0) {
       return NextResponse.json({ error: 'Failed to parse rig count data' }, { status: 502 });
@@ -181,6 +148,9 @@ export async function GET() {
 
   } catch (error) {
     console.error('Oil rig tracker error:', error);
-    return NextResponse.json({ error: 'Failed to fetch rig count data' }, { status: 502 });
+    return NextResponse.json(
+      { error: 'Failed to fetch rig count data: ' + (error instanceof Error ? error.message : 'unknown') },
+      { status: 502 }
+    );
   }
 }
