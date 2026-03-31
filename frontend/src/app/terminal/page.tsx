@@ -617,7 +617,7 @@ export default function TerminalPage() {
               <span className="text-[#DAA520] text-sm font-light tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>TERMINAL</span>
             </div>
 
-            <span className="text-gray-400 text-sm">v1.1</span>
+            <span className="text-gray-400 text-sm">v2.01</span>
             <span className="text-gray-400 text-sm">|</span>
             <div className="flex items-center gap-4 text-sm">
               <span className="text-gray-400 tracking-wider">MARKET SNAPSHOT</span>
