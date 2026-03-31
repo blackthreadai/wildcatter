@@ -115,13 +115,7 @@ export default function ClimateExtremesWidget() {
   return (
     <div className="w-full flex flex-col bg-black h-full">
       <div className="bg-gray-800 p-2 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>CLIMATE EXTREMES</h3>
-          <div className="flex gap-2 text-xs">
-            {data.summary.extreme > 0 && <span className="text-red-500 font-bold">{data.summary.extreme} EXTREME</span>}
-            {data.summary.high > 0 && <span className="text-orange-500">{data.summary.high} HIGH</span>}
-          </div>
-        </div>
+        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>CLIMATE EXTREMES</h3>
       </div>
       
       <div className="flex-1 bg-black px-3 py-1 overflow-y-auto h-0" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
