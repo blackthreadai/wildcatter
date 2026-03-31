@@ -76,7 +76,7 @@ async function fetchDPRRigCounts(apiKey: string) {
     return { basins: withPct, totalRigs: Math.round(totalRigs), totalChange, period: results[0]?.period || '' };
   } catch (err) {
     console.error('EIA DPR fetch error:', err);
-    return null;
+    return { basins: [], totalRigs: 0, totalChange: 0, period: '' };
   }
 }
 
@@ -188,8 +188,8 @@ export async function GET() {
       fetchInternationalRigs(eiaApiKey),
     ]);
 
-    // Need at least DPR data to be useful
-    if (!dpr && !weekly) {
+    // Need at least some data to be useful
+    if ((!dpr || dpr.basins.length === 0) && !weekly) {
       return NextResponse.json({ error: 'Failed to fetch rig count data from EIA' }, { status: 502 });
     }
 
