@@ -16,7 +16,7 @@ const CRYPTOS = [
   { id: 'bitcoin', symbol: 'BTC', yahoo: 'BTC-USD' },
   { id: 'ethereum', symbol: 'ETH', yahoo: 'ETH-USD' },
   { id: 'solana', symbol: 'SOL', yahoo: 'SOL-USD' },
-  { id: 'xrp', symbol: 'XRP', yahoo: 'XRP-USD' },
+  { id: 'ripple', symbol: 'XRP', yahoo: 'XRP-USD' },
 ];
 
 async function fetchYahooPrice(symbol: string) {
