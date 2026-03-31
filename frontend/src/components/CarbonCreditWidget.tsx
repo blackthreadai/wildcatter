@@ -121,7 +121,7 @@ export default function CarbonCreditWidget() {
             <div className="text-gray-400 text-xs mb-1">{data.headline.name}</div>
             <div className="flex items-end justify-between">
               <div>
-                <span className="text-2xl font-bold text-white">
+                <span className={`text-2xl font-bold ${data.headline.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                   {getCurrencySymbol(data.headline.currency)}{data.headline.price.toFixed(2)}
                 </span>
                 <span className="text-gray-400 text-xs ml-1">/tCO2</span>
