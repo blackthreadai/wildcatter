@@ -1,4 +1,5 @@
 'use client';
+import WidgetLoader from '@/components/WidgetLoader';
 
 import { useState, useEffect } from 'react';
 
@@ -74,7 +75,7 @@ export default function GlobalEnergyMarketsWidget() {
           </h3>
         </div>
         <div className="flex-1 p-2 flex items-center justify-center">
-          <div className="text-gray-500 text-xs">Loading global markets...</div>
+          <WidgetLoader />
         </div>
       </div>
     );

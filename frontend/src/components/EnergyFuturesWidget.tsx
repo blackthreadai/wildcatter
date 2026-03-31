@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 
 interface FuturesContract {
   symbol: string;
@@ -82,7 +81,7 @@ export default function EnergyFuturesWidget() {
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>ENERGY FUTURES</h3>
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
-          <div className="text-gray-500 text-xs">Loading...</div>
+          <WidgetLoader />
         </div>
       </div>
     );
@@ -220,4 +219,6 @@ export default function EnergyFuturesWidget() {
       </div>
     </div>
   );
-}
+
+import { useState, useEffect } from 'react';
+import WidgetLoader from '@/components/WidgetLoader';

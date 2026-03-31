@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 
 interface PredictionMarket {
   id: string;
@@ -63,7 +62,7 @@ export default function PredictionMarketsWidget() {
         </div>
         <div className="flex-1 bg-black p-3 space-y-3 overflow-y-auto min-h-0" style={{ scrollbarWidth: 'thin', scrollbarColor: '#4a5568 #1a202c' }}>
           <div className="flex items-center justify-center h-full">
-            <div className="text-gray-500 text-xs">Loading...</div>
+            <WidgetLoader />
           </div>
         </div>
       </div>
@@ -152,4 +151,6 @@ export default function PredictionMarketsWidget() {
       </div>
     </div>
   );
-}
+
+import { useState, useEffect } from 'react';
+import WidgetLoader from '@/components/WidgetLoader';

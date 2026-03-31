@@ -1,7 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import SPRChartWidget from './SPRChartWidget';
 
 interface NewsArticle {
   title: string;
@@ -103,7 +101,7 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>{title || `${region} ENERGY`}</h3>
         </div>
         <div className="flex-1 p-2 flex items-center justify-center bg-black min-h-0">
-          <div className="text-gray-500 text-xs">Loading...</div>
+          <WidgetLoader />
         </div>
       </div>
     );
@@ -147,4 +145,7 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
       </div>
     </div>
   );
-}
+
+import { useState, useEffect } from 'react';
+import SPRChartWidget from './SPRChartWidget';
+import WidgetLoader from '@/components/WidgetLoader';
