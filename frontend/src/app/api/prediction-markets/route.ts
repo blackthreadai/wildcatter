@@ -24,11 +24,20 @@ function isEnergyGeopoliticalMarket(question: string): boolean {
     // Direct energy
     'oil', 'natural gas', 'gas price', 'crude', 'brent', 'wti', 'opec',
     'gasoline', 'petroleum', 'fuel', 'pipeline', 'refinery', 'lng',
-    'drilling', 'barrel', 'solar', 'energy',
+    'drilling', 'barrel', 'solar', 'energy', 'electricity', 'nuclear',
+    'coal', 'renewable', 'ev ', 'electric vehicle', 'carbon', 'emission',
     // Key energy-moving geopolitics
     'iran', 'middle east', 'venezuela', 'iraq', 'saudi', 'russia',
     'sanctions', 'embargo', 'persian gulf', 'strait of hormuz',
-    'gaza', 'israel', 'libya', 'syria', 'ukraine'
+    'gaza', 'israel', 'libya', 'syria', 'ukraine', 'ceasefire',
+    'war', 'invasion', 'nato', 'military', 'missile', 'strike',
+    // Economic drivers
+    'tariff', 'trade war', 'recession', 'gdp', 'fed ', 'interest rate',
+    'inflation', 'commodity', 'gold price', 'copper',
+    // Key countries/leaders
+    'trump', 'putin', 'china', 'xi jinping', 'korea', 'taiwan',
+    'mexico', 'canada', 'india', 'brazil', 'nigeria', 'angola',
+    'exxon', 'chevron', 'aramco', 'shell', 'bp '
   ];
   const hasMatch = allTerms.some(term => q.includes(term));
   
@@ -42,7 +51,7 @@ async function fetchRealPredictionMarkets(): Promise<PredictionMarket[]> {
     
     // Fetch more markets to find energy/geopolitical events
     const response = await fetch(
-      'https://gamma-api.polymarket.com/events?limit=300&order=volume&ascending=false', 
+      'https://gamma-api.polymarket.com/events?limit=500&order=volume&ascending=false', 
       {
         headers: {
           'User-Agent': 'Wildcatter-Terminal/1.0'
@@ -106,7 +115,7 @@ async function fetchRealPredictionMarkets(): Promise<PredictionMarket[]> {
     console.log(`🔍 Found ${relevantEvents.length} energy/geopolitical markets out of ${events.length} total`);
     
     // Process up to 10 top relevant markets for the widget
-    for (const event of relevantEvents.slice(0, 10)) {
+    for (const event of relevantEvents.slice(0, 15)) {
       if (!event.markets || !event.markets[0]) continue;
       
       const market = event.markets[0];
