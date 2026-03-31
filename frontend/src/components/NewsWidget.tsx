@@ -115,7 +115,7 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
       <div className="bg-gray-800 p-2 flex-shrink-0">
         <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>{title || `${region} ENERGY`}</h3>
       </div>
-      <div className="flex-1 p-2 pb-8 overflow-y-auto bg-black min-h-0" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
+      <div className="flex-1 py-2 overflow-y-auto bg-black min-h-0" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
         {articles.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
@@ -124,9 +124,9 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
             </div>
           </div>
         ) : (
-          <div className="space-y-2 pb-6">
+          <div className="pb-6">
             {articles.map((article, i) => (
-              <div key={i} className={`border-b border-gray-700 pb-1 last:border-b-0 px-2 ${i % 2 === 1 ? 'bg-[#DAA520]/10' : 'bg-transparent'}`}>
+              <div key={i} className={`border-b border-gray-700 last:border-b-0 px-2 py-1.5 ${i % 2 === 1 ? 'bg-[#DAA520]/10' : 'bg-transparent'}`}>
                 <a 
                   href={article.url}
                   target="_blank"
