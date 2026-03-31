@@ -26,7 +26,6 @@ import CarbonCreditWidget from '@/components/CarbonCreditWidget';
 import GlobalFuelDemandWidget from '@/components/GlobalFuelDemandWidget';
 import PositionMonitorWidget from '@/components/PositionMonitorWidget';
 import AIPriceForecastWidget from '@/components/AIPriceForecastWidget';
-import EventCalendarWidget from '@/components/EventCalendarWidget';
 import WorldMapWidget from '@/components/WorldMapWidget';
 
 // Drag and drop imports
@@ -53,7 +52,7 @@ import { CSS } from '@dnd-kit/utilities';
 // Widget configuration types
 type Widget = {
   id: string;
-  type: 'news' | 'youtube' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'global-energy-markets' | 'economic-indicators' | 'climate-extremes' | 'global-oil-tracker' | 'opec' | 'natural-gas' | 'oil-rig-tracker' | 'power-grid-stress' | 'refinery-outages' | 'sanctions' | 'energy-futures' | 'crack-spread' | 'global-lng' | 'carbon-credit' | 'global-fuel-demand' | 'position-monitor' | 'ai-price-forecast' | 'event-calendar' | 'world-map';
+  type: 'news' | 'youtube' | 'world-clock' | 'travel' | 'prediction' | 'intel-feed' | 'precious-metals' | 'cryptocurrency' | 'global-energy-markets' | 'economic-indicators' | 'climate-extremes' | 'global-oil-tracker' | 'opec' | 'natural-gas' | 'oil-rig-tracker' | 'power-grid-stress' | 'refinery-outages' | 'sanctions' | 'energy-futures' | 'crack-spread' | 'global-lng' | 'carbon-credit' | 'global-fuel-demand' | 'position-monitor' | 'ai-price-forecast' | 'world-map';
   title: string;
   span?: { col: number; row: number };
   region?: 'STRATEGIC RESERVE' | 'GLOBAL';
@@ -92,7 +91,6 @@ const defaultWidgets: Widget[] = [
   { id: 'carbon-credit', type: 'carbon-credit', title: 'CARBON CREDIT' },
   { id: 'global-fuel-demand', type: 'global-fuel-demand', title: 'GLOBAL FUEL DEMAND' },
   { id: 'ai-price-forecast', type: 'ai-price-forecast', title: 'AI PRICE FORECAST' },
-  { id: 'event-calendar', type: 'event-calendar', title: 'EVENT CALENDAR' },
 ];
 
 // Draggable Widget Component
@@ -178,8 +176,6 @@ function DraggableWidget({
         return <PositionMonitorWidget />;
       case 'ai-price-forecast':
         return <AIPriceForecastWidget />;
-      case 'event-calendar':
-        return <EventCalendarWidget />;
       case 'world-map':
         return <WorldMapWidget initialLayers={widget.activeLayers || ['geopolitical']} />;
       default:
