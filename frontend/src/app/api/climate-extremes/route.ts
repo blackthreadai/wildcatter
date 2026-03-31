@@ -52,8 +52,8 @@ async function fetchGDACS(): Promise<ClimateExtreme[]> {
   const from = fromDate.toISOString().split('T')[0];
   const to = now.toISOString().split('T')[0];
 
-  // Focus on: floods, tropical cyclones, droughts, wildfires
-  const url = `https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=&fromDate=${from}&toDate=${to}&alertlevel=Green;Orange;Red&eventType=FL,TC,DR,WF`;
+  // Focus on: floods, tropical cyclones, droughts, wildfires - Orange and Red only for significant events
+  const url = `https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=&fromDate=${from}&toDate=${to}&alertlevel=Orange;Red&eventType=FL,TC,DR,WF`;
 
   const resp = await fetch(url, {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
@@ -66,9 +66,12 @@ async function fetchGDACS(): Promise<ClimateExtreme[]> {
 
   const results: ClimateExtreme[] = [];
 
+  const relevantTypes = new Set(['FL', 'TC', 'DR', 'WF']);
+
   for (const f of features) {
     const p = f.properties || {};
     const eventType = p.eventtype || '';
+    if (!relevantTypes.has(eventType)) continue; // Skip volcanoes, earthquakes etc
     const alertLevel = p.alertlevel || 'Green';
     const country = p.country || 'Unknown';
     const name = p.name || '';
