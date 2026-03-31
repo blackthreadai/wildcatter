@@ -71,6 +71,16 @@ export default function ClimateExtremesWidget() {
     }
   };
 
+  const getSeverityBg = (severity: string) => {
+    switch (severity) {
+      case 'extreme': return 'rgba(220, 38, 38, 0.12)';
+      case 'high': return 'rgba(234, 88, 12, 0.1)';
+      case 'moderate': return 'rgba(234, 179, 8, 0.08)';
+      case 'low': return 'rgba(16, 185, 129, 0.08)';
+      default: return 'transparent';
+    }
+  };
+
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return dateString;
@@ -121,7 +131,7 @@ export default function ClimateExtremesWidget() {
       
       <div className="flex-1 bg-black px-3 py-1 overflow-y-auto h-0" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
         {data.events.map((event, i) => (
-          <div key={`${event.location}-${event.type}-${i}`} className="flex items-start py-1.5 border-b border-gray-700 last:border-b-0">
+          <div key={`${event.location}-${event.type}-${i}`} className="flex items-start py-1.5 px-2 -mx-2 border-b border-gray-700 last:border-b-0" style={{ backgroundColor: getSeverityBg(event.severity) }}>
             <div className="flex-shrink-0 mr-2 mt-0.5">
               <span className="text-sm">{getTypeIcon(event.type)}</span>
             </div>
