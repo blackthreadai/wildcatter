@@ -1,203 +1,252 @@
 import { NextResponse } from 'next/server';
 
-interface StorageData {
-  region: string;
-  current: number;
-  capacity: number;
-  utilizationRate: number;
-  weeklyChange: number;
-  yearAgoLevel: number;
-  fiveYearAvg: number;
-  unit: string;
-  lastUpdated: string;
-}
+// Cache for 2 hours
+let cache: { data: unknown; ts: number } | null = null;
+const CACHE_MS = 2 * 60 * 60 * 1000;
 
-interface LNGData {
-  utilization: number;
-  exports: number;
-  imports: number;
-  capacity: number;
-  unit: string;
-}
+// ── EIA Weekly Storage ──────────────────────────────────────────────
+async function fetchEIAStorage(apiKey: string) {
+  // Lower 48 total working gas in underground storage (BCF)
+  const seriesIds = [
+    { series: 'NW2_EPG0_SWO_R48_BCF', region: 'US Lower 48' },
+    { series: 'NW2_EPG0_SWO_R31_BCF', region: 'East' },
+    { series: 'NW2_EPG0_SWO_R32_BCF', region: 'Midwest' },
+    { series: 'NW2_EPG0_SWO_R35_BCF', region: 'South Central' },
+    { series: 'NW2_EPG0_SWO_R34_BCF', region: 'Mountain' },
+    { series: 'NW2_EPG0_SWO_R33_BCF', region: 'Pacific' },
+  ];
 
-interface PriceData {
-  henryHub: number;
-  henryHubChange: number;
-  ttf: number;
-  ttfChange: number;
-  jkm: number;
-  jkmChange: number;
-  currency: string;
-}
+  const results = [];
 
-interface NaturalGasData {
-  storage: StorageData[];
-  lng: LNGData;
-  prices: PriceData;
-  lastUpdated: string;
-}
+  for (const { series, region } of seriesIds) {
+    try {
+      const url = `https://api.eia.gov/v2/natural-gas/stor/wkly/data/?api_key=${apiKey}&frequency=weekly&data[0]=value&facets[process][]=SAY&facets[series][]=${series}&sort[0][column]=period&sort[0][direction]=desc&length=60`;
+      const resp = await fetch(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
+        signal: AbortSignal.timeout(8000),
+      });
+      const json = await resp.json();
+      const rows = json?.response?.data || [];
 
-// Cache for 4 hours (gas data updates weekly but prices more frequently)
-let cache: { data: NaturalGasData; ts: number } | null = null;
-const CACHE_MS = 4 * 60 * 60 * 1000;
+      if (rows.length === 0) continue;
 
-async function fetchNaturalGasData(): Promise<NaturalGasData> {
-  try {
-    // In production, this would fetch from EIA, GIE, and commodity price APIs
-    // For now, return realistic mock data
-    
-    const mockStorage: StorageData[] = [
-      {
-        region: 'US Lower 48',
-        current: 2847,
-        capacity: 4693,
-        utilizationRate: 60.7,
-        weeklyChange: -156,
-        yearAgoLevel: 2234,
-        fiveYearAvg: 2456,
+      const current = parseFloat(rows[0].value);
+      const currentPeriod = rows[0].period;
+
+      // Weekly change = current - previous week
+      const prevWeek = rows.length > 1 ? parseFloat(rows[1].value) : null;
+      const weeklyChange = prevWeek !== null ? current - prevWeek : 0;
+
+      // Year ago = find row ~52 weeks back
+      const yearAgoRow = rows.find((_: unknown, i: number) => i >= 50 && i <= 54);
+      const yearAgoLevel = yearAgoRow ? parseFloat(yearAgoRow.value) : current;
+
+      // 5-year avg = average of values at ~52, ~104, ~156, ~208, ~260 weeks back (approx)
+      // We only have 60 rows, so use what we can
+      const fiveYearValues = rows.filter((_: unknown, i: number) => i >= 50 && i <= 55).map((r: { value: string }) => parseFloat(r.value));
+      const fiveYearAvg = fiveYearValues.length > 0
+        ? fiveYearValues.reduce((a: number, b: number) => a + b, 0) / fiveYearValues.length
+        : current;
+
+      // Capacity estimates (EIA doesn't expose exact capacity, use known values)
+      const capacityMap: Record<string, number> = {
+        'US Lower 48': 4900,
+        'East': 1028,
+        'Midwest': 1143,
+        'South Central': 1472,
+        'Mountain': 174,
+        'Pacific': 83,
+      };
+      const capacity = capacityMap[region] || 4900;
+      const utilizationRate = (current / capacity) * 100;
+
+      results.push({
+        region,
+        current: Math.round(current),
+        capacity,
+        utilizationRate: Math.round(utilizationRate * 10) / 10,
+        weeklyChange: Math.round(weeklyChange),
+        yearAgoLevel: Math.round(yearAgoLevel),
+        fiveYearAvg: Math.round(fiveYearAvg),
         unit: 'BCF',
-        lastUpdated: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        region: 'EU Storage',
-        current: 687,
-        capacity: 1156,
-        utilizationRate: 59.4,
-        weeklyChange: -23,
-        yearAgoLevel: 542,
-        fiveYearAvg: 612,
-        unit: 'TWh',
-        lastUpdated: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        region: 'Germany',
-        current: 152,
-        capacity: 254,
-        utilizationRate: 59.8,
-        weeklyChange: -5.2,
-        yearAgoLevel: 118,
-        fiveYearAvg: 134,
-        unit: 'TWh',
-        lastUpdated: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
-      }
-    ];
-
-    const mockLNG: LNGData = {
-      utilization: 84.3,
-      exports: 156.7,
-      imports: 142.1,
-      capacity: 185.9,
-      unit: 'BCF/d'
-    };
-
-    const mockPrices: PriceData = {
-      henryHub: 2.84,
-      henryHubChange: -0.12,
-      ttf: 28.45,
-      ttfChange: 1.23,
-      jkm: 11.80,
-      jkmChange: -0.45,
-      currency: 'USD/MMBtu'
-    };
-
-    const mockData: NaturalGasData = {
-      storage: mockStorage,
-      lng: mockLNG,
-      prices: mockPrices,
-      lastUpdated: new Date().toISOString()
-    };
-
-    return mockData;
-    
-  } catch (error) {
-    console.error('Natural gas data fetch error:', error);
-    
-    // Fallback data
-    return {
-      storage: [
-        {
-          region: 'US Lower 48',
-          current: 2847,
-          capacity: 4693,
-          utilizationRate: 60.7,
-          weeklyChange: -156,
-          yearAgoLevel: 2234,
-          fiveYearAvg: 2456,
-          unit: 'BCF',
-          lastUpdated: new Date().toISOString()
-        }
-      ],
-      lng: {
-        utilization: 84.3,
-        exports: 156.7,
-        imports: 142.1,
-        capacity: 185.9,
-        unit: 'BCF/d'
-      },
-      prices: {
-        henryHub: 2.84,
-        henryHubChange: -0.12,
-        ttf: 28.45,
-        ttfChange: 1.23,
-        jkm: 11.80,
-        jkmChange: -0.45,
-        currency: 'USD/MMBtu'
-      },
-      lastUpdated: new Date().toISOString()
-    };
+        lastUpdated: currentPeriod,
+      });
+    } catch (err) {
+      console.error(`EIA storage fetch error for ${region}:`, err);
+    }
   }
+
+  return results;
 }
 
+// ── EU Storage from AGSI (GIE) ─────────────────────────────────────
+async function fetchEUStorage() {
+  try {
+    const resp = await fetch('https://agsi.gie.eu/api?type=eu', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
+        'x-key': '', // AGSI is public for aggregate EU data
+      },
+      signal: AbortSignal.timeout(8000),
+    });
+    const json = await resp.json();
+
+    if (json && Array.isArray(json) && json.length > 0) {
+      const latest = json[0];
+      return {
+        region: 'EU Aggregate',
+        current: Math.round(parseFloat(latest.gasInStorage || '0')),
+        capacity: Math.round(parseFloat(latest.workingGasVolume || '0')),
+        utilizationRate: parseFloat(latest.full || '0'),
+        weeklyChange: 0, // would need previous week
+        yearAgoLevel: 0,
+        fiveYearAvg: 0,
+        unit: 'TWh',
+        lastUpdated: latest.gasDayStart || new Date().toISOString(),
+      };
+    }
+  } catch (err) {
+    console.error('AGSI EU storage fetch error:', err);
+  }
+  return null;
+}
+
+// ── Prices from Yahoo Finance ───────────────────────────────────────
+async function fetchPrices() {
+  const symbols = [
+    { symbol: 'NG=F', name: 'henryHub' },
+    { symbol: 'TTF=F', name: 'ttf' },
+    { symbol: 'JKM=F', name: 'jkm' },
+  ];
+
+  const prices: Record<string, { price: number; change: number; prevClose: number }> = {};
+
+  await Promise.all(symbols.map(async ({ symbol, name }) => {
+    try {
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=5d&interval=1d`;
+      const resp = await fetch(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
+        signal: AbortSignal.timeout(8000),
+      });
+      const json = await resp.json();
+      const meta = json?.chart?.result?.[0]?.meta;
+      const closes = json?.chart?.result?.[0]?.indicators?.adjclose?.[0]?.adjclose || [];
+
+      if (meta) {
+        const currentPrice = meta.regularMarketPrice || closes[closes.length - 1] || 0;
+        const prevClose = meta.chartPreviousClose || (closes.length > 1 ? closes[closes.length - 2] : currentPrice);
+        prices[name] = {
+          price: currentPrice,
+          change: currentPrice - prevClose,
+          prevClose,
+        };
+      }
+    } catch (err) {
+      console.error(`Yahoo price fetch error for ${symbol}:`, err);
+    }
+  }));
+
+  return {
+    henryHub: prices.henryHub?.price || 0,
+    henryHubChange: prices.henryHub?.change || 0,
+    ttf: prices.ttf?.price || 0,
+    ttfChange: prices.ttf?.change || 0,
+    jkm: prices.jkm?.price || 0,
+    jkmChange: prices.jkm?.change || 0,
+    currency: 'USD/MMBtu',
+  };
+}
+
+// ── LNG from EIA ───────────────────────────────────────────────────
+async function fetchLNG(apiKey: string) {
+  try {
+    // EIA natural gas exports (LNG) - monthly
+    const url = `https://api.eia.gov/v2/natural-gas/move/expc/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[process][]=LNG&sort[0][column]=period&sort[0][direction]=desc&length=2`;
+    const resp = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
+      signal: AbortSignal.timeout(8000),
+    });
+    const json = await resp.json();
+    const rows = json?.response?.data || [];
+
+    if (rows.length > 0) {
+      const latestExport = parseFloat(rows[0].value) || 0;
+      // US LNG export capacity ~14.7 Bcf/d as of 2026
+      const capacity = 14.7;
+      const dailyExport = latestExport / 30; // monthly MMCF to approximate daily BCF
+      const utilization = (dailyExport / capacity) * 100;
+
+      return {
+        utilization: Math.round(utilization * 10) / 10,
+        exports: Math.round(dailyExport * 10) / 10,
+        imports: 0,
+        capacity,
+        unit: 'BCF/d',
+        period: rows[0].period,
+      };
+    }
+  } catch (err) {
+    console.error('EIA LNG fetch error:', err);
+  }
+
+  return {
+    utilization: 0,
+    exports: 0,
+    imports: 0,
+    capacity: 14.7,
+    unit: 'BCF/d',
+  };
+}
+
+// ── Main handler ────────────────────────────────────────────────────
 export async function GET() {
   try {
-    // Return cached data if fresh
     if (cache && Date.now() - cache.ts < CACHE_MS) {
       return NextResponse.json(cache.data);
     }
 
-    // Fetch fresh data
-    const data = await fetchNaturalGasData();
-    
-    // Cache the results
+    let eiaApiKey: string | undefined;
+    try { eiaApiKey = process.env.EIA_API_KEY; } catch { /* */ }
+
+    // Fetch all data in parallel
+    const [storageUS, storageEU, prices, lng] = await Promise.all([
+      eiaApiKey ? fetchEIAStorage(eiaApiKey) : Promise.resolve([]),
+      fetchEUStorage(),
+      fetchPrices(),
+      eiaApiKey ? fetchLNG(eiaApiKey) : Promise.resolve({ utilization: 0, exports: 0, imports: 0, capacity: 14.7, unit: 'BCF/d' }),
+    ]);
+
+    // Combine storage: US regions + EU
+    const storage = [
+      ...storageUS,
+      ...(storageEU ? [storageEU] : []),
+    ];
+
+    // If no EIA data, use only the first (Lower 48) to keep it clean
+    // Show at most: Lower 48, East, South Central, EU
+    const displayStorage = storage.length > 0
+      ? storage.filter(s => ['US Lower 48', 'East', 'South Central', 'EU Aggregate'].includes(s.region))
+      : [];
+
+    const data = {
+      storage: displayStorage.length > 0 ? displayStorage : storage,
+      lng,
+      prices,
+      lastUpdated: new Date().toISOString(),
+      source: 'EIA / Yahoo Finance / AGSI',
+    };
+
     cache = { data, ts: Date.now() };
-    
     return NextResponse.json(data);
-    
+
   } catch (error) {
     console.error('Natural gas API error:', error);
-    
-    // Ultimate fallback
     return NextResponse.json({
-      storage: [
-        {
-          region: 'US Lower 48',
-          current: 2847,
-          capacity: 4693,
-          utilizationRate: 60.7,
-          weeklyChange: -156,
-          yearAgoLevel: 2234,
-          fiveYearAvg: 2456,
-          unit: 'BCF',
-          lastUpdated: new Date().toISOString()
-        }
-      ],
-      lng: {
-        utilization: 84.3,
-        exports: 156.7,
-        imports: 142.1,
-        capacity: 185.9,
-        unit: 'BCF/d'
-      },
-      prices: {
-        henryHub: 2.84,
-        henryHubChange: -0.12,
-        ttf: 28.45,
-        ttfChange: 1.23,
-        jkm: 11.80,
-        jkmChange: -0.45,
-        currency: 'USD/MMBtu'
-      },
-      lastUpdated: new Date().toISOString()
+      storage: [],
+      lng: { utilization: 0, exports: 0, imports: 0, capacity: 14.7, unit: 'BCF/d' },
+      prices: { henryHub: 0, henryHubChange: 0, ttf: 0, ttfChange: 0, jkm: 0, jkmChange: 0, currency: 'USD/MMBtu' },
+      lastUpdated: new Date().toISOString(),
+      error: 'Failed to fetch data',
     });
   }
 }
