@@ -214,7 +214,7 @@ export default function SPRChartWidget() {
               </div>
             </div>
             
-            <div className="text-xs text-gray-500 text-center">
+            <div className="text-xs text-gray-500 text-center mt-2.5">
               Source: U.S. Energy Information Administration (REAL-TIME)
             </div>
           </div>
