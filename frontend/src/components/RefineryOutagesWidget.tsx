@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import WidgetLoader from '@/components/WidgetLoader';
 
 interface RegionData {
   region: string;
@@ -217,6 +219,4 @@ export default function RefineryOutagesWidget() {
       </div>
     </div>
   );
-
-import { useState, useEffect } from 'react';
-import WidgetLoader from '@/components/WidgetLoader';
+}

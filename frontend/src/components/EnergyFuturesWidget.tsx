@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import WidgetLoader from '@/components/WidgetLoader';
 
 interface FuturesContract {
   symbol: string;
@@ -219,6 +221,4 @@ export default function EnergyFuturesWidget() {
       </div>
     </div>
   );
-
-import { useState, useEffect } from 'react';
-import WidgetLoader from '@/components/WidgetLoader';
+}

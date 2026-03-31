@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import WidgetLoader from '@/components/WidgetLoader';
 
 interface ClimateExtreme {
   type: string;
@@ -146,6 +148,4 @@ export default function ClimateExtremesWidget() {
       </div>
     </div>
   );
-
-import { useState, useEffect } from 'react';
-import WidgetLoader from '@/components/WidgetLoader';
+}

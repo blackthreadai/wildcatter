@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import WidgetLoader from '@/components/WidgetLoader';
 
 interface Market {
   symbol: string;
@@ -169,6 +171,4 @@ export default function CarbonCreditWidget() {
       </div>
     </div>
   );
-
-import { useState, useEffect } from 'react';
-import WidgetLoader from '@/components/WidgetLoader';
+}

@@ -1,5 +1,7 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import WidgetLoader from '@/components/WidgetLoader';
 
 interface EconomicIndicator {
   name: string;
@@ -92,6 +94,4 @@ export default function EconomicIndicatorsWidget() {
       </div>
     </div>
   );
-
-import { useState, useEffect } from 'react';
-import WidgetLoader from '@/components/WidgetLoader';
+}

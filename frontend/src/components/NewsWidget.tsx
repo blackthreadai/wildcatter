@@ -1,5 +1,8 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import SPRChartWidget from './SPRChartWidget';
+import WidgetLoader from '@/components/WidgetLoader';
 
 interface NewsArticle {
   title: string;
@@ -145,7 +148,4 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
       </div>
     </div>
   );
-
-import { useState, useEffect } from 'react';
-import SPRChartWidget from './SPRChartWidget';
-import WidgetLoader from '@/components/WidgetLoader';
+}

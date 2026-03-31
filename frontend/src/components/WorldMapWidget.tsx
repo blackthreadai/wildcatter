@@ -1,8 +1,8 @@
 'use client';
-import WidgetLoader from '@/components/WidgetLoader';
 
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
+import WidgetLoader from '@/components/WidgetLoader';
 
 // Dynamically import the map to avoid SSR issues
 const WorldMap = dynamic(() => import('@/components/WorldMap'), {

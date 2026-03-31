@@ -1,7 +1,7 @@
 'use client';
-import WidgetLoader from '@/components/WidgetLoader';
 
 import { useState, useEffect } from 'react';
+import WidgetLoader from '@/components/WidgetLoader';
 
 interface GlobalEnergyStock {
   symbol: string;
