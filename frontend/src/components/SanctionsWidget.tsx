@@ -160,7 +160,7 @@ export default function SanctionsWidget() {
 
         {/* Recent OFAC Actions */}
         {data.recentActions.length > 0 && (
-          <div className="mb-3 pb-2 border-b border-gray-700">
+          <div className="mb-3 pb-2 border-b border-gray-700 bg-red-500/10 -mx-3 px-3 pt-2">
             <div className="text-[#DAA520] text-xs font-bold mb-2">RECENT OFAC ACTIONS</div>
             {data.recentActions.slice(0, 5).map((action, i) => (
               <div key={i} className="mb-1.5 text-xs">
