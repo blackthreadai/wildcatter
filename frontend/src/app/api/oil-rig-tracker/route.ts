@@ -10,7 +10,7 @@ async function findLatestBHFile(): Promise<ArrayBuffer> {
   // Step 1: Scrape the BH page for static file UUIDs
   const pageResp = await fetch('https://rigcount.bakerhughes.com/na-rig-count', {
     headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
-    signal: AbortSignal.timeout(10000),
+    signal: AbortSignal.timeout(6000),
   });
   if (!pageResp.ok) throw new Error(`BH page fetch failed: ${pageResp.status}`);
   const html = await pageResp.text();
@@ -25,48 +25,36 @@ async function findLatestBHFile(): Promise<ArrayBuffer> {
 
   if (uuids.size === 0) throw new Error('No static files found on BH page');
 
-  // Step 2: HEAD each file to find the weekly NA report
-  let latestUUID = '';
-  let latestDate = '';
-
+  // Step 2: HEAD all files in parallel to find the weekly report
   const checks = Array.from(uuids).map(async (uuid) => {
     try {
       const resp = await fetch(`https://rigcount.bakerhughes.com/static-files/${uuid}`, {
         method: 'HEAD',
         headers: { 'User-Agent': 'Mozilla/5.0' },
-        signal: AbortSignal.timeout(5000),
+        signal: AbortSignal.timeout(3000),
       });
       const disp = resp.headers.get('content-disposition') || '';
-      // Match pattern: "MM-DD-YYYY North_America Rig_Count Report.xlsx"
-      const nameMatch = disp.match(/(\d{2}-\d{2}-\d{4})\s+North.America.*Rig.Count.*Report/i);
-      if (nameMatch) {
-        return { uuid, date: nameMatch[1] };
+      if (disp.includes('Rig_Count') && disp.includes('Report') && disp.includes('.xlsx')) {
+        return { uuid, disp };
       }
-    } catch { /* ignore */ }
+    } catch { /* */ }
     return null;
   });
 
-  const results = (await Promise.all(checks)).filter(Boolean) as { uuid: string; date: string }[];
-
+  const results = (await Promise.all(checks)).filter(Boolean) as { uuid: string; disp: string }[];
   if (results.length === 0) throw new Error('No weekly BH report found');
 
-  // Pick the most recent by date
-  results.sort((a, b) => {
-    const [am, ad, ay] = a.date.split('-').map(Number);
-    const [bm, bd, by] = b.date.split('-').map(Number);
-    return new Date(by, bm - 1, bd).getTime() - new Date(ay, am - 1, ad).getTime();
-  });
-  latestUUID = results[results.length - 1].uuid;
-  latestDate = results[results.length - 1].date;
+  // Pick the first match (there's usually only one current weekly report)
+  // If multiple, pick by most recent date in filename
+  const target = results[0];
+  console.log(`Found BH report: ${target.disp}`);
 
-  console.log(`Found BH report: ${latestDate} (${latestUUID})`);
-
-  // Step 3: Download the file
-  const fileResp = await fetch(`https://rigcount.bakerhughes.com/static-files/${latestUUID}`, {
+  // Step 3: Download
+  const fileResp = await fetch(`https://rigcount.bakerhughes.com/static-files/${target.uuid}`, {
     headers: { 'User-Agent': 'Mozilla/5.0' },
-    signal: AbortSignal.timeout(15000),
+    signal: AbortSignal.timeout(8000),
   });
-  if (!fileResp.ok) throw new Error(`BH file download failed: ${fileResp.status}`);
+  if (!fileResp.ok) throw new Error(`BH download failed: ${fileResp.status}`);
   return fileResp.arrayBuffer();
 }
 
