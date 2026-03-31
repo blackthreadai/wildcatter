@@ -3,116 +3,75 @@
 import { useState, useEffect } from 'react';
 
 interface SectorDemand {
-  sector: 'Aviation' | 'Trucking' | 'Shipping' | 'Rail' | 'Industrial' | 'Power Generation';
-  fuelType: 'Jet Fuel' | 'Diesel' | 'Heavy Fuel Oil' | 'Natural Gas' | 'Coal' | 'Gasoline';
+  sector: string;
+  fuelType: string;
   currentDemand: number;
   unit: string;
   change: number;
-  forecast: {
-    nextMonth: number;
-    nextQuarter: number;
-    yearEnd: number;
-  };
+  icon: string;
   region: string;
-  lastUpdated: string;
 }
 
 interface EconomicIndicator {
   name: string;
   value: number;
   change: number;
-  impact: 'Positive' | 'Negative' | 'Neutral';
+  impact: string;
   description: string;
-  lastUpdated: string;
+  date: string;
+}
+
+interface RegionalData {
+  region: string;
+  totalDemand: number;
+  unit: string;
 }
 
 interface GlobalFuelDemandData {
   sectorDemand: SectorDemand[];
   economicIndicators: EconomicIndicator[];
-  regionalSummary: {
-    region: string;
-    totalDemand: number;
-    change: number;
-    majorDrivers: string[];
-  }[];
+  regionalSummary: RegionalData[];
   marketSummary: {
     globalDemand: number;
-    quarterlyGrowth: number;
-    yearOverYear: number;
+    usDemand: number;
+    weeklyChange: number;
     strongestSector: string;
     weakestSector: string;
+    period: string;
+    intlPeriod: string;
   };
   lastUpdated: string;
+  source: string;
+  error?: string;
 }
 
 export default function GlobalFuelDemandWidget() {
   const [data, setData] = useState<GlobalFuelDemandData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'sectors' | 'indicators' | 'regions'>('sectors');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch('/api/global-fuel-demand');
-        const demandData = await response.json();
-        setData(demandData);
+        const json = await response.json();
+        if (!response.ok || json.error) {
+          setError(json.error || 'Failed to load data');
+          setLoading(false);
+          return;
+        }
+        setData(json);
+        setError(null);
         setLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch global fuel demand data:', error);
-        
-        // Fallback data
-        const fallbackData: GlobalFuelDemandData = {
-          sectorDemand: [
-            {
-              sector: 'Aviation',
-              fuelType: 'Jet Fuel',
-              currentDemand: 6.2,
-              unit: 'million bpd',
-              change: 8.5,
-              forecast: {
-                nextMonth: 6.4,
-                nextQuarter: 6.8,
-                yearEnd: 7.1
-              },
-              region: 'Global',
-              lastUpdated: new Date().toISOString()
-            }
-          ],
-          economicIndicators: [
-            {
-              name: 'US Manufacturing PMI',
-              value: 52.3,
-              change: 1.8,
-              impact: 'Positive',
-              description: 'Above 50 indicates expansion, driving fuel demand',
-              lastUpdated: new Date().toISOString()
-            }
-          ],
-          regionalSummary: [
-            {
-              region: 'North America',
-              totalDemand: 20.8,
-              change: 1.8,
-              majorDrivers: ['Strong aviation recovery', 'Trucking activity']
-            }
-          ],
-          marketSummary: {
-            globalDemand: 83.4,
-            quarterlyGrowth: 0.8,
-            yearOverYear: 2.1,
-            strongestSector: 'Aviation',
-            weakestSector: 'Shipping'
-          },
-          lastUpdated: new Date().toISOString()
-        };
-        
-        setData(fallbackData);
+      } catch {
+        setError('Failed to fetch fuel demand data');
         setLoading(false);
       }
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 6 * 60 * 60 * 1000); // Update every 6 hours
+    const interval = setInterval(fetchData, 6 * 60 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -122,18 +81,6 @@ export default function GlobalFuelDemandWidget() {
       case 'Negative': return 'text-red-500';
       case 'Neutral': return 'text-yellow-500';
       default: return 'text-gray-400';
-    }
-  };
-
-  const getSectorIcon = (sector: string) => {
-    switch (sector) {
-      case 'Aviation': return '✈️';
-      case 'Trucking': return '🚛';
-      case 'Shipping': return '🚢';
-      case 'Rail': return '🚂';
-      case 'Industrial': return '🏭';
-      case 'Power Generation': return '⚡';
-      default: return '⚪';
     }
   };
 
@@ -150,14 +97,14 @@ export default function GlobalFuelDemandWidget() {
     );
   }
 
-  if (!data) {
+  if (error || !data) {
     return (
       <div className="w-full flex flex-col bg-black h-full">
         <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>GLOBAL FUEL DEMAND</h3>
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
-          <div className="text-gray-500 text-xs">No data available</div>
+          <div className="text-red-500 text-xs">{error || 'No data available'}</div>
         </div>
       </div>
     );
@@ -175,13 +122,13 @@ export default function GlobalFuelDemandWidget() {
           <div className="text-[#DAA520] text-xs font-bold mb-2">MARKET SUMMARY</div>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div>
-              <div className="text-gray-400">Global Demand</div>
-              <div className="text-white font-bold">{data.marketSummary.globalDemand.toFixed(1)} Mbpd</div>
+              <div className="text-gray-400">US Demand ({data.marketSummary.period})</div>
+              <div className="text-white font-bold">{data.marketSummary.usDemand.toLocaleString()} kbd</div>
             </div>
             <div>
-              <div className="text-gray-400">YoY Growth</div>
-              <div className={`font-bold ${data.marketSummary.yearOverYear >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                {data.marketSummary.yearOverYear >= 0 ? '+' : ''}{data.marketSummary.yearOverYear.toFixed(1)}%
+              <div className="text-gray-400">WoW Change</div>
+              <div className={`font-bold ${data.marketSummary.weeklyChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {data.marketSummary.weeklyChange >= 0 ? '+' : ''}{data.marketSummary.weeklyChange.toFixed(1)}%
               </div>
             </div>
             <div>
@@ -193,6 +140,12 @@ export default function GlobalFuelDemandWidget() {
               <div className="text-red-400 font-medium">{data.marketSummary.weakestSector}</div>
             </div>
           </div>
+          {data.marketSummary.globalDemand > 0 && (
+            <div className="mt-2 text-xs">
+              <span className="text-gray-400">Global Consumption ({data.marketSummary.intlPeriod}): </span>
+              <span className="text-white font-bold">{data.marketSummary.globalDemand.toLocaleString()} kbd</span>
+            </div>
+          )}
         </div>
 
         {/* Tab Selector */}
@@ -205,7 +158,7 @@ export default function GlobalFuelDemandWidget() {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as 'sectors' | 'indicators' | 'regions')}
                 className={`px-2 py-1 rounded border transition-colors ${
                   activeTab === tab.id
                     ? 'bg-[#DAA520] text-black border-[#DAA520]'
@@ -218,14 +171,14 @@ export default function GlobalFuelDemandWidget() {
           </div>
         </div>
 
-        {/* Content */}
+        {/* Sectors Tab */}
         {activeTab === 'sectors' && (
           <div className="space-y-2">
             {data.sectorDemand.map((sector, i) => (
               <div key={i} className="pb-2 border-b border-gray-700 last:border-b-0">
                 <div className="flex items-start justify-between mb-1">
                   <div className="flex items-start gap-2">
-                    <span className="text-sm mt-0.5">{getSectorIcon(sector.sector)}</span>
+                    <span className="text-sm mt-0.5">{sector.icon}</span>
                     <div>
                       <div className="text-white text-xs font-medium">{sector.sector}</div>
                       <div className="text-gray-400 text-xs">{sector.fuelType}</div>
@@ -233,35 +186,24 @@ export default function GlobalFuelDemandWidget() {
                   </div>
                   <div className="text-right">
                     <div className="text-white text-xs font-bold">
-                      {sector.currentDemand.toFixed(1)} {sector.unit}
+                      {sector.currentDemand.toLocaleString()} {sector.unit}
                     </div>
                     <div className={`text-xs font-medium ${
                       sector.change >= 0 ? 'text-green-500' : 'text-red-500'
                     }`}>
-                      {sector.change >= 0 ? '+' : ''}{sector.change.toFixed(1)}%
+                      {sector.change >= 0 ? '+' : ''}{sector.change.toFixed(1)}% WoW
                     </div>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-1 text-xs">
-                  <div>
-                    <div className="text-gray-500">Next Month</div>
-                    <div className="text-gray-300">{sector.forecast.nextMonth.toFixed(1)}</div>
-                  </div>
-                  <div>
-                    <div className="text-gray-500">Next Quarter</div>
-                    <div className="text-gray-300">{sector.forecast.nextQuarter.toFixed(1)}</div>
-                  </div>
-                  <div>
-                    <div className="text-gray-500">Year End</div>
-                    <div className="text-[#DAA520]">{sector.forecast.yearEnd.toFixed(1)}</div>
                   </div>
                 </div>
               </div>
             ))}
+            {data.sectorDemand.length === 0 && (
+              <div className="text-gray-500 text-xs text-center py-2">No sector data available</div>
+            )}
           </div>
         )}
 
+        {/* Indicators Tab */}
         {activeTab === 'indicators' && (
           <div className="space-y-2">
             {data.economicIndicators.map((indicator, i) => (
@@ -272,28 +214,26 @@ export default function GlobalFuelDemandWidget() {
                     <div className="text-white text-xs font-bold">
                       {indicator.value.toFixed(1)}
                     </div>
-                    <div className={`text-xs font-medium ${
-                      indicator.change >= 0 ? 'text-green-500' : 'text-red-500'
-                    }`}>
-                      {indicator.change >= 0 ? '+' : ''}{indicator.change.toFixed(1)}
-                    </div>
                   </div>
                 </div>
-                
                 <div className="flex items-center justify-between text-xs">
                   <div className={`font-medium ${getImpactColor(indicator.impact)}`}>
                     {indicator.impact} Impact
                   </div>
+                  <div className="text-gray-500">{indicator.date}</div>
                 </div>
-                
                 <div className="text-xs text-gray-400 mt-1">
                   {indicator.description}
                 </div>
               </div>
             ))}
+            {data.economicIndicators.length === 0 && (
+              <div className="text-gray-500 text-xs text-center py-2">No indicator data available</div>
+            )}
           </div>
         )}
 
+        {/* Regions Tab */}
         {activeTab === 'regions' && (
           <div className="space-y-2">
             {data.regionalSummary.map((region, i) => (
@@ -302,26 +242,15 @@ export default function GlobalFuelDemandWidget() {
                   <div className="text-white text-xs font-medium">{region.region}</div>
                   <div className="text-right">
                     <div className="text-white text-xs font-bold">
-                      {region.totalDemand.toFixed(1)} Mbpd
+                      {region.totalDemand.toLocaleString()} {region.unit}
                     </div>
-                    <div className={`text-xs font-medium ${
-                      region.change >= 0 ? 'text-green-500' : 'text-red-500'
-                    }`}>
-                      {region.change >= 0 ? '+' : ''}{region.change.toFixed(1)}%
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="text-xs text-gray-400">
-                  <div className="font-medium text-[#DAA520] mb-1">Major Drivers:</div>
-                  <div className="space-y-1">
-                    {region.majorDrivers.map((driver, j) => (
-                      <div key={j} className="text-gray-300">• {driver}</div>
-                    ))}
                   </div>
                 </div>
               </div>
             ))}
+            {data.regionalSummary.length === 0 && (
+              <div className="text-gray-500 text-xs text-center py-2">No regional data available</div>
+            )}
           </div>
         )}
       </div>
