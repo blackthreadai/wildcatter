@@ -19,7 +19,7 @@ export default function YouTubeWidget() {
         <h3 className="text-white text-xs font-bold tracking-[0.2em] absolute left-2" style={{ fontStretch: 'condensed' }}>LIVE NEWS</h3>
         <div className="flex items-center gap-1">
           <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-          <span className="text-red-500 text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>LIVE</span>
+          <span className="text-green-500 text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>LIVE</span>
         </div>
       </div>
 

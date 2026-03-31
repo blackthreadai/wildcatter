@@ -761,6 +761,8 @@ export default function TerminalPage() {
             
             <a 
               href="https://wildcatter.com/login"
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-2 text-xs text-gray-400 hover:text-[#DAA520] transition-colors cursor-pointer uppercase"
               style={{ fontStretch: 'condensed' }}
             >
