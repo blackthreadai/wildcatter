@@ -165,7 +165,7 @@ async function fetchPrices() {
 async function fetchLNG(apiKey: string) {
   try {
     // EIA natural gas exports (LNG) - monthly
-    const url = `https://api.eia.gov/v2/natural-gas/move/expc/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[process][]=LNG&sort[0][column]=period&sort[0][direction]=desc&length=2`;
+    const url = `https://api.eia.gov/v2/natural-gas/move/expc/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[process][]=ENG&sort[0][column]=period&sort[0][direction]=desc&length=2`;
     const resp = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
       signal: AbortSignal.timeout(8000),
@@ -174,19 +174,22 @@ async function fetchLNG(apiKey: string) {
     const rows = json?.response?.data || [];
 
     if (rows.length > 0) {
-      const latestExport = parseFloat(rows[0].value) || 0;
+      const latestExportMMCF = parseFloat(rows[0].value) || 0;
+      const period = rows[0].period; // e.g. "2025-12"
+      const daysInMonth = new Date(parseInt(period.split('-')[0]), parseInt(period.split('-')[1]), 0).getDate();
+      // Convert MMCF/month to BCF/day
+      const dailyExportBCF = latestExportMMCF / daysInMonth / 1000;
       // US LNG export capacity ~14.7 Bcf/d as of 2026
       const capacity = 14.7;
-      const dailyExport = latestExport / 30; // monthly MMCF to approximate daily BCF
-      const utilization = (dailyExport / capacity) * 100;
+      const utilization = (dailyExportBCF / capacity) * 100;
 
       return {
         utilization: Math.round(utilization * 10) / 10,
-        exports: Math.round(dailyExport * 10) / 10,
+        exports: Math.round(dailyExportBCF * 10) / 10,
         imports: 0,
         capacity,
         unit: 'BCF/d',
-        period: rows[0].period,
+        period,
       };
     }
   } catch (err) {
