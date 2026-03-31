@@ -127,81 +127,70 @@ async function fetchSanctionsAlerts(): Promise<GeopoliticalEvent[]> {
   }
 }
 
-// Source 4: Active conflict zones with energy impact (curated, updated periodically)
-function getActiveConflictZones(): GeopoliticalEvent[] {
-  const now = new Date().toISOString();
-  return [
-    {
-      id: 'conflict_ukraine', lat: 48.3794, lng: 31.1656,
-      title: 'Ukraine-Russia Conflict Zone',
-      description: 'Ongoing military conflict disrupting European energy supply chains, gas transit routes, and Black Sea shipping',
-      severity: 'critical', category: 'conflict', source: 'Conflict Monitor',
-      date: now, countries: ['Ukraine', 'Russia'], confidence: 0.99
-    },
-    {
-      id: 'conflict_redsea', lat: 13.5, lng: 43.0,
-      title: 'Red Sea / Houthi Maritime Threat',
-      description: 'Houthi attacks on commercial shipping in Red Sea and Bab el-Mandeb strait disrupting global oil/LNG tanker routes',
-      severity: 'critical', category: 'naval', source: 'Maritime Security',
-      date: now, countries: ['Yemen', 'Saudi Arabia'], confidence: 0.98
-    },
-    {
-      id: 'conflict_hormuz', lat: 26.5, lng: 56.5,
-      title: 'Strait of Hormuz Tensions',
-      description: 'Elevated military presence and tanker seizure risks in the Strait of Hormuz, through which 20% of global oil transits',
-      severity: 'high', category: 'naval', source: 'Maritime Security',
-      date: now, countries: ['Iran', 'UAE', 'Oman'], confidence: 0.90
-    },
-    {
-      id: 'conflict_libya', lat: 32.9, lng: 13.18,
-      title: 'Libya Political Instability',
-      description: 'Rival governments and militia control over oil facilities cause periodic production shutdowns affecting global supply',
-      severity: 'high', category: 'facility', source: 'Conflict Monitor',
-      date: now, countries: ['Libya'], confidence: 0.92
-    },
-    {
-      id: 'conflict_niger_delta', lat: 5.0, lng: 6.5,
-      title: 'Niger Delta Pipeline Security',
-      description: 'Ongoing pipeline vandalism, oil theft, and militant activity in Nigeria\'s primary oil-producing region',
-      severity: 'moderate', category: 'pipeline', source: 'Conflict Monitor',
-      date: now, countries: ['Nigeria'], confidence: 0.88
-    },
-    {
-      id: 'conflict_taiwan', lat: 23.7, lng: 121.0,
-      title: 'Taiwan Strait Geopolitical Risk',
-      description: 'Military tensions in the Taiwan Strait threaten disruption to major LNG shipping lanes and semiconductor supply chains',
-      severity: 'moderate', category: 'naval', source: 'Geopolitical Risk',
-      date: now, countries: ['Taiwan', 'China'], confidence: 0.80
-    },
-    {
-      id: 'conflict_venezuela', lat: 10.5, lng: -66.9,
-      title: 'Venezuela Oil Sector Sanctions',
-      description: 'US sanctions on Venezuelan oil exports continue to constrain PDVSA production and global heavy crude supply',
-      severity: 'high', category: 'sanctions', source: 'Sanctions Monitor',
-      date: now, countries: ['Venezuela'], confidence: 0.95
-    },
-    {
-      id: 'conflict_sudan', lat: 15.5, lng: 32.5,
-      title: 'Sudan Civil Conflict',
-      description: 'Civil war between SAF and RSF forces threatens oil infrastructure and South Sudan export pipeline routes',
-      severity: 'high', category: 'conflict', source: 'Conflict Monitor',
-      date: now, countries: ['Sudan', 'South Sudan'], confidence: 0.90
-    },
-    {
-      id: 'conflict_iraq_kurds', lat: 36.2, lng: 44.0,
-      title: 'Iraq-Kurdistan Oil Dispute',
-      description: 'Ongoing dispute over northern Iraq oil exports via Turkey pipeline, affecting 400,000+ bpd of Kurdish crude exports',
-      severity: 'moderate', category: 'pipeline', source: 'Energy Intelligence',
-      date: now, countries: ['Iraq', 'Turkey'], confidence: 0.85
-    },
-    {
-      id: 'conflict_mozambique', lat: -12.3, lng: 40.3,
-      title: 'Mozambique LNG Insurgency',
-      description: 'Islamist insurgency in Cabo Delgado province threatens TotalEnergies and ExxonMobil LNG mega-projects',
-      severity: 'moderate', category: 'facility', source: 'Conflict Monitor',
-      date: now, countries: ['Mozambique'], confidence: 0.85
-    }
+// Source 4: Live geopolitical news from Google News RSS (auto-updating)
+async function fetchGeoNewsRSS(): Promise<GeopoliticalEvent[]> {
+  const queries = [
+    'energy+conflict+oil+gas+pipeline+attack',
+    'sanctions+oil+energy+embargo',
+    'military+naval+strait+shipping+blockade',
+    'OPEC+geopolitical+crude+disruption'
   ];
+  const events: GeopoliticalEvent[] = [];
+  const seen = new Set<string>();
+
+  for (const q of queries) {
+    try {
+      const url = `https://news.google.com/rss/search?q=${q}&hl=en-US&gl=US&ceid=US:en`;
+      const response = await fetch(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; WildcatterTerminal/1.0)' },
+        signal: AbortSignal.timeout(8000)
+      });
+      if (!response.ok) continue;
+      const xml = await response.text();
+
+      // Parse RSS items
+      const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+      const items = [...xml.matchAll(itemRegex)];
+
+      for (const match of items.slice(0, 8)) {
+        const itemXml = match[1];
+        const titleMatch = itemXml.match(/<title>([\s\S]*?)<\/title>/i);
+        const pubDateMatch = itemXml.match(/<pubDate>([\s\S]*?)<\/pubDate>/i);
+        const sourceMatch = itemXml.match(/<source[^>]*>([\s\S]*?)<\/source>/i);
+
+        let title = titleMatch ? titleMatch[1].replace(/<!\[CDATA\[|\]\]>/g, '').trim() : '';
+        if (!title) continue;
+
+        // Deduplicate by title similarity
+        const titleKey = title.toLowerCase().substring(0, 40);
+        if (seen.has(titleKey)) continue;
+        seen.add(titleKey);
+
+        const loc = extractLocation(title);
+        if (!loc.lat) continue; // Skip if we can't geocode
+
+        const cls = classifyEvent(title, '');
+
+        events.push({
+          id: `gnews_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+          lat: loc.lat + (Math.random() - 0.5) * 0.5, // Slight jitter to avoid overlap
+          lng: loc.lng + (Math.random() - 0.5) * 0.5,
+          title: title.length > 100 ? title.substring(0, 97) + '...' : title,
+          description: title,
+          severity: cls.severity,
+          category: cls.category,
+          source: sourceMatch ? sourceMatch[1].replace(/<!\[CDATA\[|\]\]>/g, '').trim() : 'Google News',
+          date: pubDateMatch ? new Date(pubDateMatch[1].trim()).toISOString() : new Date().toISOString(),
+          countries: loc.countries,
+          confidence: 0.80
+        });
+      }
+    } catch {
+      continue;
+    }
+  }
+  console.log(`Google News RSS: ${events.length} geopolitical events found`);
+  return events;
 }
 
 function extractLocation(text: string): { lat: number; lng: number; countries: string[] } {
@@ -303,24 +292,23 @@ export async function GET() {
     }
 
     // Fetch all sources in parallel
-    const [gdeltEvents, travelEvents, sanctionsEvents] = await Promise.all([
+    const [gdeltEvents, travelEvents, sanctionsEvents, newsEvents] = await Promise.all([
       fetchGDELTEvents(),
       fetchTravelAdvisoryAlerts(),
-      fetchSanctionsAlerts()
+      fetchSanctionsAlerts(),
+      fetchGeoNewsRSS()
     ]);
 
-    // Always include curated conflict zones
-    const conflictZones = getActiveConflictZones();
+    // Merge all sources - all live, no hardcoded data
+    let allEvents = [...newsEvents, ...sanctionsEvents, ...travelEvents, ...gdeltEvents];
 
-    // Merge all sources, conflict zones first (highest confidence)
-    let allEvents = [...conflictZones, ...sanctionsEvents, ...travelEvents, ...gdeltEvents];
-
-    const sources: string[] = ['Conflict Zones'];
+    const sources: string[] = [];
+    if (newsEvents.length > 0) sources.push('Google News');
     if (gdeltEvents.length > 0) sources.push('GDELT');
     if (travelEvents.length > 0) sources.push('State Dept');
     if (sanctionsEvents.length > 0) sources.push('OFAC');
 
-    console.log(`Geopolitical: ${conflictZones.length} conflict zones + ${gdeltEvents.length} GDELT + ${travelEvents.length} travel + ${sanctionsEvents.length} sanctions`);
+    console.log(`Geopolitical: ${newsEvents.length} news + ${gdeltEvents.length} GDELT + ${travelEvents.length} travel + ${sanctionsEvents.length} sanctions`);
 
     // Sort by severity
     const severityOrder = { critical: 4, high: 3, moderate: 2, low: 1 };
@@ -346,14 +334,12 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Geopolitical API error:', error);
-    // Even on error, return conflict zones
-    const fallback = getActiveConflictZones();
     return NextResponse.json({
-      events: fallback,
+      events: [],
       lastUpdate: new Date().toISOString(),
-      totalEvents: fallback.length,
-      dataSource: 'Conflict Zones (fallback)',
-      note: 'Primary APIs failed, showing curated conflict zones'
+      totalEvents: 0,
+      dataSource: 'error',
+      error: 'Failed to load geopolitical data'
     });
   }
 }
