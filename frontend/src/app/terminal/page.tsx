@@ -760,9 +760,7 @@ export default function TerminalPage() {
             </div>
             
             <a 
-              href="https://apps.apple.com/app/wildcatter-energy-intelligence/id123456789" 
-              target="_blank" 
-              rel="noopener noreferrer"
+              href="https://wildcatter.com/login"
               className="flex items-center gap-2 text-xs text-gray-400 hover:text-[#DAA520] transition-colors cursor-pointer uppercase"
               style={{ fontStretch: 'condensed' }}
             >
