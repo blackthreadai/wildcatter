@@ -11,7 +11,7 @@ const FRED_KEY = process.env.FRED_API_KEY || '61cf53e2891a727efe4e48f18f6545f2';
 async function fetchUSProductSupplied(apiKey: string) {
   try {
     // Weekly US product supplied - key series for demand
-    const url = `https://api.eia.gov/v2/petroleum/sum/sndw/data/?api_key=${apiKey}&frequency=weekly&data[0]=value&facets[duoarea][]=NUS&sort[0][column]=period&sort[0][direction]=desc&length=50`;
+    const url = `https://api.eia.gov/v2/petroleum/sum/sndw/data/?api_key=${apiKey}&frequency=weekly&data[0]=value&facets[duoarea][]=NUS&sort[0][column]=period&sort[0][direction]=desc&length=80`;
     const resp = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
       signal: AbortSignal.timeout(10000),
@@ -222,12 +222,13 @@ export async function GET() {
     const prevTotalUS = (usData.sectors['gas']?.prev || 0) + (usData.sectors['diesel']?.prev || 0);
     const usChange = prevTotalUS > 0 ? Math.round(((totalUS - prevTotalUS) / prevTotalUS) * 1000) / 10 : 0;
 
-    const strongestSector = sectorDemand.filter(s => s.sector !== 'Total Petroleum').reduce(
-      (max, s) => s.change > max.change ? s : max, { sector: '', change: -999, fuelType: '', currentDemand: 0, unit: '', icon: '', region: '' }
-    );
-    const weakestSector = sectorDemand.filter(s => s.sector !== 'Total Petroleum').reduce(
-      (min, s) => s.change < min.change ? s : min, { sector: '', change: 999, fuelType: '', currentDemand: 0, unit: '', icon: '', region: '' }
-    );
+    const demandOnly = sectorDemand.filter(s => !['Refinery Throughput', 'Crude Production'].includes(s.sector));
+    const strongestSector = demandOnly.length > 0 ? demandOnly.reduce(
+      (max, s) => s.change > max.change ? s : max, demandOnly[0]
+    ) : { sector: '' };
+    const weakestSector = demandOnly.length > 1 ? demandOnly.reduce(
+      (min, s) => s.change < min.change ? s : min, demandOnly[0]
+    ) : { sector: '' };
 
     const data = {
       sectorDemand,
