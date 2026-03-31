@@ -51,6 +51,7 @@ interface PositionMonitorData {
 export default function PositionMonitorWidget() {
   const [data, setData] = useState<PositionMonitorData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'positions' | 'sentiment' | 'extremes'>('positions');
 
   useEffect(() => {
@@ -58,47 +59,16 @@ export default function PositionMonitorWidget() {
       try {
         const response = await fetch('/api/position-monitor');
         const positionData = await response.json();
+        if (!response.ok || positionData.error) {
+          setError(positionData.error || 'Failed to load data');
+          setLoading(false);
+          return;
+        }
         setData(positionData);
+        setError(null);
         setLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch position monitor data:', error);
-        
-        // Fallback data
-        const fallbackData: PositionMonitorData = {
-          positions: [
-            {
-              instrument: 'WTI Crude Oil',
-              category: 'Crude Oil',
-              longPositions: 485000,
-              shortPositions: 398000,
-              netPositions: 87000,
-              openInterest: 2150000,
-              positionChange: 15000,
-              sentiment: 'Bullish',
-              unit: 'contracts',
-              lastUpdated: new Date().toISOString()
-            }
-          ],
-          traderClasses: [],
-          sentimentIndicators: [
-            {
-              name: 'Fear & Greed Index (Energy)',
-              value: 65,
-              interpretation: 'Greed - Bullish sentiment dominating',
-              trend: 'Rising',
-              lastUpdated: new Date().toISOString()
-            }
-          ],
-          marketSummary: {
-            overallSentiment: 'Mixed',
-            specNetLong: 4.0,
-            commercialNetShort: 67.8,
-            extremePositions: []
-          },
-          lastUpdated: new Date().toISOString()
-        };
-        
-        setData(fallbackData);
+      } catch {
+        setError('Failed to fetch position monitor data');
         setLoading(false);
       }
     };
@@ -159,14 +129,14 @@ export default function PositionMonitorWidget() {
     );
   }
 
-  if (!data) {
+  if (error || !data) {
     return (
       <div className="w-full flex flex-col bg-black h-full">
         <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>POSITION MONITOR</h3>
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
-          <div className="text-gray-500 text-xs">No data available</div>
+          <div className="text-red-500 text-xs">{error || 'No data available'}</div>
         </div>
       </div>
     );
