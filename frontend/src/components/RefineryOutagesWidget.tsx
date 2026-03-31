@@ -91,7 +91,7 @@ export default function RefineryOutagesWidget() {
     return (
       <div className="w-full flex flex-col bg-black h-full">
         <div className="bg-gray-800 p-2 flex-shrink-0">
-          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>REFINERY OUTAGES</h3>
+          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>REFINERY STATUS</h3>
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
           <div className="text-gray-500 text-xs">Loading...</div>
@@ -104,7 +104,7 @@ export default function RefineryOutagesWidget() {
     return (
       <div className="w-full flex flex-col bg-black h-full">
         <div className="bg-gray-800 p-2 flex-shrink-0">
-          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>REFINERY OUTAGES</h3>
+          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>REFINERY STATUS</h3>
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
           <div className="text-red-500 text-xs">{error || 'No data available'}</div>
@@ -118,7 +118,7 @@ export default function RefineryOutagesWidget() {
   return (
     <div className="w-full flex flex-col bg-black h-full">
       <div className="bg-gray-800 p-2 flex-shrink-0">
-        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>REFINERY OUTAGES</h3>
+        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>REFINERY STATUS</h3>
       </div>
       
       <div className="flex-1 bg-black px-3 py-2 overflow-y-auto h-0" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
