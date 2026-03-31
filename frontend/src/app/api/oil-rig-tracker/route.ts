@@ -5,7 +5,7 @@ let cache: { data: unknown; ts: number } | null = null;
 const CACHE_MS = 12 * 60 * 60 * 1000;
 
 // ── EIA Drilling Productivity Report - Rig Counts by Basin ──────────
-async function fetchDPRRigCounts(apiKey: string) {
+async function fetchDPRRigCounts(apiKey: string): Promise<{ basins: { basin: string; rigs: number; change: number; percentage: number; period: string }[]; totalRigs: number; totalChange: number; period: string }> {
   // EIA DPR provides monthly rig counts per shale play
   const basins = [
     { id: 'Permian Region', label: 'Permian' },
