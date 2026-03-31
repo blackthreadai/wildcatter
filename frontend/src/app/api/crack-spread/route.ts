@@ -1,261 +1,129 @@
 import { NextResponse } from 'next/server';
 
-interface CrackSpread {
-  name: string;
-  description: string;
-  value: number; // $/barrel
-  change: number;
-  percentChange: number;
-  unit: string;
-  components: {
-    crude: number;
-    refined: number;
-    ratio: string;
-  };
-  lastUpdated: string;
-}
+// Cache for 15 minutes (commodity prices move during trading hours)
+let cache: { data: unknown; ts: number } | null = null;
+const CACHE_MS = 15 * 60 * 1000;
 
-interface RefineryMargins {
-  region: string;
-  grossMargin: number; // $/barrel
-  netMargin: number; // $/barrel
-  utilization: number; // percentage
-  throughput: number; // thousand bpd
-  marginChange: number;
-}
+// Yahoo Finance symbols
+// CL=F: WTI Crude Oil ($/barrel)
+// BZ=F: Brent Crude Oil ($/barrel)
+// RB=F: RBOB Gasoline ($/gallon)
+// HO=F: Heating Oil / ULSD ($/gallon)
 
-interface CrackSpreadData {
-  spreads: CrackSpread[];
-  refineryMargins: RefineryMargins[];
-  marketConditions: {
-    refiningDemand: 'Weak' | 'Moderate' | 'Strong' | 'Very Strong';
-    seasonalFactor: 'Low Season' | 'Building' | 'Peak Season' | 'Declining';
-    inventoryStatus: 'Low' | 'Normal' | 'High' | 'Very High';
-  };
-  lastUpdated: string;
-}
+const SYMBOLS = ['CL=F', 'BZ=F', 'RB=F', 'HO=F'];
+const GALLONS_PER_BARREL = 42;
 
-// Cache for 30 minutes (crack spreads change with commodity prices)
-let cache: { data: CrackSpreadData; ts: number } | null = null;
-const CACHE_MS = 30 * 60 * 1000;
+async function fetchPrices(): Promise<Record<string, { price: number; prevClose: number; name: string }>> {
+  const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${SYMBOLS.join(',')}&fields=regularMarketPrice,regularMarketPreviousClose,shortName`;
 
-async function fetchCrackSpreadData(): Promise<CrackSpreadData> {
-  try {
-    // In production, this would calculate from live WTI, RBOB, ULSD prices
-    // For now, return realistic mock data based on typical refining margins
-    
-    const mockSpreads: CrackSpread[] = [
-      {
-        name: '3:2:1 Crack Spread',
-        description: '3 barrels crude → 2 barrels gasoline + 1 barrel distillate',
-        value: 28.45,
-        change: 1.23,
-        percentChange: 4.5,
-        unit: '$/barrel',
-        components: {
-          crude: 73.45, // WTI price
-          refined: (2.12 * 42) + (2.34 * 42), // RBOB + ULSD prices * gallons/barrel
-          ratio: '3:2:1'
-        },
-        lastUpdated: new Date(Date.now() - 15 * 60 * 1000).toISOString()
-      },
-      {
-        name: '2:1:1 Crack Spread',
-        description: '2 barrels crude → 1 barrel gasoline + 1 barrel distillate',
-        value: 31.20,
-        change: 0.85,
-        percentChange: 2.8,
-        unit: '$/barrel',
-        components: {
-          crude: 73.45,
-          refined: (2.12 * 42) + (2.34 * 42),
-          ratio: '2:1:1'
-        },
-        lastUpdated: new Date(Date.now() - 18 * 60 * 1000).toISOString()
-      },
-      {
-        name: 'Gasoline Crack',
-        description: 'WTI crude to RBOB gasoline spread',
-        value: 15.67,
-        change: 0.45,
-        percentChange: 3.0,
-        unit: '$/barrel',
-        components: {
-          crude: 73.45,
-          refined: 2.12 * 42, // RBOB * gallons per barrel
-          ratio: '1:1'
-        },
-        lastUpdated: new Date(Date.now() - 12 * 60 * 1000).toISOString()
-      },
-      {
-        name: 'Diesel Crack',
-        description: 'WTI crude to ULSD diesel spread',
-        value: 18.23,
-        change: -0.32,
-        percentChange: -1.7,
-        unit: '$/barrel',
-        components: {
-          crude: 73.45,
-          refined: 2.34 * 42, // ULSD * gallons per barrel
-          ratio: '1:1'
-        },
-        lastUpdated: new Date(Date.now() - 20 * 60 * 1000).toISOString()
-      },
-      {
-        name: 'Heating Oil Crack',
-        description: 'WTI crude to heating oil spread',
-        value: 19.85,
-        change: 0.67,
-        percentChange: 3.5,
-        unit: '$/barrel',
-        components: {
-          crude: 73.45,
-          refined: 2.38 * 42,
-          ratio: '1:1'
-        },
-        lastUpdated: new Date(Date.now() - 25 * 60 * 1000).toISOString()
-      },
-      {
-        name: 'Jet Fuel Crack',
-        description: 'WTI crude to jet fuel spread',
-        value: 16.42,
-        change: -0.18,
-        percentChange: -1.1,
-        unit: '$/barrel',
-        components: {
-          crude: 73.45,
-          refined: 2.26 * 42,
-          ratio: '1:1'
-        },
-        lastUpdated: new Date(Date.now() - 10 * 60 * 1000).toISOString()
-      }
-    ];
+  const resp = await fetch(url, {
+    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+    signal: AbortSignal.timeout(8000),
+  });
 
-    const mockRefineryMargins: RefineryMargins[] = [
-      {
-        region: 'US Gulf Coast',
-        grossMargin: 32.50,
-        netMargin: 18.75,
-        utilization: 89.2,
-        throughput: 8420,
-        marginChange: 1.85
-      },
-      {
-        region: 'US West Coast',
-        grossMargin: 45.30,
-        netMargin: 28.90,
-        utilization: 85.6,
-        throughput: 2180,
-        marginChange: 2.45
-      },
-      {
-        region: 'US Midwest',
-        grossMargin: 28.90,
-        netMargin: 16.40,
-        utilization: 87.1,
-        throughput: 3760,
-        marginChange: 0.95
-      },
-      {
-        region: 'Europe',
-        grossMargin: 12.80,
-        netMargin: 3.20,
-        utilization: 82.4,
-        throughput: 10200,
-        marginChange: -0.85
-      },
-      {
-        region: 'Asia Pacific',
-        grossMargin: 8.45,
-        netMargin: -1.20,
-        utilization: 78.9,
-        throughput: 15600,
-        marginChange: -1.45
-      }
-    ];
+  if (!resp.ok) throw new Error(`Yahoo Finance: ${resp.status}`);
+  const json = await resp.json();
+  const quotes = json.quoteResponse?.result || [];
 
-    const mockData: CrackSpreadData = {
-      spreads: mockSpreads,
-      refineryMargins: mockRefineryMargins,
-      marketConditions: {
-        refiningDemand: 'Strong',
-        seasonalFactor: 'Building',
-        inventoryStatus: 'Normal'
-      },
-      lastUpdated: new Date().toISOString()
-    };
-
-    return mockData;
-    
-  } catch (error) {
-    console.error('Crack spread data fetch error:', error);
-    
-    // Fallback data
-    return {
-      spreads: [
-        {
-          name: '3:2:1 Crack Spread',
-          description: '3 barrels crude → 2 barrels gasoline + 1 barrel distillate',
-          value: 28.45,
-          change: 1.23,
-          percentChange: 4.5,
-          unit: '$/barrel',
-          components: {
-            crude: 73.45,
-            refined: 187.32,
-            ratio: '3:2:1'
-          },
-          lastUpdated: new Date().toISOString()
-        }
-      ],
-      refineryMargins: [
-        {
-          region: 'US Gulf Coast',
-          grossMargin: 32.50,
-          netMargin: 18.75,
-          utilization: 89.2,
-          throughput: 8420,
-          marginChange: 1.85
-        }
-      ],
-      marketConditions: {
-        refiningDemand: 'Strong',
-        seasonalFactor: 'Building',
-        inventoryStatus: 'Normal'
-      },
-      lastUpdated: new Date().toISOString()
+  const prices: Record<string, { price: number; prevClose: number; name: string }> = {};
+  for (const q of quotes) {
+    prices[q.symbol] = {
+      price: q.regularMarketPrice || 0,
+      prevClose: q.regularMarketPreviousClose || 0,
+      name: q.shortName || q.symbol,
     };
   }
+  return prices;
+}
+
+function calculateSpreads(prices: Record<string, { price: number; prevClose: number; name: string }>) {
+  const wti = prices['CL=F']?.price || 0;
+  const wtiPrev = prices['CL=F']?.prevClose || 0;
+  const brent = prices['BZ=F']?.price || 0;
+  const brentPrev = prices['BZ=F']?.prevClose || 0;
+  const rbob = prices['RB=F']?.price || 0; // $/gallon
+  const rbobPrev = prices['RB=F']?.prevClose || 0;
+  const ho = prices['HO=F']?.price || 0; // $/gallon
+  const hoPrev = prices['HO=F']?.prevClose || 0;
+
+  if (!wti || !rbob || !ho) throw new Error('Missing price data');
+
+  // Convert product prices to $/barrel
+  const rbobBbl = rbob * GALLONS_PER_BARREL;
+  const rbobBblPrev = rbobPrev * GALLONS_PER_BARREL;
+  const hoBbl = ho * GALLONS_PER_BARREL;
+  const hoBblPrev = hoPrev * GALLONS_PER_BARREL;
+
+  // 3:2:1 Crack Spread: (2 * RBOB_bbl + 1 * HO_bbl - 3 * WTI) / 3
+  const crack321 = (2 * rbobBbl + 1 * hoBbl - 3 * wti) / 3;
+  const crack321Prev = (2 * rbobBblPrev + 1 * hoBblPrev - 3 * wtiPrev) / 3;
+
+  // 2:1:1 Crack Spread: (1 * RBOB_bbl + 1 * HO_bbl - 2 * WTI) / 2
+  const crack211 = (1 * rbobBbl + 1 * hoBbl - 2 * wti) / 2;
+  const crack211Prev = (1 * rbobBblPrev + 1 * hoBblPrev - 2 * wtiPrev) / 2;
+
+  // Simple gasoline crack: RBOB_bbl - WTI
+  const gasCrack = rbobBbl - wti;
+  const gasCrackPrev = rbobBblPrev - wtiPrev;
+
+  // Simple diesel/heating oil crack: HO_bbl - WTI
+  const dieselCrack = hoBbl - wti;
+  const dieselCrackPrev = hoBblPrev - wtiPrev;
+
+  // Brent-WTI spread
+  const brentWti = brent - wti;
+  const brentWtiPrev = brentPrev - wtiPrev;
+
+  const makeSpread = (name: string, desc: string, value: number, prev: number, ratio: string) => ({
+    name,
+    description: desc,
+    value: Math.round(value * 100) / 100,
+    change: Math.round((value - prev) * 100) / 100,
+    percentChange: prev !== 0 ? Math.round(((value - prev) / Math.abs(prev)) * 1000) / 10 : 0,
+    unit: '$/barrel',
+    ratio,
+  });
+
+  return {
+    spreads: [
+      makeSpread('3:2:1 Crack Spread', '3 bbl crude to 2 bbl gasoline + 1 bbl diesel', crack321, crack321Prev, '3:2:1'),
+      makeSpread('2:1:1 Crack Spread', '2 bbl crude to 1 bbl gasoline + 1 bbl diesel', crack211, crack211Prev, '2:1:1'),
+      makeSpread('Gasoline Crack', 'RBOB gasoline vs WTI crude', gasCrack, gasCrackPrev, '1:1'),
+      makeSpread('Diesel Crack', 'ULSD heating oil vs WTI crude', dieselCrack, dieselCrackPrev, '1:1'),
+      makeSpread('Brent-WTI Spread', 'Brent crude premium over WTI', brentWti, brentWtiPrev, 'N/A'),
+    ],
+    components: {
+      wti: { price: Math.round(wti * 100) / 100, change: Math.round((wti - wtiPrev) * 100) / 100 },
+      brent: { price: Math.round(brent * 100) / 100, change: Math.round((brent - brentPrev) * 100) / 100 },
+      rbob: { price: Math.round(rbob * 10000) / 10000, bbl: Math.round(rbobBbl * 100) / 100, change: Math.round((rbob - rbobPrev) * 10000) / 10000 },
+      ho: { price: Math.round(ho * 10000) / 10000, bbl: Math.round(hoBbl * 100) / 100, change: Math.round((ho - hoPrev) * 10000) / 10000 },
+    },
+  };
 }
 
 export async function GET() {
   try {
-    // Return cached data if fresh
     if (cache && Date.now() - cache.ts < CACHE_MS) {
       return NextResponse.json(cache.data);
     }
 
-    // Fetch fresh data
-    const data = await fetchCrackSpreadData();
-    
-    // Cache the results
+    const prices = await fetchPrices();
+    const calculated = calculateSpreads(prices);
+
+    const data = {
+      ...calculated,
+      lastUpdated: new Date().toISOString(),
+      source: 'Yahoo Finance (calculated)',
+    };
+
     cache = { data, ts: Date.now() };
-    
     return NextResponse.json(data);
-    
+
   } catch (error) {
-    console.error('Crack spread API error:', error);
-    
-    // Ultimate fallback
-    return NextResponse.json({
-      spreads: [],
-      refineryMargins: [],
-      marketConditions: {
-        refiningDemand: 'Moderate',
-        seasonalFactor: 'Building',
-        inventoryStatus: 'Normal'
-      },
-      lastUpdated: new Date().toISOString()
-    });
+    console.error('Crack spread error:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch crack spread data: ' + (error instanceof Error ? error.message : String(error)) },
+      { status: 502 },
+    );
   }
 }
