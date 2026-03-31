@@ -20,8 +20,8 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
 
     // Initialize map with default center (will be updated by geolocation)
     const map = L.map(mapRef.current, {
-      center: [40.0, -95.0], // Default to US center as fallback
-      zoom: 5, // Broader regional view
+      center: [20.0, -20.0], // World center view
+      zoom: 2, // Full world view
       zoomControl: false,
       attributionControl: false,
     });
@@ -40,7 +40,8 @@ export default function WorldMap({ activeLayers }: WorldMapProps) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          map.setView([latitude, longitude], 7); // Zoom to user's location with broader view
+          // Show user marker but keep world view
+          map.setView([20.0, -20.0], 2);
           
           // Add location pin marker for current location
           const locationPinIcon = L.divIcon({
