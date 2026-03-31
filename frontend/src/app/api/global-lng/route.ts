@@ -63,51 +63,30 @@ async function fetchLNGImports(apiKey: string) {
 }
 
 function processExports(rows: Record<string, string>[]) {
-  // Group by destination country, get latest month totals
-  if (rows.length === 0) return { byCountry: [], totalMcf: 0, period: '' };
+  if (rows.length === 0) return { monthly: [], totalMcf: 0, prevTotalMcf: 0, period: '' };
 
-  const latestPeriod = rows[0]?.period || '';
-  const latestRows = rows.filter(r => r.period === latestPeriod);
-
-  const byCountry: Record<string, number> = {};
-  let totalMcf = 0;
-
-  for (const row of latestRows) {
-    // duoarea format: "NUS-NJA" means US to Japan. Extract destination.
-    const area = row.duoarea || '';
-    const areaName = row['area-name'] || row['duoarea-name'] || '';
-    // Skip the total row (Z00 = world)
-    if (area.includes('Z00')) continue;
-    const country = areaName || area;
+  // Group by period (monthly totals)
+  const byPeriod: Record<string, number> = {};
+  for (const row of rows) {
     const val = parseFloat(row.value) || 0;
     if (val > 0) {
-      byCountry[country] = (byCountry[country] || 0) + val;
-      totalMcf += val;
+      byPeriod[row.period] = (byPeriod[row.period] || 0) + val;
     }
   }
 
-  const sorted = Object.entries(byCountry)
-    .map(([country, mcf]) => ({ country, mcf: Math.round(mcf), pct: 0 }))
-    .sort((a, b) => b.mcf - a.mcf);
+  const monthly = Object.entries(byPeriod)
+    .map(([period, mcf]) => ({ period, mcf: Math.round(mcf) }))
+    .sort((a, b) => b.period.localeCompare(a.period))
+    .slice(0, 12);
 
-  sorted.forEach(s => { s.pct = totalMcf > 0 ? Math.round((s.mcf / totalMcf) * 1000) / 10 : 0; });
-
-  // Get previous month for comparison
-  const periods = [...new Set(rows.map(r => r.period))].sort().reverse();
-  let prevTotalMcf = 0;
-  if (periods.length >= 2) {
-    const prevRows = rows.filter(r => r.period === periods[1]);
-    for (const row of prevRows) {
-      const val = parseFloat(row.value) || 0;
-      if (val > 0) prevTotalMcf += val;
-    }
-  }
+  const totalMcf = monthly[0]?.mcf || 0;
+  const prevTotalMcf = monthly[1]?.mcf || 0;
 
   return {
-    byCountry: sorted.slice(0, 10),
-    totalMcf: Math.round(totalMcf),
-    prevTotalMcf: Math.round(prevTotalMcf),
-    period: latestPeriod,
+    monthly,
+    totalMcf,
+    prevTotalMcf,
+    period: monthly[0]?.period || '',
   };
 }
 
@@ -184,7 +163,7 @@ export async function GET() {
       usExports: {
         totalMcf: exportData.totalMcf,
         prevTotalMcf: exportData.prevTotalMcf,
-        topDestinations: exportData.byCountry,
+        monthly: exportData.monthly.slice(0, 6),
         period: exportData.period,
       },
       usImports: {

@@ -16,10 +16,9 @@ interface Premium {
   value: number;
 }
 
-interface Destination {
-  country: string;
+interface MonthlyExport {
+  period: string;
   mcf: number;
-  pct: number;
 }
 
 interface LNGData {
@@ -28,7 +27,7 @@ interface LNGData {
   usExports: {
     totalMcf: number;
     prevTotalMcf: number;
-    topDestinations: Destination[];
+    monthly: MonthlyExport[];
     period: string;
   };
   usImports: {
@@ -159,15 +158,21 @@ export default function GlobalLNGWidget() {
                 )}
               </div>
             </div>
-            {data.usExports.topDestinations.slice(0, 6).map((d, i) => (
-              <div key={i} className="mb-0.5 flex items-center justify-between text-xs">
-                <span className="text-gray-300">{d.country}</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-400">{d.pct}%</span>
-                  <span className="text-white">{formatMcf(d.mcf)}</span>
+            {data.usExports.monthly.map((m, i) => {
+              const maxMcf = Math.max(...data.usExports.monthly.map(x => x.mcf));
+              const barPct = maxMcf > 0 ? (m.mcf / maxMcf) * 100 : 0;
+              return (
+                <div key={i} className="mb-1">
+                  <div className="flex items-center justify-between text-xs mb-0.5">
+                    <span className="text-gray-400">{m.period}</span>
+                    <span className="text-white">{formatMcf(m.mcf)}</span>
+                  </div>
+                  <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
+                    <div className="h-full bg-blue-600 rounded-full" style={{ width: `${barPct}%` }} />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
