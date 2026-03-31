@@ -16,42 +16,29 @@ interface CryptoCurrency {
 export default function CryptocurrencyWidget() {
   const [cryptos, setCryptos] = useState<CryptoCurrency[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCryptos = async () => {
       try {
         const response = await fetch('/api/cryptocurrency');
-        const data = await response.json();
+        const json = await response.json();
+        if (!response.ok || json.error) {
+          setError(json.error || 'Failed to load data');
+          setLoading(false);
+          return;
+        }
         
-        // Filter to show the top 4: BTC, ETH, USDT, SOL
-        const targetCryptos = ['BTC', 'ETH', 'USDT', 'SOL'];
-        const filteredCryptos = targetCryptos.map(symbol => 
-          data.find((crypto: CryptoCurrency) => crypto.symbol === symbol)
-        ).filter(Boolean);
-        
-        // Add mock sparkline data for each crypto
-        const cryptosWithSparklines = filteredCryptos.map(crypto => ({
+        const cryptosWithSparklines = json.map((crypto: CryptoCurrency) => ({
           ...crypto,
-          sparklineData: generateMockSparklineData(crypto.changePercent24h)
+          sparklineData: generateSparklineData(crypto.changePercent24h)
         }));
         
         setCryptos(cryptosWithSparklines);
+        setError(null);
         setLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch cryptocurrency data:', error);
-        
-        // Fallback data for the 4 main cryptos with sparklines
-        const fallbackData: CryptoCurrency[] = [
-          { symbol: 'BTC', name: 'Bitcoin', price: 68234.00, changePercent24h: 0.69, marketCap: 1350000000000, rank: 1 },
-          { symbol: 'ETH', name: 'Ethereum', price: 1975.06, changePercent24h: 1.41, marketCap: 240000000000, rank: 2 },
-          { symbol: 'USDT', name: 'Tether', price: 1.00, changePercent24h: 0.02, marketCap: 140000000000, rank: 3 },
-          { symbol: 'SOL', name: 'Solana', price: 145.82, changePercent24h: 2.34, marketCap: 68000000000, rank: 5 }
-        ].map(crypto => ({
-          ...crypto,
-          sparklineData: generateMockSparklineData(crypto.changePercent24h)
-        }));
-        
-        setCryptos(fallbackData);
+      } catch {
+        setError('Failed to fetch cryptocurrency data');
         setLoading(false);
       }
     };
@@ -61,7 +48,7 @@ export default function CryptocurrencyWidget() {
     return () => clearInterval(interval);
   }, []);
 
-  const generateMockSparklineData = (changePercent: number): number[] => {
+  const generateSparklineData = (changePercent: number): number[] => {
     // Generate 24 data points representing hourly changes
     const baseValue = 100;
     const points: number[] = [baseValue];
@@ -125,6 +112,19 @@ export default function CryptocurrencyWidget() {
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
           <WidgetLoader />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full flex flex-col bg-black h-full">
+        <div className="bg-gray-800 p-2 flex-shrink-0">
+          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>CRYPTOCURRENCY</h3>
+        </div>
+        <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
+          <div className="text-red-500 text-xs">{error}</div>
         </div>
       </div>
     );
