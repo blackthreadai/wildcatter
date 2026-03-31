@@ -15,25 +15,23 @@ interface PreciousMetal {
 export default function PreciousMetalsWidget() {
   const [metals, setMetals] = useState<PreciousMetal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMetals = async () => {
       try {
         const response = await fetch('/api/precious-metals');
         const data = await response.json();
+        if (!response.ok || data.error) {
+          setError(data.error || 'Failed to load data');
+          setLoading(false);
+          return;
+        }
         setMetals(data);
+        setError(null);
         setLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch precious metals data:', error);
-        
-        // Fallback data
-        const fallbackData: PreciousMetal[] = [
-          { symbol: 'XAU', name: 'Gold', price: 2045.50, change: 12.30, changePercent: 0.60, unit: 'USD/oz' },
-          { symbol: 'XAG', name: 'Silver', price: 24.85, change: -0.45, changePercent: -1.78, unit: 'USD/oz' },
-          { symbol: 'XPT', name: 'Platinum', price: 1028.75, change: 8.25, changePercent: 0.81, unit: 'USD/oz' }
-        ];
-        
-        setMetals(fallbackData);
+      } catch {
+        setError('Failed to fetch precious metals data');
         setLoading(false);
       }
     };
@@ -98,6 +96,19 @@ export default function PreciousMetalsWidget() {
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
           <WidgetLoader />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="w-full flex flex-col bg-black h-full">
+        <div className="bg-gray-800 p-2 flex-shrink-0">
+          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>PRECIOUS METALS</h3>
+        </div>
+        <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
+          <div className="text-red-500 text-xs">{error}</div>
         </div>
       </div>
     );
