@@ -47,47 +47,13 @@ export default function NaturalGasWidget() {
     const fetchData = async () => {
       try {
         const response = await fetch('/api/natural-gas-data');
+        if (!response.ok) throw new Error(`API returned ${response.status}`);
         const gasData = await response.json();
         setData(gasData);
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch natural gas data:', error);
-        
-        // Fallback data
-        const fallbackData: NaturalGasData = {
-          storage: [
-            {
-              region: 'US Lower 48',
-              current: 2847,
-              capacity: 4693,
-              utilizationRate: 60.7,
-              weeklyChange: -156,
-              yearAgoLevel: 2234,
-              fiveYearAvg: 2456,
-              unit: 'BCF',
-              lastUpdated: new Date().toISOString()
-            }
-          ],
-          lng: {
-            utilization: 84.3,
-            exports: 156.7,
-            imports: 142.1,
-            capacity: 185.9,
-            unit: 'BCF/d'
-          },
-          prices: {
-            henryHub: 2.84,
-            henryHubChange: -0.12,
-            ttf: 28.45,
-            ttfChange: 1.23,
-            jkm: 11.80,
-            jkmChange: -0.45,
-            currency: 'USD/MMBtu'
-          },
-          lastUpdated: new Date().toISOString()
-        };
-        
-        setData(fallbackData);
+        setData(null);
         setLoading(false);
       }
     };
@@ -117,7 +83,7 @@ export default function NaturalGasWidget() {
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>NATURAL GAS</h3>
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
-          <div className="text-gray-500 text-xs">No data available</div>
+          <div className="text-red-500 text-xs">Failed to load data</div>
         </div>
       </div>
     );

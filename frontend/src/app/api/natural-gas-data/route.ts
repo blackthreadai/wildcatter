@@ -248,12 +248,6 @@ export async function GET() {
 
   } catch (error) {
     console.error('Natural gas API error:', error);
-    return NextResponse.json({
-      storage: [],
-      lng: { utilization: 0, exports: 0, imports: 0, capacity: 20.4, unit: 'BCF/d' },
-      prices: { henryHub: 0, henryHubChange: 0, ttf: 0, ttfChange: 0, jkm: 0, jkmChange: 0, currency: 'USD/MMBtu' },
-      lastUpdated: new Date().toISOString(),
-      error: 'Failed to fetch data',
-    });
+    return NextResponse.json({ error: 'Failed to fetch natural gas data' }, { status: 502 });
   }
 }
