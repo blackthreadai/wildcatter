@@ -105,7 +105,7 @@ export default function CrackSpreadWidget() {
             <div className="text-gray-400 text-xs mb-1">{primary.name}</div>
             <div className="flex items-end justify-between">
               <div>
-                <span className="text-2xl font-bold text-white">${primary.value.toFixed(2)}</span>
+                <span className={`text-2xl font-bold ${primary.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>${primary.value.toFixed(2)}</span>
                 <span className="text-gray-400 text-xs ml-1">/bbl</span>
               </div>
               <div className="text-right">
