@@ -50,6 +50,7 @@ interface AIPriceForecastData {
 export default function AIPriceForecastWidget() {
   const [data, setData] = useState<AIPriceForecastData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'forecasts' | 'models' | 'conditions'>('forecasts');
   const [selectedInstrument, setSelectedInstrument] = useState<string>('WTI Crude Oil');
 
@@ -58,64 +59,16 @@ export default function AIPriceForecastWidget() {
       try {
         const response = await fetch('/api/ai-price-forecast');
         const forecastData = await response.json();
+        if (!response.ok || forecastData.error) {
+          setError(forecastData.error || 'Failed to load data');
+          setLoading(false);
+          return;
+        }
         setData(forecastData);
+        setError(null);
         setLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch AI price forecast data:', error);
-        
-        // Fallback data
-        const fallbackData: AIPriceForecastData = {
-          forecasts: [
-            {
-              instrument: 'WTI Crude Oil',
-              currentPrice: 73.45,
-              currency: 'USD',
-              unit: '$/barrel',
-              forecasts: [
-                {
-                  period: '7-day',
-                  targetPrice: 75.20,
-                  confidence: 78,
-                  direction: 'Bullish',
-                  priceChange: 1.75,
-                  percentChange: 2.4,
-                  keyFactors: ['Technical momentum', 'Supply constraints'],
-                  riskLevel: 'Medium'
-                }
-              ],
-              technicalSignals: {
-                rsi: 55,
-                macd: 'Bullish',
-                movingAverage: 'Above',
-                support: 71.20,
-                resistance: 76.80
-              },
-              lastUpdated: new Date().toISOString()
-            }
-          ],
-          modelMetrics: [
-            {
-              modelName: 'Energy Price Neural Network v3.2',
-              accuracy: 68.5,
-              lastUpdate: new Date().toISOString(),
-              version: '3.2.1',
-              trainingPeriod: '2019-2024',
-              features: ['Technical indicators', 'Fundamentals']
-            }
-          ],
-          marketConditions: {
-            volatility: 'Medium',
-            trendStrength: 62,
-            marketRegime: 'Consolidating',
-            forecastReliability: 'Medium'
-          },
-          disclaimers: [
-            'AI forecasts are for informational purposes only'
-          ],
-          lastUpdated: new Date().toISOString()
-        };
-        
-        setData(fallbackData);
+      } catch {
+        setError('Failed to fetch AI price forecast data');
         setLoading(false);
       }
     };
@@ -170,14 +123,14 @@ export default function AIPriceForecastWidget() {
     );
   }
 
-  if (!data) {
+  if (error || !data) {
     return (
       <div className="w-full flex flex-col bg-black h-full">
         <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>AI PRICE FORECAST</h3>
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
-          <div className="text-gray-500 text-xs">No data available</div>
+          <div className="text-red-500 text-xs">{error || 'No data available'}</div>
         </div>
       </div>
     );
