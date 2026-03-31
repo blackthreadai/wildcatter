@@ -102,7 +102,7 @@ export default function OilRigTrackerWidget() {
         <div className="mb-3 pb-2 border-b border-gray-700">
           <div className="text-[#DAA520] text-xs font-bold mb-2">US TOTALS</div>
           <div className="flex items-center justify-between mb-2">
-            <div className="text-white text-lg font-bold">{data.usTotals.total}</div>
+            <div className={`text-lg font-bold ${data.usTotals.weeklyChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>{data.usTotals.total}</div>
             {data.usTotals.weeklyChange !== 0 && (
               <div className={`text-xs font-medium ${
                 data.usTotals.weeklyChange >= 0 ? 'text-green-500' : 'text-red-500'
@@ -130,7 +130,7 @@ export default function OilRigTrackerWidget() {
           <div className="mb-3 pb-2 border-b border-gray-700">
             <div className="text-[#DAA520] text-xs font-bold mb-2">SHALE BASINS</div>
             {data.basins.map((basin, i) => (
-              <div key={i} className="mb-1.5 flex items-center justify-between">
+              <div key={i} className={`py-1 px-2 -mx-2 flex items-center justify-between ${i % 2 === 1 ? 'bg-[#DAA520]/10' : 'bg-transparent'}`}>
                 <div>
                   <div className="text-white text-xs font-medium">{basin.basin}</div>
                   <div className="text-gray-500 text-xs">{basin.percentage.toFixed(1)}% of total</div>
@@ -173,7 +173,7 @@ export default function OilRigTrackerWidget() {
           <div>
             <div className="text-[#DAA520] text-xs font-bold mb-2">TOP STATES</div>
             {data.topStates.map((s, i) => (
-              <div key={i} className="mb-1 flex items-center justify-between text-xs">
+              <div key={i} className="pb-1 mb-1 flex items-center justify-between text-xs border-b border-gray-800">
                 <div className="text-white font-medium">{s.state}</div>
                 <div className="flex items-center gap-2">
                   <div className="text-gray-300">{s.rigs}</div>
