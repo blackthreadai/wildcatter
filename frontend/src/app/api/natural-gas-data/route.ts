@@ -20,7 +20,7 @@ async function fetchEIAStorage(apiKey: string) {
 
   for (const { series, region } of seriesIds) {
     try {
-      const url = `https://api.eia.gov/v2/natural-gas/stor/wkly/data/?api_key=${apiKey}&frequency=weekly&data[0]=value&facets[process][]=SAY&facets[series][]=${series}&sort[0][column]=period&sort[0][direction]=desc&length=60`;
+      const url = `https://api.eia.gov/v2/natural-gas/stor/wkly/data/?api_key=${apiKey}&frequency=weekly&data[0]=value&facets[process][]=SWO&facets[series][]=${series}&sort[0][column]=period&sort[0][direction]=desc&length=60`;
       const resp = await fetch(url, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
         signal: AbortSignal.timeout(8000),
@@ -133,13 +133,17 @@ async function fetchPrices() {
       const closes = json?.chart?.result?.[0]?.indicators?.adjclose?.[0]?.adjclose || [];
 
       if (meta) {
-        const currentPrice = meta.regularMarketPrice || closes[closes.length - 1] || 0;
-        const prevClose = meta.chartPreviousClose || (closes.length > 1 ? closes[closes.length - 2] : currentPrice);
-        prices[name] = {
-          price: currentPrice,
-          change: currentPrice - prevClose,
-          prevClose,
-        };
+        // Filter out null closes
+        const validCloses = closes.filter((c: number | null) => c !== null && c !== undefined);
+        const currentPrice = meta.regularMarketPrice || (validCloses.length > 0 ? validCloses[validCloses.length - 1] : 0);
+        const prevClose = meta.chartPreviousClose || (validCloses.length > 1 ? validCloses[validCloses.length - 2] : currentPrice);
+        if (currentPrice > 0) {
+          prices[name] = {
+            price: currentPrice,
+            change: currentPrice - prevClose,
+            prevClose,
+          };
+        }
       }
     } catch (err) {
       console.error(`Yahoo price fetch error for ${symbol}:`, err);
