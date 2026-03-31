@@ -18,16 +18,23 @@ interface USTotals {
   period: string;
 }
 
-interface IntlData {
-  region: string;
+interface StateData {
+  state: string;
+  rigs: number;
+  change: number;
+}
+
+interface CanadaData {
   total: number;
-  period: string;
+  weeklyChange: number;
 }
 
 interface OilRigData {
   usTotals: USTotals;
   basins: BasinData[];
-  international: IntlData[];
+  canada: CanadaData;
+  topStates: StateData[];
+  reportDate: string;
   lastUpdated: string;
   source: string;
 }
@@ -142,14 +149,39 @@ export default function OilRigTrackerWidget() {
           </div>
         )}
 
-        {/* International */}
-        {data.international.length > 0 && (
+        {/* Canada */}
+        {data.canada && data.canada.total > 0 && (
+          <div className="mb-3 pb-2 border-b border-gray-700">
+            <div className="text-[#DAA520] text-xs font-bold mb-2">CANADA</div>
+            <div className="flex items-center justify-between text-xs">
+              <div className="text-white font-medium">Total Rigs</div>
+              <div className="flex items-center gap-2">
+                <div className="text-white font-medium">{data.canada.total}</div>
+                {data.canada.weeklyChange !== 0 && (
+                  <div className={data.canada.weeklyChange >= 0 ? 'text-green-500' : 'text-red-500'}>
+                    {data.canada.weeklyChange >= 0 ? '+' : ''}{data.canada.weeklyChange}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Top States */}
+        {data.topStates && data.topStates.length > 0 && (
           <div>
-            <div className="text-[#DAA520] text-xs font-bold mb-2">INTERNATIONAL</div>
-            {data.international.map((country, i) => (
+            <div className="text-[#DAA520] text-xs font-bold mb-2">TOP STATES</div>
+            {data.topStates.map((s, i) => (
               <div key={i} className="mb-1 flex items-center justify-between text-xs">
-                <div className="text-white font-medium">{country.region}</div>
-                <div className="text-gray-300">{country.total} rigs</div>
+                <div className="text-white font-medium">{s.state}</div>
+                <div className="flex items-center gap-2">
+                  <div className="text-gray-300">{s.rigs}</div>
+                  {s.change !== 0 && (
+                    <div className={s.change >= 0 ? 'text-green-500' : 'text-red-500'}>
+                      {s.change >= 0 ? '+' : ''}{s.change}
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
