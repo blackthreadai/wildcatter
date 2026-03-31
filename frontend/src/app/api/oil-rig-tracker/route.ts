@@ -27,7 +27,7 @@ async function fetchDPRRigCounts(apiKey: string): Promise<{ basins: { basin: str
     const json = await resp.json();
     const rows = json?.response?.data || [];
 
-    if (rows.length === 0) return [];
+    if (rows.length === 0) return { basins: [], totalRigs: 0, totalChange: 0, period: '' };
 
     // Group by region, get latest + previous month
     const grouped: Record<string, { value: number; period: string }[]> = {};
