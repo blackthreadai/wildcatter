@@ -179,8 +179,8 @@ async function fetchLNG(apiKey: string) {
       const daysInMonth = new Date(parseInt(period.split('-')[0]), parseInt(period.split('-')[1]), 0).getDate();
       // Convert MMCF/month to BCF/day
       const dailyExportBCF = latestExportMMCF / daysInMonth / 1000;
-      // US LNG export capacity ~14.7 Bcf/d as of 2026
-      const capacity = 14.7;
+      // US LNG export capacity ~20.4 Bcf/d as of early 2026 (Sabine Pass, Cameron, Freeport, Corpus Christi, Calcasieu Pass, Plaquemines)
+      const capacity = 20.4;
       const utilization = (dailyExportBCF / capacity) * 100;
 
       return {
@@ -200,7 +200,7 @@ async function fetchLNG(apiKey: string) {
     utilization: 0,
     exports: 0,
     imports: 0,
-    capacity: 14.7,
+    capacity: 20.4,
     unit: 'BCF/d',
   };
 }
@@ -220,7 +220,7 @@ export async function GET() {
       eiaApiKey ? fetchEIAStorage(eiaApiKey) : Promise.resolve([]),
       fetchEUStorage(),
       fetchPrices(),
-      eiaApiKey ? fetchLNG(eiaApiKey) : Promise.resolve({ utilization: 0, exports: 0, imports: 0, capacity: 14.7, unit: 'BCF/d' }),
+      eiaApiKey ? fetchLNG(eiaApiKey) : Promise.resolve({ utilization: 0, exports: 0, imports: 0, capacity: 20.4, unit: 'BCF/d' }),
     ]);
 
     // Combine storage: US regions + EU
@@ -250,7 +250,7 @@ export async function GET() {
     console.error('Natural gas API error:', error);
     return NextResponse.json({
       storage: [],
-      lng: { utilization: 0, exports: 0, imports: 0, capacity: 14.7, unit: 'BCF/d' },
+      lng: { utilization: 0, exports: 0, imports: 0, capacity: 20.4, unit: 'BCF/d' },
       prices: { henryHub: 0, henryHubChange: 0, ttf: 0, ttfChange: 0, jkm: 0, jkmChange: 0, currency: 'USD/MMBtu' },
       lastUpdated: new Date().toISOString(),
       error: 'Failed to fetch data',
