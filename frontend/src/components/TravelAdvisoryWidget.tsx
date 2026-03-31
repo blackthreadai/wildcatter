@@ -46,6 +46,16 @@ export default function TravelAdvisoryWidget() {
     }
   };
 
+  const getSeverityBg = (severity: string) => {
+    switch (severity) {
+      case 'critical': return 'rgba(220, 38, 38, 0.1)';
+      case 'high': return 'rgba(234, 88, 12, 0.1)';
+      case 'moderate': return 'rgba(234, 179, 8, 0.08)';
+      case 'low': return 'rgba(16, 185, 129, 0.08)';
+      default: return 'transparent';
+    }
+  };
+
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return dateString; // If can't parse, show raw
@@ -93,7 +103,7 @@ export default function TravelAdvisoryWidget() {
       
       <div className="flex-1 bg-black px-3 py-1 overflow-y-auto" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
         {advisories.map((advisory, i) => (
-          <div key={advisory.country} className="border-b border-gray-700 pb-1 mb-1 last:border-b-0 last:mb-0">
+          <div key={advisory.country} className="border-b border-gray-700 py-1.5 px-2 -mx-2 last:border-b-0" style={{ backgroundColor: getSeverityBg(advisory.severity) }}>
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
                 <div className="text-[#DAA520] text-xs font-semibold">{advisory.country}</div>
