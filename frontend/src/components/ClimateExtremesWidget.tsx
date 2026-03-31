@@ -3,161 +3,87 @@
 import { useState, useEffect } from 'react';
 
 interface ClimateExtreme {
-  type: 'hurricane' | 'typhoon' | 'flood' | 'drought' | 'wildfire' | 'extreme-heat';
+  type: string;
   title: string;
   location: string;
   severity: 'low' | 'moderate' | 'high' | 'extreme';
   description: string;
   lastUpdated: string;
   source: string;
+  url?: string;
+}
+
+interface ClimateData {
+  events: ClimateExtreme[];
+  summary: { total: number; extreme: number; high: number; moderate: number };
+  lastUpdated: string;
+  source: string;
 }
 
 export default function ClimateExtremesWidget() {
-  const [extremes, setExtremes] = useState<ClimateExtreme[]>([]);
+  const [data, setData] = useState<ClimateData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchExtremes = async () => {
+    const fetchData = async () => {
       try {
         const response = await fetch('/api/climate-extremes');
-        const data = await response.json();
-        setExtremes(data);
+        if (!response.ok) throw new Error(`API returned ${response.status}`);
+        const result = await response.json();
+        if (result.error) throw new Error(result.error);
+        setData(result);
         setLoading(false);
       } catch (error) {
         console.error('Failed to fetch climate extremes:', error);
-        
-        // Fallback data - 8 climate extremes
-        const fallbackData: ClimateExtreme[] = [
-          {
-            type: 'hurricane',
-            title: 'Hurricane Season Activity',
-            location: 'Atlantic Basin',
-            severity: 'high',
-            description: 'Tropical Storm Zeta strengthening',
-            lastUpdated: new Date().toISOString(),
-            source: 'National Hurricane Center'
-          },
-          {
-            type: 'drought',
-            title: 'Severe Drought Conditions',
-            location: 'Southwestern US',
-            severity: 'extreme',
-            description: 'Exceptional drought persists across region',
-            lastUpdated: new Date().toISOString(),
-            source: 'US Drought Monitor'
-          },
-          {
-            type: 'flood',
-            title: 'River Flood Warning',
-            location: 'Mississippi Valley',
-            severity: 'high',
-            description: 'Major flooding expected along Mississippi River',
-            lastUpdated: new Date().toISOString(),
-            source: 'NOAA/NWS'
-          },
-          {
-            type: 'wildfire',
-            title: 'Active Wildfire',
-            location: 'Northern California',
-            severity: 'high',
-            description: 'Creek Fire burning 15,000 acres',
-            lastUpdated: new Date().toISOString(),
-            source: 'CAL FIRE'
-          },
-          {
-            type: 'extreme-heat',
-            title: 'Heat Wave Warning',
-            location: 'Phoenix Metro',
-            severity: 'extreme',
-            description: 'Excessive heat warning - temps 115°F+',
-            lastUpdated: new Date().toISOString(),
-            source: 'National Weather Service'
-          },
-          {
-            type: 'typhoon',
-            title: 'Typhoon Activity',
-            location: 'Western Pacific',
-            severity: 'high',
-            description: 'Typhoon Megi approaching Philippines',
-            lastUpdated: new Date().toISOString(),
-            source: 'JMA Tokyo'
-          },
-          {
-            type: 'flood',
-            title: 'Flash Flood Emergency',
-            location: 'Texas Hill Country',
-            severity: 'extreme',
-            description: 'Life-threatening flash flooding in progress',
-            lastUpdated: new Date().toISOString(),
-            source: 'National Weather Service'
-          },
-          {
-            type: 'wildfire',
-            title: 'Mega Fire Complex',
-            location: 'British Columbia',
-            severity: 'extreme',
-            description: 'Multiple fires burning 50,000+ acres',
-            lastUpdated: new Date().toISOString(),
-            source: 'BC Wildfire Service'
-          }
-        ];
-        
-        setExtremes(fallbackData);
+        setData(null);
         setLoading(false);
       }
     };
 
-    fetchExtremes();
-    const interval = setInterval(fetchExtremes, 60 * 60 * 1000); // Update every hour
+    fetchData();
+    const interval = setInterval(fetchData, 60 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'hurricane':
-        return '🌀';
-      case 'typhoon':
-        return '🌀';
-      case 'flood':
-        return '🌊';
-      case 'drought':
-        return '🏜️';
-      case 'wildfire':
-        return '🔥';
-      case 'extreme-heat':
-        return '🌡️';
-      default:
-        return '⚠️';
+      case 'cyclone': return '🌀';
+      case 'flood': return '🌊';
+      case 'drought': return '🏜️';
+      case 'wildfire': return '🔥';
+      case 'extreme-heat': return '🌡️';
+      case 'tornado': return '🌪️';
+      case 'tsunami': return '🌊';
+      case 'volcano': return '🌋';
+      case 'earthquake': return '💥';
+      default: return '⚠️';
     }
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'extreme':
-        return 'text-red-500';
-      case 'high':
-        return 'text-orange-500';
-      case 'moderate':
-        return 'text-yellow-500';
-      case 'low':
-        return 'text-green-500';
-      default:
-        return 'text-gray-500';
+      case 'extreme': return 'text-red-500';
+      case 'high': return 'text-orange-500';
+      case 'moderate': return 'text-yellow-500';
+      case 'low': return 'text-green-500';
+      default: return 'text-gray-500';
     }
   };
 
   const formatTimeAgo = (dateString: string) => {
-    const now = new Date();
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     
+    if (diffHours < 0) return 'Ongoing';
     if (diffHours < 1) return 'Just now';
-    if (diffHours === 1) return '1h ago';
     if (diffHours < 24) return `${diffHours}h ago`;
     const diffDays = Math.floor(diffHours / 24);
     if (diffDays === 1) return '1d ago';
-    return `${diffDays}d ago`;
+    if (diffDays < 30) return `${diffDays}d ago`;
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
   if (loading) {
@@ -173,30 +99,51 @@ export default function ClimateExtremesWidget() {
     );
   }
 
+  if (!data) {
+    return (
+      <div className="w-full flex flex-col bg-black h-full">
+        <div className="bg-gray-800 p-2 flex-shrink-0">
+          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>CLIMATE EXTREMES</h3>
+        </div>
+        <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
+          <div className="text-red-500 text-xs">Failed to load data</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full flex flex-col bg-black h-full">
       <div className="bg-gray-800 p-2 flex-shrink-0">
-        <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>CLIMATE EXTREMES</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>CLIMATE EXTREMES</h3>
+          <div className="flex gap-2 text-xs">
+            {data.summary.extreme > 0 && <span className="text-red-500 font-bold">{data.summary.extreme} EXTREME</span>}
+            {data.summary.high > 0 && <span className="text-orange-500">{data.summary.high} HIGH</span>}
+          </div>
+        </div>
       </div>
       
-      <div className="flex-1 bg-black px-3 py-1">
-        {extremes.map((extreme, i) => (
-          <div key={`${extreme.location}-${i}`} className="flex items-start py-1 border-b border-gray-700 last:border-b-0">
+      <div className="flex-1 bg-black px-3 py-1 overflow-y-auto h-0" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
+        {data.events.map((event, i) => (
+          <div key={`${event.location}-${event.type}-${i}`} className="flex items-start py-1.5 border-b border-gray-700 last:border-b-0">
             <div className="flex-shrink-0 mr-2 mt-0.5">
-              <span className="text-sm">{getTypeIcon(extreme.type)}</span>
+              <span className="text-sm">{getTypeIcon(event.type)}</span>
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-start justify-between">
                 <div className="min-w-0 flex-1">
-                  <div className="text-[#DAA520] text-xs font-semibold truncate">{extreme.location}</div>
-                  <div className="text-gray-300 text-xs truncate">{extreme.description}</div>
+                  <div className="text-[#DAA520] text-xs font-semibold truncate">{event.location}</div>
+                  <div className="text-gray-300 text-xs leading-tight">{event.title}</div>
+                  <div className="text-gray-500 text-xs truncate">{event.description}</div>
                 </div>
                 <div className="flex-shrink-0 ml-2 text-right">
-                  <div className={`text-xs font-bold ${getSeverityColor(extreme.severity)}`}>
-                    {extreme.severity.toUpperCase()}
+                  <div className={`text-xs font-bold ${getSeverityColor(event.severity)}`}>
+                    {event.severity.toUpperCase()}
                   </div>
-                  <div className="text-gray-400 text-xs">
-                    {formatTimeAgo(extreme.lastUpdated)}
+                  <div className="text-gray-500 text-xs">{event.source}</div>
+                  <div className="text-gray-600 text-xs">
+                    {formatTimeAgo(event.lastUpdated)}
                   </div>
                 </div>
               </div>
