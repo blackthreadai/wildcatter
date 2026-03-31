@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 
 export const maxDuration = 20;
 
-let cache: { data: unknown; ts: number } | null = null;
+let cache: { data: unknown; ts: number; ver: number } | null = null;
 const CACHE_MS = 6 * 60 * 60 * 1000;
+const CACHE_VER = 2; // bump to bust cache on deploy
 
 const FRED_KEY = process.env.FRED_API_KEY || '61cf53e2891a727efe4e48f18f6545f2';
 
@@ -139,7 +140,7 @@ function processIntlConsumption(rows: Record<string, string>[]) {
 
 export async function GET() {
   try {
-    if (cache && Date.now() - cache.ts < CACHE_MS) {
+    if (cache && cache.ver === CACHE_VER && Date.now() - cache.ts < CACHE_MS) {
       return NextResponse.json(cache.data);
     }
 
@@ -247,7 +248,7 @@ export async function GET() {
       source: 'EIA Weekly Petroleum Status Report, FRED',
     };
 
-    cache = { data, ts: Date.now() };
+    cache = { data, ts: Date.now(), ver: CACHE_VER };
     return NextResponse.json(data);
 
   } catch (error) {
