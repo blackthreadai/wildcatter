@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import * as XLSX from 'xlsx';
 
+export const maxDuration = 30; // seconds (Pro plan)
+
 // Cache for 12 hours
 let cache: { data: unknown; ts: number } | null = null;
 const CACHE_MS = 12 * 60 * 60 * 1000;
