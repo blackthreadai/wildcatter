@@ -1,208 +1,231 @@
 import { NextResponse } from 'next/server';
 
-interface RefineryOutage {
-  refinery: string;
-  company: string;
-  location: string;
-  capacity: number; // barrels per day
-  status: 'Planned' | 'Unplanned' | 'Extended' | 'Partial';
-  startDate: string;
-  expectedEnd?: string;
-  affectedUnits: string[];
-  reason: string;
-  impactLevel: 'Low' | 'Medium' | 'High' | 'Critical';
-  lastUpdated: string;
-}
+export const maxDuration = 30;
 
-interface RefinerySummary {
-  totalOutages: number;
-  affectedCapacity: number; // total bpd affected
-  plannedOutages: number;
-  unplannedOutages: number;
-  criticalOutages: number;
-}
-
-interface RefineryOutageData {
-  outages: RefineryOutage[];
-  summary: RefinerySummary;
-  lastUpdated: string;
-}
-
-// Cache for 4 hours (refinery data changes but not super frequently)
-let cache: { data: RefineryOutageData; ts: number } | null = null;
+// Cache for 4 hours
+let cache: { data: unknown; ts: number } | null = null;
 const CACHE_MS = 4 * 60 * 60 * 1000;
 
-async function fetchRefineryData(): Promise<RefineryOutageData> {
+const EIA_BASE = 'https://api.eia.gov/v2';
+
+interface PADDData {
+  region: string;
+  paddId: string;
+  utilizationPct: number;
+  prevUtilizationPct: number;
+  grossInputs: number; // thousand bbl/day
+  prevGrossInputs: number;
+  operableCapacity: number;
+  period: string;
+}
+
+// PADD regions and their approximate operable capacities (EIA Jan 2026 data, thousand bbl/day)
+const PADD_INFO: Record<string, { name: string; capacity: number }> = {
+  'R10': { name: 'East Coast (PADD 1)', capacity: 1179 },
+  'R20': { name: 'Midwest (PADD 2)', capacity: 4159 },
+  'R30': { name: 'Gulf Coast (PADD 3)', capacity: 10262 },
+  'R40': { name: 'Rocky Mountain (PADD 4)', capacity: 696 },
+  'R50': { name: 'West Coast (PADD 5)', capacity: 2630 },
+};
+
+async function fetchEIAData(apiKey: string) {
+  // Fetch weekly refinery utilization and inputs by PADD
+  // EIA series: petroleum/pnp/wiup/data
+  // Facets: duoarea (NUS=National, R10-R50=PADD regions)
+  // Products: utilization % and gross inputs
+
+  const url = `${EIA_BASE}/petroleum/pnp/wiup/data/?api_key=${apiKey}&frequency=weekly&data[0]=value&facets[duoarea][]=NUS&facets[duoarea][]=R10&facets[duoarea][]=R20&facets[duoarea][]=R30&facets[duoarea][]=R40&facets[duoarea][]=R50&sort[0][column]=period&sort[0][direction]=desc&length=100`;
+
+  const resp = await fetch(url, {
+    headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
+    signal: AbortSignal.timeout(10000),
+  });
+
+  if (!resp.ok) throw new Error(`EIA API: ${resp.status}`);
+  const json = await resp.json();
+
+  if (json.error) throw new Error(json.error.message || 'EIA API error');
+
+  return json.response?.data || [];
+}
+
+async function fetchCapacityData(apiKey: string) {
+  // Monthly operable capacity: petroleum/pnp/cap1/data
   try {
-    // In production, this would fetch from energy intelligence services like
-    // Energy Intelligence, OPIS, or direct refinery reporting
-    // For now, return realistic mock data based on typical refinery outage patterns
-    
-    const mockOutages: RefineryOutage[] = [
-      {
-        refinery: 'Port Arthur Refinery',
-        company: 'Motiva Enterprises',
-        location: 'Texas, USA',
-        capacity: 635000,
-        status: 'Planned',
-        startDate: '2026-02-15',
-        expectedEnd: '2026-03-20',
-        affectedUnits: ['Crude Distillation Unit 2', 'Catalytic Cracker'],
-        reason: 'Scheduled turnaround maintenance',
-        impactLevel: 'High',
-        lastUpdated: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        refinery: 'Baytown Refinery',
-        company: 'ExxonMobil',
-        location: 'Texas, USA',
-        capacity: 584000,
-        status: 'Unplanned',
-        startDate: '2026-03-01',
-        expectedEnd: '2026-03-10',
-        affectedUnits: ['Hydrocracker'],
-        reason: 'Equipment failure - compressor malfunction',
-        impactLevel: 'Medium',
-        lastUpdated: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        refinery: 'Whiting Refinery',
-        company: 'BP',
-        location: 'Indiana, USA',
-        capacity: 435000,
-        status: 'Extended',
-        startDate: '2026-02-08',
-        expectedEnd: '2026-03-25',
-        affectedUnits: ['Fluid Catalytic Cracker', 'Alkylation Unit'],
-        reason: 'Extended maintenance - delayed parts delivery',
-        impactLevel: 'High',
-        lastUpdated: new Date(Date.now() - 30 * 60 * 1000).toISOString()
-      },
-      {
-        refinery: 'Richmond Refinery',
-        company: 'Chevron',
-        location: 'California, USA',
-        capacity: 245000,
-        status: 'Partial',
-        startDate: '2026-02-28',
-        expectedEnd: '2026-03-08',
-        affectedUnits: ['Reformer'],
-        reason: 'Catalyst replacement',
-        impactLevel: 'Low',
-        lastUpdated: new Date(Date.now() - 45 * 60 * 1000).toISOString()
-      },
-      {
-        refinery: 'Wood River Refinery',
-        company: 'Shell',
-        location: 'Illinois, USA',
-        capacity: 327000,
-        status: 'Planned',
-        startDate: '2026-03-10',
-        expectedEnd: '2026-04-15',
-        affectedUnits: ['Crude Distillation Unit 1'],
-        reason: 'Major turnaround - every 4 years',
-        impactLevel: 'Medium',
-        lastUpdated: new Date(Date.now() - 20 * 60 * 1000).toISOString()
-      },
-      {
-        refinery: 'Pembroke Refinery',
-        company: 'Valero',
-        location: 'Wales, UK',
-        capacity: 270000,
-        status: 'Unplanned',
-        startDate: '2026-03-02',
-        affectedUnits: ['Power Generation Unit'],
-        reason: 'Electrical system failure',
-        impactLevel: 'Critical',
-        lastUpdated: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString()
-      }
-    ];
+    const url = `${EIA_BASE}/petroleum/pnp/cap1/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[duoarea][]=NUS&facets[duoarea][]=R10&facets[duoarea][]=R20&facets[duoarea][]=R30&facets[duoarea][]=R40&facets[duoarea][]=R50&sort[0][column]=period&sort[0][direction]=desc&length=12`;
 
-    const plannedCount = mockOutages.filter(o => o.status === 'Planned').length;
-    const unplannedCount = mockOutages.filter(o => o.status === 'Unplanned').length;
-    const criticalCount = mockOutages.filter(o => o.impactLevel === 'Critical').length;
-    const totalCapacity = mockOutages.reduce((sum, outage) => {
-      const capacityImpact = outage.status === 'Partial' ? outage.capacity * 0.3 : outage.capacity;
-      return sum + capacityImpact;
-    }, 0);
+    const resp = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
+      signal: AbortSignal.timeout(8000),
+    });
 
-    const mockSummary: RefinerySummary = {
-      totalOutages: mockOutages.length,
-      affectedCapacity: Math.round(totalCapacity),
-      plannedOutages: plannedCount,
-      unplannedOutages: unplannedCount,
-      criticalOutages: criticalCount
-    };
-
-    const mockData: RefineryOutageData = {
-      outages: mockOutages,
-      summary: mockSummary,
-      lastUpdated: new Date().toISOString()
-    };
-
-    return mockData;
-    
-  } catch (error) {
-    console.error('Refinery outage data fetch error:', error);
-    
-    // Fallback data
-    return {
-      outages: [
-        {
-          refinery: 'Port Arthur Refinery',
-          company: 'Motiva Enterprises',
-          location: 'Texas, USA',
-          capacity: 635000,
-          status: 'Planned',
-          startDate: '2026-02-15',
-          expectedEnd: '2026-03-20',
-          affectedUnits: ['Crude Distillation Unit 2'],
-          reason: 'Scheduled turnaround maintenance',
-          impactLevel: 'High',
-          lastUpdated: new Date().toISOString()
-        }
-      ],
-      summary: {
-        totalOutages: 1,
-        affectedCapacity: 635000,
-        plannedOutages: 1,
-        unplannedOutages: 0,
-        criticalOutages: 0
-      },
-      lastUpdated: new Date().toISOString()
-    };
+    if (!resp.ok) return [];
+    const json = await resp.json();
+    return json.response?.data || [];
+  } catch {
+    return [];
   }
+}
+
+function processData(raw: Record<string, string>[], capacityRaw: Record<string, string>[]) {
+  // Group by region and get latest 2 weeks
+  const byRegion: Record<string, Record<string, string>[]> = {};
+  for (const row of raw) {
+    const area = row.duoarea;
+    if (!byRegion[area]) byRegion[area] = [];
+    byRegion[area].push(row);
+  }
+
+  // Get capacity data
+  const capacityByRegion: Record<string, number> = {};
+  for (const row of capacityRaw) {
+    const area = row.duoarea;
+    if (!capacityByRegion[area]) {
+      capacityByRegion[area] = parseFloat(row.value) || 0;
+    }
+  }
+
+  const padds: PADDData[] = [];
+  let nationalUtil = 0, nationalPrevUtil = 0, nationalInputs = 0, nationalPrevInputs = 0;
+  let nationalCapacity = 0;
+  let reportPeriod = '';
+
+  for (const [paddId, info] of Object.entries(PADD_INFO)) {
+    const rows = byRegion[paddId] || [];
+
+    // Separate utilization % rows from input rows
+    const utilRows = rows.filter(r =>
+      (r['series-description'] || r.process || '').toLowerCase().includes('utilization') ||
+      (r.series || '').includes('WPUL')
+    );
+    const inputRows = rows.filter(r =>
+      (r['series-description'] || r.process || '').toLowerCase().includes('input') ||
+      (r.series || '').includes('_FPF_') || (r.series || '').includes('_YPT_')
+    );
+
+    // If we can't separate, try by value range (utilization is 0-100%, inputs are thousands)
+    let latestUtil = 0, prevUtil = 0, latestInputs = 0, prevInputs = 0;
+
+    if (utilRows.length >= 2) {
+      latestUtil = parseFloat(utilRows[0].value) || 0;
+      prevUtil = parseFloat(utilRows[1].value) || 0;
+    } else if (rows.length >= 2) {
+      // Heuristic: values < 110 are likely utilization %, values > 110 are inputs
+      const vals = rows.map(r => ({ ...r, val: parseFloat(r.value) || 0 }));
+      const utilLike = vals.filter(v => v.val > 0 && v.val <= 100);
+      const inputLike = vals.filter(v => v.val > 100);
+
+      if (utilLike.length >= 2) {
+        latestUtil = utilLike[0].val;
+        prevUtil = utilLike[1].val;
+      }
+      if (inputLike.length >= 2) {
+        latestInputs = inputLike[0].val;
+        prevInputs = inputLike[1].val;
+      }
+    }
+
+    if (inputRows.length >= 2) {
+      latestInputs = parseFloat(inputRows[0].value) || 0;
+      prevInputs = parseFloat(inputRows[1].value) || 0;
+    }
+
+    if (!reportPeriod && rows.length > 0) {
+      reportPeriod = rows[0].period;
+    }
+
+    const capacity = capacityByRegion[paddId] || info.capacity;
+
+    padds.push({
+      region: info.name,
+      paddId,
+      utilizationPct: Math.round(latestUtil * 10) / 10,
+      prevUtilizationPct: Math.round(prevUtil * 10) / 10,
+      grossInputs: Math.round(latestInputs),
+      prevGrossInputs: Math.round(prevInputs),
+      operableCapacity: capacity,
+      period: rows[0]?.period || '',
+    });
+  }
+
+  // National data
+  const nusRows = byRegion['NUS'] || [];
+  if (nusRows.length >= 2) {
+    const vals = nusRows.map(r => parseFloat(r.value) || 0);
+    const utilLike = vals.filter(v => v > 0 && v <= 100);
+    const inputLike = vals.filter(v => v > 100);
+    if (utilLike.length >= 2) { nationalUtil = utilLike[0]; nationalPrevUtil = utilLike[1]; }
+    if (inputLike.length >= 2) { nationalInputs = inputLike[0]; nationalPrevInputs = inputLike[1]; }
+  }
+  nationalCapacity = capacityByRegion['NUS'] || Object.values(PADD_INFO).reduce((s, p) => s + p.capacity, 0);
+
+  // Calculate estimated offline capacity
+  const offlineCapacity = nationalCapacity > 0 && nationalUtil > 0
+    ? Math.round(nationalCapacity * (1 - nationalUtil / 100))
+    : 0;
+
+  // Flag regions with significant utilization drops (potential outages)
+  const alerts = padds
+    .filter(p => p.utilizationPct > 0 && p.prevUtilizationPct > 0)
+    .filter(p => p.prevUtilizationPct - p.utilizationPct > 2)
+    .map(p => ({
+      region: p.region,
+      drop: Math.round((p.prevUtilizationPct - p.utilizationPct) * 10) / 10,
+      currentUtil: p.utilizationPct,
+      estimatedOffline: Math.round(p.operableCapacity * (p.prevUtilizationPct - p.utilizationPct) / 100),
+    }));
+
+  return {
+    national: {
+      utilizationPct: Math.round(nationalUtil * 10) / 10,
+      prevUtilizationPct: Math.round(nationalPrevUtil * 10) / 10,
+      grossInputs: Math.round(nationalInputs),
+      operableCapacity: nationalCapacity,
+      estimatedOfflineCapacity: offlineCapacity,
+      period: reportPeriod,
+    },
+    regions: padds,
+    alerts,
+    reportPeriod,
+  };
 }
 
 export async function GET() {
   try {
-    // Return cached data if fresh
     if (cache && Date.now() - cache.ts < CACHE_MS) {
       return NextResponse.json(cache.data);
     }
 
-    // Fetch fresh data
-    const data = await fetchRefineryData();
-    
-    // Cache the results
+    const apiKey = process.env.EIA_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: 'EIA API key not configured' }, { status: 502 });
+    }
+
+    const [raw, capacityRaw] = await Promise.all([
+      fetchEIAData(apiKey),
+      fetchCapacityData(apiKey),
+    ]);
+
+    if (!raw || raw.length === 0) {
+      return NextResponse.json({ error: 'No refinery data returned from EIA' }, { status: 502 });
+    }
+
+    const processed = processData(raw, capacityRaw);
+
+    const data = {
+      ...processed,
+      lastUpdated: new Date().toISOString(),
+      source: 'EIA Weekly Petroleum Status Report',
+    };
+
     cache = { data, ts: Date.now() };
-    
     return NextResponse.json(data);
-    
+
   } catch (error) {
-    console.error('Refinery outages API error:', error);
-    
-    // Ultimate fallback
-    return NextResponse.json({
-      outages: [],
-      summary: {
-        totalOutages: 0,
-        affectedCapacity: 0,
-        plannedOutages: 0,
-        unplannedOutages: 0,
-        criticalOutages: 0
-      },
-      lastUpdated: new Date().toISOString()
-    });
+    console.error('Refinery outages error:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch refinery data: ' + (error instanceof Error ? error.message : String(error)) },
+      { status: 502 },
+    );
   }
 }

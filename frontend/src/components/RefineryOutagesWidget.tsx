@@ -2,117 +2,89 @@
 
 import { useState, useEffect } from 'react';
 
-interface RefineryOutage {
-  refinery: string;
-  company: string;
-  location: string;
-  capacity: number;
-  status: 'Planned' | 'Unplanned' | 'Extended' | 'Partial';
-  startDate: string;
-  expectedEnd?: string;
-  affectedUnits: string[];
-  reason: string;
-  impactLevel: 'Low' | 'Medium' | 'High' | 'Critical';
-  lastUpdated: string;
+interface RegionData {
+  region: string;
+  paddId: string;
+  utilizationPct: number;
+  prevUtilizationPct: number;
+  grossInputs: number;
+  prevGrossInputs: number;
+  operableCapacity: number;
+  period: string;
 }
 
-interface RefinerySummary {
-  totalOutages: number;
-  affectedCapacity: number;
-  plannedOutages: number;
-  unplannedOutages: number;
-  criticalOutages: number;
+interface Alert {
+  region: string;
+  drop: number;
+  currentUtil: number;
+  estimatedOffline: number;
 }
 
-interface RefineryOutageData {
-  outages: RefineryOutage[];
-  summary: RefinerySummary;
+interface NationalData {
+  utilizationPct: number;
+  prevUtilizationPct: number;
+  grossInputs: number;
+  operableCapacity: number;
+  estimatedOfflineCapacity: number;
+  period: string;
+}
+
+interface RefineryData {
+  national: NationalData;
+  regions: RegionData[];
+  alerts: Alert[];
+  reportPeriod: string;
   lastUpdated: string;
+  source: string;
+  error?: string;
 }
 
 export default function RefineryOutagesWidget() {
-  const [data, setData] = useState<RefineryOutageData | null>(null);
+  const [data, setData] = useState<RefineryData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch('/api/refinery-outages');
-        const outageData = await response.json();
-        setData(outageData);
+        const json = await response.json();
+        if (!response.ok || json.error) {
+          setError(json.error || 'Failed to load data');
+          setLoading(false);
+          return;
+        }
+        setData(json);
+        setError(null);
         setLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch refinery outage data:', error);
-        
-        // Fallback data
-        const fallbackData: RefineryOutageData = {
-          outages: [
-            {
-              refinery: 'Port Arthur Refinery',
-              company: 'Motiva Enterprises',
-              location: 'Texas, USA',
-              capacity: 635000,
-              status: 'Planned',
-              startDate: '2026-02-15',
-              expectedEnd: '2026-03-20',
-              affectedUnits: ['Crude Distillation Unit 2'],
-              reason: 'Scheduled turnaround maintenance',
-              impactLevel: 'High',
-              lastUpdated: new Date().toISOString()
-            }
-          ],
-          summary: {
-            totalOutages: 1,
-            affectedCapacity: 635000,
-            plannedOutages: 1,
-            unplannedOutages: 0,
-            criticalOutages: 0
-          },
-          lastUpdated: new Date().toISOString()
-        };
-        
-        setData(fallbackData);
+      } catch (err) {
+        setError('Failed to fetch refinery data');
         setLoading(false);
       }
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 4 * 60 * 60 * 1000); // Update every 4 hours
+    const interval = setInterval(fetchData, 4 * 60 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Planned': return 'text-blue-500';
-      case 'Unplanned': return 'text-orange-500';
-      case 'Extended': return 'text-red-500';
-      case 'Partial': return 'text-yellow-500';
-      default: return 'text-gray-400';
-    }
+  const getUtilColor = (pct: number) => {
+    if (pct >= 92) return 'text-green-500';
+    if (pct >= 85) return 'text-yellow-500';
+    if (pct >= 75) return 'text-orange-500';
+    return 'text-red-500';
   };
 
-  const getImpactColor = (impact: string) => {
-    switch (impact) {
-      case 'Critical': return 'text-red-500';
-      case 'High': return 'text-orange-500';
-      case 'Medium': return 'text-yellow-500';
-      case 'Low': return 'text-green-500';
-      default: return 'text-gray-400';
-    }
+  const getChangeColor = (change: number) => {
+    if (change > 0.5) return 'text-green-500';
+    if (change < -0.5) return 'text-red-500';
+    return 'text-gray-400';
   };
 
-  const formatCapacity = (capacity: number) => {
-    return `${(capacity / 1000).toFixed(0)}K bpd`;
-  };
-
-  const getDaysRemaining = (endDate?: string) => {
-    if (!endDate) return 'TBD';
-    const end = new Date(endDate);
-    const now = new Date();
-    const diffTime = end.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays <= 0) return 'Overdue';
-    return `${diffDays}d remaining`;
+  const formatChange = (current: number, prev: number) => {
+    const diff = current - prev;
+    if (Math.abs(diff) < 0.1) return '--';
+    return `${diff >= 0 ? '+' : ''}${diff.toFixed(1)}%`;
   };
 
   if (loading) {
@@ -128,18 +100,20 @@ export default function RefineryOutagesWidget() {
     );
   }
 
-  if (!data) {
+  if (error || !data) {
     return (
       <div className="w-full flex flex-col bg-black h-full">
         <div className="bg-gray-800 p-2 flex-shrink-0">
           <h3 className="text-white text-xs font-bold tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>REFINERY OUTAGES</h3>
         </div>
         <div className="flex-1 px-3 py-2 flex items-center justify-center bg-black min-h-0">
-          <div className="text-gray-500 text-xs">No data available</div>
+          <div className="text-red-500 text-xs">{error || 'No data available'}</div>
         </div>
       </div>
     );
   }
+
+  const utilChange = data.national.utilizationPct - data.national.prevUtilizationPct;
 
   return (
     <div className="w-full flex flex-col bg-black h-full">
@@ -148,85 +122,98 @@ export default function RefineryOutagesWidget() {
       </div>
       
       <div className="flex-1 bg-black px-3 py-2 overflow-y-auto h-0" style={{ scrollbarWidth: "thin", scrollbarColor: "#4a5568 #1a202c" }}>
-        {/* Summary */}
+        {/* National Summary */}
         <div className="mb-3 pb-2 border-b border-gray-700">
-          <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="text-[#DAA520] text-xs font-bold mb-2">US REFINERY UTILIZATION</div>
+          <div className="flex items-end justify-between mb-1">
             <div>
-              <div className="text-gray-400">Total Outages</div>
-              <div className="text-white font-bold text-lg">{data.summary.totalOutages}</div>
-            </div>
-            <div>
-              <div className="text-gray-400">Affected Capacity</div>
-              <div className="text-[#DAA520] font-bold text-lg">
-                {formatCapacity(data.summary.affectedCapacity)}
+              <div className={`text-2xl font-bold ${getUtilColor(data.national.utilizationPct)}`}>
+                {data.national.utilizationPct > 0 ? `${data.national.utilizationPct}%` : 'N/A'}
               </div>
+              <div className="text-gray-400 text-xs">of operable capacity</div>
             </div>
-            <div>
-              <div className="text-gray-400">Planned</div>
-              <div className="text-blue-500 font-medium">{data.summary.plannedOutages}</div>
-            </div>
-            <div>
-              <div className="text-gray-400">Unplanned</div>
-              <div className="text-orange-500 font-medium">{data.summary.unplannedOutages}</div>
+            <div className="text-right">
+              {data.national.utilizationPct > 0 && (
+                <div className={`text-sm font-medium ${getChangeColor(utilChange)}`}>
+                  {formatChange(data.national.utilizationPct, data.national.prevUtilizationPct)} WoW
+                </div>
+              )}
+              {data.national.grossInputs > 0 && (
+                <div className="text-gray-400 text-xs">{data.national.grossInputs.toLocaleString()} kbd inputs</div>
+              )}
             </div>
           </div>
-          {data.summary.criticalOutages > 0 && (
-            <div className="mt-2 text-xs">
-              <div className="text-red-500 font-medium">
-                ⚠️ {data.summary.criticalOutages} Critical Outage{data.summary.criticalOutages > 1 ? 's' : ''}
-              </div>
+          {data.national.estimatedOfflineCapacity > 0 && (
+            <div className="text-xs text-gray-400 mt-1">
+              Est. offline capacity: <span className="text-orange-400 font-medium">{data.national.estimatedOfflineCapacity.toLocaleString()} kbd</span>
             </div>
           )}
         </div>
 
-        {/* Active Outages */}
-        <div className="space-y-3">
-          {data.outages.map((outage, i) => (
-            <div key={i} className="pb-3 border-b border-gray-700 last:border-b-0">
-              <div className="flex items-start justify-between mb-2">
-                <div>
-                  <div className="text-white text-xs font-medium">{outage.refinery}</div>
-                  <div className="text-gray-400 text-xs">{outage.company} • {outage.location}</div>
-                </div>
-                <div className="text-right">
-                  <div className={`text-xs font-bold ${getStatusColor(outage.status)}`}>
-                    {outage.status.toUpperCase()}
-                  </div>
-                  <div className={`text-xs font-medium ${getImpactColor(outage.impactLevel)}`}>
-                    {outage.impactLevel.toUpperCase()}
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 text-xs mb-2">
-                <div>
-                  <div className="text-gray-400">Capacity</div>
-                  <div className="text-white font-medium">{formatCapacity(outage.capacity)}</div>
-                </div>
-                <div>
-                  <div className="text-gray-400">Duration</div>
-                  <div className="text-gray-300 font-medium">{getDaysRemaining(outage.expectedEnd)}</div>
-                </div>
-              </div>
-
-              <div className="text-xs mb-2">
-                <div className="text-gray-400 mb-1">Affected Units:</div>
-                <div className="text-gray-300">{outage.affectedUnits.join(', ')}</div>
-              </div>
-
-              <div className="text-xs">
-                <div className="text-gray-400 mb-1">Reason:</div>
-                <div className="text-gray-300 leading-tight">{outage.reason}</div>
-              </div>
-
-              <div className="text-xs text-gray-500 mt-2">
-                Started: {new Date(outage.startDate).toLocaleDateString()}
-                {outage.expectedEnd && (
-                  <span> • End: {new Date(outage.expectedEnd).toLocaleDateString()}</span>
+        {/* Alerts */}
+        {data.alerts.length > 0 && (
+          <div className="mb-3 pb-2 border-b border-gray-700">
+            <div className="text-red-500 text-xs font-bold mb-1">UTILIZATION DROPS</div>
+            {data.alerts.map((alert, i) => (
+              <div key={i} className="text-xs mb-1">
+                <span className="text-white font-medium">{alert.region}</span>
+                <span className="text-red-400 ml-1">-{alert.drop}%</span>
+                <span className="text-gray-400 ml-1">({alert.currentUtil}% util)</span>
+                {alert.estimatedOffline > 0 && (
+                  <span className="text-orange-400 ml-1">~{alert.estimatedOffline} kbd offline</span>
                 )}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+        )}
+
+        {/* PADD Regions */}
+        <div>
+          <div className="text-[#DAA520] text-xs font-bold mb-2">BY REGION (PADD)</div>
+          {data.regions.map((region, i) => {
+            const change = region.utilizationPct - region.prevUtilizationPct;
+            return (
+              <div key={i} className="mb-2 pb-2 border-b border-gray-800 last:border-b-0">
+                <div className="flex items-center justify-between text-xs">
+                  <div className="text-white font-medium">{region.region}</div>
+                  <div className="flex items-center gap-2">
+                    <span className={`font-bold ${getUtilColor(region.utilizationPct)}`}>
+                      {region.utilizationPct > 0 ? `${region.utilizationPct}%` : 'N/A'}
+                    </span>
+                    {region.utilizationPct > 0 && region.prevUtilizationPct > 0 && (
+                      <span className={`${getChangeColor(change)}`}>
+                        {formatChange(region.utilizationPct, region.prevUtilizationPct)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-xs text-gray-500 mt-0.5">
+                  <span>Capacity: {region.operableCapacity.toLocaleString()} kbd</span>
+                  {region.grossInputs > 0 && <span>Inputs: {region.grossInputs.toLocaleString()} kbd</span>}
+                </div>
+                {/* Utilization bar */}
+                {region.utilizationPct > 0 && (
+                  <div className="mt-1 h-1 bg-gray-800 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${
+                        region.utilizationPct >= 92 ? 'bg-green-600' :
+                        region.utilizationPct >= 85 ? 'bg-yellow-600' :
+                        region.utilizationPct >= 75 ? 'bg-orange-600' : 'bg-red-600'
+                      }`}
+                      style={{ width: `${Math.min(100, region.utilizationPct)}%` }}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Footer */}
+        <div className="mt-2 text-xs text-gray-600">
+          {data.reportPeriod && <span>Week of {data.reportPeriod}</span>}
+          <span className="mx-1">|</span>
+          <span>{data.source}</span>
         </div>
       </div>
     </div>
