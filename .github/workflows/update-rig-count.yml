@@ -1,0 +1,32 @@
+name: Update Baker Hughes Rig Count
+
+on:
+  schedule:
+    # Every Friday at 6pm UTC (1pm ET / 12pm CT)
+    - cron: '0 18 * * 5'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install xlsx
+        working-directory: frontend
+        run: npm install xlsx
+
+      - name: Fetch latest rig count data
+        working-directory: frontend
+        run: node scripts/update-rig-count.mjs
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --staged --quiet || (git commit -m "data: update Baker Hughes rig count $(date +%Y-%m-%d)" && git push)
