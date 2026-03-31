@@ -63,58 +63,51 @@ async function fetchYahooPrice(symbol: string) {
 }
 
 function processProductSupplied(rows: Record<string, string>[]) {
-  // Key product codes for demand sectors
-  const productMap: Record<string, { sector: string; fuelType: string }> = {
-    'EPJK': { sector: 'Aviation', fuelType: 'Jet Fuel' },
-    'EPD2DXL0': { sector: 'Trucking', fuelType: 'Diesel' },
-    'EPM0F': { sector: 'Shipping', fuelType: 'Residual Fuel Oil' },
-    'EPMRU': { sector: 'Gasoline Demand', fuelType: 'Motor Gasoline' },
-    'EPPK': { sector: 'Propane Demand', fuelType: 'Propane' },
-    'EPLLPZ': { sector: 'NGL Demand', fuelType: 'NGL/LPG' },
-  };
+  if (rows.length === 0) return { sectors: {}, period: '', extras: {} };
 
-  // Also look for total product supplied
-  const sectors: Record<string, { current: number; prev: number; unit: string; sector: string; fuelType: string }> = {};
-
-  const latestPeriod = rows[0]?.period || '';
   const periods = [...new Set(rows.map(r => r.period))].sort().reverse();
+  const latestPeriod = periods[0] || '';
+  const prevPeriod = periods[1] || '';
+
+  // We need to match by description since the product codes overlap
+  interface SectorEntry { current: number; prev: number; unit: string; sector: string; fuelType: string; icon: string }
+  const sectors: Record<string, SectorEntry> = {};
+  const extras: Record<string, { current: number; prev: number }> = {};
 
   for (const row of rows) {
-    const product = row.product || '';
-    const desc = (row['series-description'] || '').toLowerCase();
+    const desc = row['series-description'] || '';
     const val = parseFloat(row.value) || 0;
-    if (val <= 0) continue;
+    const isPeriodCurrent = row.period === latestPeriod;
+    const isPeriodPrev = row.period === prevPeriod;
 
-    let key = '';
-    let sector = '';
-    let fuelType = '';
+    if (!isPeriodCurrent && !isPeriodPrev) continue;
 
-    if (desc.includes('kerosene-type jet fuel') && desc.includes('product supplied')) {
-      key = 'jet'; sector = 'Aviation'; fuelType = 'Jet Fuel';
-    } else if (desc.includes('distillate fuel oil') && desc.includes('product supplied')) {
-      key = 'diesel'; sector = 'Trucking/Heating'; fuelType = 'Distillate';
-    } else if (desc.includes('residual fuel oil') && desc.includes('product supplied')) {
-      key = 'resid'; sector = 'Shipping/Industrial'; fuelType = 'Residual Fuel Oil';
-    } else if (desc.includes('total motor gasoline') && desc.includes('product supplied')) {
-      key = 'gas'; sector = 'Road Transport'; fuelType = 'Motor Gasoline';
-    } else if (desc.includes('total petroleum') && desc.includes('product supplied') && !desc.includes('excluding')) {
-      key = 'total'; sector = 'Total Petroleum'; fuelType = 'All Products';
-    } else if (desc.includes('propane') && desc.includes('product supplied')) {
-      key = 'propane'; sector = 'Petrochemical/Heating'; fuelType = 'Propane';
+    // Product Supplied = demand proxy
+    if (desc.includes('Product Supplied of Finished Motor Gasoline')) {
+      if (!sectors['gas']) sectors['gas'] = { current: 0, prev: 0, unit: 'kbd', sector: 'Road Transport', fuelType: 'Motor Gasoline', icon: '🚗' };
+      if (isPeriodCurrent) sectors['gas'].current = val;
+      if (isPeriodPrev) sectors['gas'].prev = val;
+    } else if (desc.includes('Product Supplied of Distillate Fuel Oil')) {
+      if (!sectors['diesel']) sectors['diesel'] = { current: 0, prev: 0, unit: 'kbd', sector: 'Trucking/Heating', fuelType: 'Distillate Fuel Oil', icon: '🚛' };
+      if (isPeriodCurrent) sectors['diesel'].current = val;
+      if (isPeriodPrev) sectors['diesel'].prev = val;
     }
 
-    if (!key) continue;
-
-    if (row.period === latestPeriod) {
-      if (!sectors[key]) sectors[key] = { current: 0, prev: 0, unit: 'kbd', sector, fuelType };
-      sectors[key].current = val;
-    } else if (periods.length >= 2 && row.period === periods[1]) {
-      if (!sectors[key]) sectors[key] = { current: 0, prev: 0, unit: 'kbd', sector, fuelType };
-      sectors[key].prev = val;
+    // Refinery inputs = throughput indicator
+    if (desc.includes('Gross Inputs into Refineries')) {
+      if (!extras['refInputs']) extras['refInputs'] = { current: 0, prev: 0 };
+      if (isPeriodCurrent) extras['refInputs'].current = val;
+      if (isPeriodPrev) extras['refInputs'].prev = val;
+    }
+    // Crude production
+    if (desc.includes('Field Production of Crude Oil')) {
+      if (!extras['crudeProd']) extras['crudeProd'] = { current: 0, prev: 0 };
+      if (isPeriodCurrent) extras['crudeProd'].current = val;
+      if (isPeriodPrev) extras['crudeProd'].prev = val;
     }
   }
 
-  return { sectors, period: latestPeriod };
+  return { sectors, period: latestPeriod, extras };
 }
 
 function processIntlConsumption(rows: Record<string, string>[]) {
@@ -166,10 +159,7 @@ export async function GET() {
     const intl = Array.isArray(intlData) ? processIntlConsumption(intlData) : { regions: [], worldTotal: 0, period: '' };
 
     // Build sector demand from US product supplied
-    const sectorOrder = ['total', 'gas', 'diesel', 'jet', 'propane', 'resid'];
-    const sectorIcons: Record<string, string> = {
-      total: '🛢️', gas: '🚗', diesel: '🚛', jet: '✈️', propane: '🏭', resid: '🚢',
-    };
+    const sectorOrder = ['gas', 'diesel'];
 
     const sectorDemand = sectorOrder
       .filter(k => usData.sectors[k]?.current > 0)
@@ -182,10 +172,29 @@ export async function GET() {
           currentDemand: Math.round(s.current),
           unit: 'kbd',
           change,
-          icon: sectorIcons[k] || '⚪',
+          icon: s.icon,
           region: 'United States',
         };
       });
+
+    // Add refinery/production extras as additional indicators
+    const ex = usData.extras;
+    if (ex['refInputs']?.current) {
+      sectorDemand.push({
+        sector: 'Refinery Throughput', fuelType: 'Gross Inputs',
+        currentDemand: Math.round(ex['refInputs'].current), unit: 'kbd',
+        change: ex['refInputs'].prev > 0 ? Math.round(((ex['refInputs'].current - ex['refInputs'].prev) / ex['refInputs'].prev) * 1000) / 10 : 0,
+        icon: '🏭', region: 'United States',
+      });
+    }
+    if (ex['crudeProd']?.current) {
+      sectorDemand.push({
+        sector: 'Crude Production', fuelType: 'Field Production',
+        currentDemand: Math.round(ex['crudeProd'].current), unit: 'kbd',
+        change: ex['crudeProd'].prev > 0 ? Math.round(((ex['crudeProd'].current - ex['crudeProd'].prev) / ex['crudeProd'].prev) * 1000) / 10 : 0,
+        icon: '🛢️', region: 'United States',
+      });
+    }
 
     // Economic indicators from FRED
     const economicIndicators = [];
@@ -208,9 +217,9 @@ export async function GET() {
       unit: 'kbd',
     }));
 
-    // Market summary
-    const totalUS = usData.sectors['total']?.current || 0;
-    const prevTotalUS = usData.sectors['total']?.prev || 0;
+    // Market summary - sum gasoline + distillate for US demand
+    const totalUS = (usData.sectors['gas']?.current || 0) + (usData.sectors['diesel']?.current || 0);
+    const prevTotalUS = (usData.sectors['gas']?.prev || 0) + (usData.sectors['diesel']?.prev || 0);
     const usChange = prevTotalUS > 0 ? Math.round(((totalUS - prevTotalUS) / prevTotalUS) * 1000) / 10 : 0;
 
     const strongestSector = sectorDemand.filter(s => s.sector !== 'Total Petroleum').reduce(
