@@ -79,6 +79,18 @@ export default function PreciousMetalsWidget() {
           symbol: 'Cu',
           textColor: 'text-orange-900'
         };
+      case 'Steel (ETF)':
+        return {
+          background: 'linear-gradient(135deg, #71797E 0%, #565656 50%, #3B3B3B 100%)',
+          symbol: 'Steel',
+          textColor: 'text-gray-200'
+        };
+      case 'Aluminum':
+        return {
+          background: 'linear-gradient(135deg, #D6D6D6 0%, #ABABAB 50%, #848484 100%)',
+          symbol: 'Al',
+          textColor: 'text-gray-700'
+        };
       default:
         return {
           background: 'linear-gradient(135deg, #666 0%, #444 100%)',
