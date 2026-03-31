@@ -126,7 +126,7 @@ export default function NewsWidget({ region = 'US', title }: NewsWidgetProps) {
         ) : (
           <div className="space-y-2 pb-6">
             {articles.map((article, i) => (
-              <div key={i} className="border-b border-gray-700 pb-1 last:border-b-0">
+              <div key={i} className={`border-b border-gray-700 pb-1 last:border-b-0 px-2 ${i % 2 === 1 ? 'bg-[#DAA520]/10' : 'bg-transparent'}`}>
                 <a 
                   href={article.url}
                   target="_blank"
