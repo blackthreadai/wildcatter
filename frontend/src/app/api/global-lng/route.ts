@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export const maxDuration = 20;
+export const maxDuration = 30;
 
 let cache: { data: unknown; ts: number } | null = null;
 const CACHE_MS = 60 * 60 * 1000; // 1 hour
@@ -16,7 +16,7 @@ async function fetchYahooPrice(symbol: string): Promise<{ price: number; prevClo
   const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5d&includePrePost=false`;
   const resp = await fetch(url, {
     headers: { 'User-Agent': 'Mozilla/5.0' },
-    signal: AbortSignal.timeout(6000),
+    signal: AbortSignal.timeout(12000),
   });
   if (!resp.ok) return { price: 0, prevClose: 0 };
   const json = await resp.json();
@@ -36,7 +36,7 @@ async function fetchLNGExports(apiKey: string) {
     const url = `https://api.eia.gov/v2/natural-gas/move/expc/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[process][]=ENG&sort[0][column]=period&sort[0][direction]=desc&length=200`;
     const resp = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(15000),
     });
     if (!resp.ok) return [];
     const json = await resp.json();
@@ -52,7 +52,7 @@ async function fetchLNGImports(apiKey: string) {
     const url = `https://api.eia.gov/v2/natural-gas/move/impc/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[process][]=IRP&sort[0][column]=period&sort[0][direction]=desc&length=20`;
     const resp = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(15000),
     });
     if (!resp.ok) return [];
     const json = await resp.json();

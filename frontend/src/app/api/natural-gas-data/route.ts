@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const maxDuration = 30;
+
 // Cache for 2 hours
 let cache: { data: unknown; ts: number; ver: number } | null = null;
 const CACHE_MS = 2 * 60 * 60 * 1000;
@@ -33,7 +35,7 @@ async function fetchEIAStorage(apiKey: string) {
       const url = `https://api.eia.gov/v2/natural-gas/stor/wkly/data/?api_key=${apiKey}&frequency=weekly&data[0]=value&facets[process][]=SWO&facets[series][]=${series}&sort[0][column]=period&sort[0][direction]=desc&length=60`;
       const resp = await fetch(url, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(15000),
       });
       const json = await resp.json();
       const rows = json?.response?.data || [];
@@ -81,7 +83,7 @@ async function fetchEUStorage() {
         'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)',
         'x-key': '', // AGSI is public for aggregate EU data
       },
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(15000),
     });
     const json = await resp.json();
 
@@ -120,7 +122,7 @@ async function fetchPrices() {
       const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=5d&interval=1d`;
       const resp = await fetch(url, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(15000),
       });
       const json = await resp.json();
       const meta = json?.chart?.result?.[0]?.meta;
@@ -162,7 +164,7 @@ async function fetchLNG(apiKey: string) {
     const url = `https://api.eia.gov/v2/natural-gas/move/expc/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[process][]=ENG&sort[0][column]=period&sort[0][direction]=desc&length=2`;
     const resp = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(15000),
     });
     const json = await resp.json();
     const rows = json?.response?.data || [];

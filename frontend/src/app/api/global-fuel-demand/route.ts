@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export const maxDuration = 20;
+export const maxDuration = 30;
 
 let cache: { data: unknown; ts: number; ver: number } | null = null;
 const CACHE_MS = 6 * 60 * 60 * 1000;
@@ -16,7 +16,7 @@ async function fetchUSProductSupplied(apiKey: string) {
     const url = `https://api.eia.gov/v2/petroleum/sum/sndw/data/?api_key=${apiKey}&frequency=weekly&data[0]=value&facets[duoarea][]=NUS&sort[0][column]=period&sort[0][direction]=desc&length=120`;
     const resp = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(15000),
     });
     if (!resp.ok) return [];
     const json = await resp.json();
@@ -30,7 +30,7 @@ async function fetchIntlConsumption(apiKey: string) {
     const url = `https://api.eia.gov/v2/international/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[productId][]=PETC&sort[0][column]=period&sort[0][direction]=desc&length=50`;
     const resp = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(15000),
     });
     if (!resp.ok) return [];
     const json = await resp.json();
@@ -42,7 +42,7 @@ async function fetchIntlConsumption(apiKey: string) {
 async function fetchFREDSeries(seriesId: string): Promise<{ value: number; date: string } | null> {
   try {
     const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${FRED_KEY}&file_type=json&sort_order=desc&limit=2`;
-    const resp = await fetch(url, { signal: AbortSignal.timeout(6000) });
+    const resp = await fetch(url, { signal: AbortSignal.timeout(12000) });
     if (!resp.ok) return null;
     const json = await resp.json();
     const obs = json.observations?.filter((o: { value: string }) => o.value !== '.');
@@ -55,7 +55,7 @@ async function fetchFREDSeries(seriesId: string): Promise<{ value: number; date:
 async function fetchYahooPrice(symbol: string) {
   try {
     const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5d`;
-    const resp = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(6000) });
+    const resp = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(12000) });
     if (!resp.ok) return null;
     const json = await resp.json();
     const meta = json.chart?.result?.[0]?.meta;

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const maxDuration = 30;
+
 // Cache for 4 hours
 let cache: { data: unknown; ts: number } | null = null;
 const CACHE_MS = 4 * 60 * 60 * 1000;
@@ -12,42 +14,48 @@ async function fetchStorageData(apiKey: string) {
     { series: 'WCSSTUS1', label: 'US Strategic (SPR)', capacity: 714000 },
   ];
 
-  const results = [];
+  // Batch all storage series in one EIA call
+  const seriesFacets = targets.map(t => `&facets[series][]=${t.series}`).join('');
+  try {
+    const url = `https://api.eia.gov/v2/petroleum/stoc/wstk/data/?api_key=${apiKey}&frequency=weekly&data[0]=value&facets[product][]=EPC0${seriesFacets}&sort[0][column]=period&sort[0][direction]=desc&length=20`;
+    const resp = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
+      signal: AbortSignal.timeout(15000),
+    });
+    const json = await resp.json();
+    const rows = json?.response?.data || [];
 
-  for (const { series, label, capacity } of targets) {
-    try {
-      const url = `https://api.eia.gov/v2/petroleum/stoc/wstk/data/?api_key=${apiKey}&frequency=weekly&data[0]=value&facets[product][]=EPC0&facets[series][]=${series}&sort[0][column]=period&sort[0][direction]=desc&length=5`;
-      const resp = await fetch(url, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
-        signal: AbortSignal.timeout(8000),
-      });
-      const json = await resp.json();
-      const rows = json?.response?.data || [];
+    const grouped: Record<string, { value: string; period: string }[]> = {};
+    for (const row of rows) {
+      const s = row.series;
+      if (!grouped[s]) grouped[s] = [];
+      grouped[s].push(row);
+    }
 
-      if (rows.length === 0) continue;
-
-      const currentKB = parseFloat(rows[0].value);
-      const prevKB = rows.length > 1 ? parseFloat(rows[1].value) : currentKB;
+    return targets.map(({ series, label, capacity }) => {
+      const seriesRows = grouped[series] || [];
+      if (seriesRows.length === 0) return null;
+      const currentKB = parseFloat(seriesRows[0].value);
+      const prevKB = seriesRows.length > 1 ? parseFloat(seriesRows[1].value) : currentKB;
       const currentMMB = currentKB / 1000;
       const weeklyChangeMMB = (currentKB - prevKB) / 1000;
       const capacityMMB = capacity / 1000;
       const utilization = (currentMMB / capacityMMB) * 100;
 
-      results.push({
+      return {
         location: label,
         current: Math.round(currentMMB * 10) / 10,
         capacity: capacityMMB,
         utilizationRate: Math.round(utilization * 10) / 10,
         weeklyChange: Math.round(weeklyChangeMMB * 10) / 10,
         unit: 'MMB',
-        lastUpdated: rows[0].period,
-      });
-    } catch (err) {
-      console.error(`EIA storage fetch error for ${label}:`, err);
-    }
+        lastUpdated: seriesRows[0].period,
+      };
+    }).filter((r): r is NonNullable<typeof r> => r !== null);
+  } catch (err) {
+    console.error('EIA storage batch fetch error:', err);
+    return [];
   }
-
-  return results;
 }
 
 // ── PADD Region Breakdown ───────────────────────────────────────────
@@ -68,7 +76,7 @@ async function fetchPADDData(apiKey: string) {
     const url = `https://api.eia.gov/v2/petroleum/stoc/wstk/data/?api_key=${apiKey}&frequency=weekly&data[0]=value&facets[product][]=EPC0${seriesFacets}&sort[0][column]=period&sort[0][direction]=desc&length=20`;
     const resp = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(15000),
     });
     const json = await resp.json();
     const rows = json?.response?.data || [];
@@ -116,7 +124,7 @@ async function fetchOilPrices() {
       const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=5d&interval=1d`;
       const resp = await fetch(url, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(15000),
       });
       const json = await resp.json();
       const meta = json?.chart?.result?.[0]?.meta;
@@ -159,9 +167,7 @@ export async function GET() {
       fetchOilPrices(),
     ]);
 
-    if (storage.length === 0 && prices.length === 0) {
-      return NextResponse.json({ error: 'Failed to fetch oil tracker data' }, { status: 502 });
-    }
+    // Don't 502 if we have at least some data (prices from Yahoo are fast)
 
     const data = {
       storage,

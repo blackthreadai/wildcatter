@@ -22,7 +22,7 @@ async function fetchEIAData(apiKey: string) {
 
   const resp = await fetch(url, {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
-    signal: AbortSignal.timeout(10000),
+    signal: AbortSignal.timeout(15000),
   });
 
   if (!resp.ok) throw new Error(`EIA API: ${resp.status}`);

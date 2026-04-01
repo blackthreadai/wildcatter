@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const maxDuration = 30;
+
 // Cache for 15 minutes (grid data is hourly)
 let cache: { data: unknown; ts: number } | null = null;
 const CACHE_MS = 15 * 60 * 1000;
