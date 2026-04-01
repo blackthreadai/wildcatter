@@ -27,8 +27,7 @@ interface WorldMapWidgetProps {
 
 export default function WorldMapWidget({ initialLayers = ['geopolitical'] }: WorldMapWidgetProps) {
   const [activeLayers, setActiveLayers] = useState<string[]>(initialLayers);
-  
-  console.log('🗺️ WorldMapWidget rendering with activeLayers:', activeLayers);
+  const [layerPanelOpen, setLayerPanelOpen] = useState(false);
 
   const layers = [
     { id: 'geopolitical', label: 'GEOPOLITICAL ALERTS', color: '#ef4444', disabled: false },
@@ -59,16 +58,38 @@ export default function WorldMapWidget({ initialLayers = ['geopolitical'] }: Wor
         {/* World Map Container - Full Size */}
         <WorldMap activeLayers={activeLayers} />
 
-        {/* Layer Control Panel - Overlay */}
+        {/* Layer Toggle Button - mobile only */}
+        <button
+          onClick={() => setLayerPanelOpen(!layerPanelOpen)}
+          className="absolute top-2 left-2 lg:hidden z-[1001] bg-black/80 border border-gray-600 rounded p-2 text-[#DAA520] hover:text-white transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+          </svg>
+        </button>
+
+        {/* Layer Control Panel - always visible on desktop, slide-out on mobile */}
         <div 
-          className="absolute top-0 left-0 w-64 border-r flex flex-col"
+          className={`absolute top-0 left-0 w-64 border-r flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+            layerPanelOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
           style={{ 
             zIndex: 1000,
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
             borderColor: '#333333',
             height: '100%'
           }}
         >
+          {/* Close button - mobile only */}
+          <button
+            onClick={() => setLayerPanelOpen(false)}
+            className="lg:hidden absolute top-2 right-2 text-gray-400 hover:text-white z-10"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
           {/* Scrollable Layers List */}
           <div className="h-full overflow-y-auto scrollbar-thin scrollbar-track-gray-800 scrollbar-thumb-gray-600">
             <div className="p-3 space-y-2">
