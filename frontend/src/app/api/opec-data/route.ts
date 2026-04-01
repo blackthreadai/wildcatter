@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const maxDuration = 30;
+
 // Cache for 12 hours
 let cache: { data: any; ts: number } | null = null;
 const CACHE_MS = 12 * 60 * 60 * 1000;
@@ -40,12 +42,13 @@ async function fetchProduction(): Promise<{ data: Record<string, { production: n
   const isos = ['SAU', 'RUS', 'IRQ', 'ARE', 'KWT', 'IRN', 'NGA', 'LBY', 'AGO', 'VEN', 'DZA', 'KAZ', 'OMN'];
   const countryFacets = isos.map(c => `&facets[countryRegionId][]=${c}`).join('');
   
-  const url = `https://api.eia.gov/v2/international/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[productId][]=57&facets[activityId][]=1${countryFacets}&sort[0][column]=period&sort[0][direction]=desc&length=50`;
+  // length=20 is enough: 13 countries x 1 latest record each = 13 rows needed
+  const url = `https://api.eia.gov/v2/international/data/?api_key=${apiKey}&frequency=monthly&data[0]=value&facets[productId][]=57&facets[activityId][]=1${countryFacets}&sort[0][column]=period&sort[0][direction]=desc&length=20`;
 
   try {
     const resp = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(25000),
     });
 
     if (!resp.ok) {

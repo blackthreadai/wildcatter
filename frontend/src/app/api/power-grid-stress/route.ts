@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 
 export const maxDuration = 30;
 
-// Cache for 15 minutes (grid data is hourly)
+// Cache for 30 minutes (EIA grid data is hourly, API is slow ~15s)
 let cache: { data: unknown; ts: number } | null = null;
-const CACHE_MS = 15 * 60 * 1000;
+const CACHE_MS = 30 * 60 * 1000;
 
 // Major US ISOs/RTOs with approximate peak capacity (MW)
 const GRID_REGIONS = [
@@ -28,11 +28,12 @@ async function fetchGridData(apiKey: string) {
   const respondentFacets = GRID_REGIONS.map(r => `&facets[respondent][]=${r.id}`).join('');
 
   // Fetch demand (D), demand forecast (DF), and net generation (NG)
-  const url = `https://api.eia.gov/v2/electricity/rto/region-data/data/?api_key=${apiKey}&frequency=hourly&data[0]=value${respondentFacets}&sort[0][column]=period&sort[0][direction]=desc&length=100`;
+  // Use length=50 (not 100) — we only need latest per type per region (7 regions x 3 types = 21 rows needed)
+  const url = `https://api.eia.gov/v2/electricity/rto/region-data/data/?api_key=${apiKey}&frequency=hourly&data[0]=value${respondentFacets}&sort[0][column]=period&sort[0][direction]=desc&length=50`;
 
   const resp = await fetch(url, {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EnergyTerminal/1.0)' },
-    signal: AbortSignal.timeout(12000),
+    signal: AbortSignal.timeout(25000),
   });
 
   if (!resp.ok) throw new Error(`EIA RTO API returned ${resp.status}`);
