@@ -184,12 +184,13 @@ function DraggableWidget({
   };
 
   // Generate span classes properly for Tailwind
+  // On mobile (single column), all widgets are col-span-1
   const getSpanClasses = () => {
     if (!widget.span) return '';
     
-    const colSpan = widget.span.col === 2 ? 'col-span-2' : 
-                   widget.span.col === 3 ? 'col-span-3' : '';
-    const rowSpan = widget.span.row === 2 ? 'row-span-2' : '';
+    const colSpan = widget.span.col === 2 ? 'md:col-span-2' : 
+                   widget.span.col === 3 ? 'lg:col-span-3 md:col-span-2' : '';
+    const rowSpan = widget.span.row === 2 ? 'md:row-span-2' : '';
     
     return `${colSpan} ${rowSpan}`.trim();
   };
@@ -301,7 +302,8 @@ export default function TerminalPage() {
   const [hoveredTooltip, setHoveredTooltip] = useState<string | null>(null);
 
   // Tailwind safelist for dynamic classes (ensures they're not purged)
-  // col-span-2 row-span-2 col-span-3
+  // col-span-2 row-span-2 col-span-3 md:col-span-2 md:row-span-2 lg:col-span-3
+  // sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -564,10 +566,22 @@ export default function TerminalPage() {
         /* Standardized Widget Grid */
         .widget-grid {
           display: grid;
-          grid-template-columns: repeat(5, 1fr);
+          grid-template-columns: 1fr;
           grid-auto-rows: minmax(400px, max-content);
-          gap: 1rem;
+          gap: 0.75rem;
           align-items: start;
+        }
+        @media (min-width: 640px) {
+          .widget-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+        }
+        @media (min-width: 1024px) {
+          .widget-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (min-width: 1280px) {
+          .widget-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        @media (min-width: 1536px) {
+          .widget-grid { grid-template-columns: repeat(5, 1fr); }
         }
         
         /* Consistent Widget Heights */
@@ -595,31 +609,30 @@ export default function TerminalPage() {
         }
       `}</style>
 
-      <div className="beta-warning-banner bg-red-600 border-b border-red-500 px-6 py-2 sticky top-0 z-[99999] w-full">
+      <div className="beta-warning-banner bg-red-600 border-b border-red-500 px-3 sm:px-6 py-2 sticky top-0 z-[99999] w-full">
         <div className="flex items-center justify-center text-center">
-          <div className="flex items-center gap-3">
-            <svg className="w-5 h-5 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 16h2v2h-2v-2zm0-6h2v4h-2v-4z"/>
             </svg>
-            <span className="text-white text-sm font-medium">
-              <strong>BETA WARNING:</strong> This terminal is in beta testing. All data should be independently verified before making financial or operational decisions. 
-              Not investment advice. Use at your own risk. Market data may be delayed or inaccurate.
+            <span className="text-white text-xs sm:text-sm font-medium">
+              <strong>BETA:</strong> <span className="hidden sm:inline">This terminal is in beta testing. </span>All data should be independently verified. Not investment advice.
             </span>
           </div>
         </div>
       </div>
 
-      <header className="bg-black border-b border-gray-800 px-6 py-4">
+      <header className="bg-black border-b border-gray-800 px-3 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-3">
-              <img src="/w-icon.svg" alt="W" className="w-8 h-8" />
-              <span className="text-[#DAA520] text-sm font-light tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>TERMINAL</span>
+          <div className="flex items-center gap-3 sm:gap-6 min-w-0">
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              <img src="/w-icon.svg" alt="W" className="w-6 h-6 sm:w-8 sm:h-8" />
+              <span className="text-[#DAA520] text-xs sm:text-sm font-light tracking-[0.2em]" style={{ fontStretch: 'condensed' }}>TERMINAL</span>
             </div>
 
-            <span className="text-gray-400 text-sm">v2.01</span>
-            <span className="text-gray-400 text-sm">|</span>
-            <div className="flex items-center gap-4 text-sm">
+            <span className="text-gray-400 text-xs sm:text-sm hidden sm:inline">v2.01</span>
+            <span className="text-gray-400 text-sm hidden md:inline">|</span>
+            <div className="hidden md:flex items-center gap-4 text-sm">
               <span className="text-gray-400 tracking-wider">MARKET SNAPSHOT</span>
               {marketData.map((item, i) => (
                 <div key={i} className="flex items-center gap-2">
@@ -633,7 +646,7 @@ export default function TerminalPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
             <div className="flex items-center gap-1 relative">
               <div className="relative">
                 <button 
@@ -742,35 +755,37 @@ export default function TerminalPage() {
       </header>
 
       <div className="h-[calc(100vh-115px)] relative">
-        <div className="bg-gray-800 border-b border-gray-700 py-2 px-6 pb-3">
-          <div className="flex items-center justify-center gap-8">
-            <span className="text-white text-sm font-thin tracking-[0.1em] uppercase" style={{ fontStretch: 'condensed' }}>
+        <div className="bg-gray-800 border-b border-gray-700 py-2 px-3 sm:px-6 pb-3">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-8">
+            <span className="text-white text-xs sm:text-sm font-thin tracking-[0.1em] uppercase" style={{ fontStretch: 'condensed' }}>
               {formatDateTime(currentTime)}
             </span>
-            <div 
-              className="flex items-center gap-1 text-xs font-bold tracking-[0.2em] border px-2 py-1" 
-              style={{ 
-                fontStretch: 'condensed', 
-                animation: defconStatus.level <= 3 ? 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite' : undefined,
-                color: defconStatus.color,
-                borderColor: defconStatus.color
-              }}
-            >
-              <span>DEFCON {defconStatus.level}</span>
+            <div className="flex items-center gap-4 sm:gap-8">
+              <div 
+                className="flex items-center gap-1 text-xs font-bold tracking-[0.2em] border px-2 py-1" 
+                style={{ 
+                  fontStretch: 'condensed', 
+                  animation: defconStatus.level <= 3 ? 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite' : undefined,
+                  color: defconStatus.color,
+                  borderColor: defconStatus.color
+                }}
+              >
+                <span>DEFCON {defconStatus.level}</span>
+              </div>
+              
+              <a 
+                href="https://wildcatter.com/login"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:flex items-center gap-2 text-xs text-gray-400 hover:text-[#DAA520] transition-colors cursor-pointer uppercase"
+                style={{ fontStretch: 'condensed' }}
+              >
+                <span>GET</span>
+                <img src="/w-icon.svg" alt="W" className="w-6 h-6" />
+                <span className="text-[#DAA520]">ENERGY INTELLIGENCE™</span>
+                <span>ON iOS</span>
+              </a>
             </div>
-            
-            <a 
-              href="https://wildcatter.com/login"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-xs text-gray-400 hover:text-[#DAA520] transition-colors cursor-pointer uppercase"
-              style={{ fontStretch: 'condensed' }}
-            >
-              <span>GET</span>
-              <img src="/w-icon.svg" alt="W" className="w-6 h-6" />
-              <span className="text-[#DAA520]">ENERGY INTELLIGENCE™</span>
-              <span>ON iOS</span>
-            </a>
           </div>
         </div>
 
@@ -785,7 +800,7 @@ export default function TerminalPage() {
               strategy={rectSortingStrategy}
             >
               <div 
-                className="grid grid-cols-5 gap-4 h-full overflow-y-auto p-4"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 h-full overflow-y-auto p-2 sm:p-4"
                 style={{
                   gridAutoRows: 'minmax(420px, max-content)',
                   alignItems: 'start',
