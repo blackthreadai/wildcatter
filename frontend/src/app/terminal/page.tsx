@@ -797,7 +797,7 @@ export default function TerminalPage() {
 
       <div className="h-[calc(100vh-115px)] relative">
         <div className="bg-gray-800 border-b border-gray-700 py-2 px-3 sm:px-6 pb-3">
-          <div className="flex flex-row items-center justify-center gap-3 sm:gap-8">
+          <div className="flex flex-row items-center justify-center gap-6 sm:gap-8">
             <span className="text-white text-xs sm:text-sm font-thin tracking-[0.1em] uppercase" style={{ fontStretch: 'condensed' }}>
               <span className="hidden sm:inline">{formatDateTime(currentTime)}</span>
               <span className="sm:hidden">{formatDateTimeMobile(currentTime)}</span>
