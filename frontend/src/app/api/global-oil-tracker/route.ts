@@ -151,7 +151,7 @@ export async function GET() {
     }
 
     let eiaApiKey: string | undefined;
-    try { eiaApiKey = process.env.EIA_API_KEY; } catch { /* */ }
+    try { eiaApiKey = process.env.EIA_API_KEY || 'VhDcsSa1FuMvhz8ZAG5yWQEnGy5xXadKrUOP2qYj'; } catch { /* */ }
 
     const [storage, padds, prices] = await Promise.all([
       eiaApiKey ? fetchStorageData(eiaApiKey) : Promise.resolve([]),

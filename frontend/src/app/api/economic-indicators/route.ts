@@ -78,7 +78,7 @@ async function fetchFREDSeries(seriesId: string, limit: number = 2): Promise<any
     let fredApiKey: string | undefined;
     
     try {
-      fredApiKey = process.env.FRED_API_KEY;
+      fredApiKey = process.env.FRED_API_KEY || '61cf53e2891a727efe4e48f18f6545f2';
     } catch (envError) {
       console.error(`❌ Environment variable access error for ${seriesId}:`, envError);
       return [];

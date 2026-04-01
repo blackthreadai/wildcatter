@@ -24,7 +24,7 @@ async function fetchEIASPRData(): Promise<SPRResponse | null> {
     let eiaApiKey: string | undefined;
     
     try {
-      eiaApiKey = process.env.EIA_API_KEY;
+      eiaApiKey = process.env.EIA_API_KEY || 'VhDcsSa1FuMvhz8ZAG5yWQEnGy5xXadKrUOP2qYj';
     } catch (envError) {
       console.error('❌ Environment variable access error for EIA_API_KEY:', envError);
       return null;

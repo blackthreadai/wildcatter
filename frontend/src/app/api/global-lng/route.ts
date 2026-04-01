@@ -96,7 +96,7 @@ export async function GET() {
       return NextResponse.json(cache.data);
     }
 
-    const apiKey = process.env.EIA_API_KEY;
+    const apiKey = process.env.EIA_API_KEY || 'VhDcsSa1FuMvhz8ZAG5yWQEnGy5xXadKrUOP2qYj';
 
     // Fetch prices and EIA data in parallel
     const [hh, ttf, jkm, exports, imports] = await Promise.all([

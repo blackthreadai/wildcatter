@@ -33,7 +33,7 @@ const MEETINGS_2026 = [
 // Fetch OPEC production from EIA International API (one call, tight timeout)
 async function fetchProduction(): Promise<{ data: Record<string, { production: number; period: string }>; debug: string }> {
   let apiKey: string | undefined;
-  try { apiKey = process.env.EIA_API_KEY; } catch { return { data: {}, debug: 'env error' }; }
+  try { apiKey = process.env.EIA_API_KEY || 'VhDcsSa1FuMvhz8ZAG5yWQEnGy5xXadKrUOP2qYj'; } catch { return { data: {}, debug: 'env error' }; }
   if (!apiKey) return { data: {}, debug: 'no key' };
 
   // Use only the top producers to keep response small and fast

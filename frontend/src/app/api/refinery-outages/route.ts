@@ -133,7 +133,7 @@ export async function GET() {
       return NextResponse.json(cache.data);
     }
 
-    const apiKey = process.env.EIA_API_KEY;
+    const apiKey = process.env.EIA_API_KEY || 'VhDcsSa1FuMvhz8ZAG5yWQEnGy5xXadKrUOP2qYj';
     if (!apiKey) {
       return NextResponse.json({ error: 'EIA API key not configured' }, { status: 502 });
     }
