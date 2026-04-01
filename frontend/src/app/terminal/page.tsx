@@ -797,37 +797,35 @@ export default function TerminalPage() {
 
       <div className="h-[calc(100vh-115px)] relative">
         <div className="bg-gray-800 border-b border-gray-700 py-2 px-3 sm:px-6 pb-3">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-8">
+          <div className="flex flex-row items-center justify-center gap-3 sm:gap-8">
             <span className="text-white text-xs sm:text-sm font-thin tracking-[0.1em] uppercase" style={{ fontStretch: 'condensed' }}>
               <span className="hidden sm:inline">{formatDateTime(currentTime)}</span>
               <span className="sm:hidden">{formatDateTimeMobile(currentTime)}</span>
             </span>
-            <div className="flex items-center gap-4 sm:gap-8">
-              <div 
-                className="flex items-center gap-1 text-xs font-bold tracking-[0.2em] border px-2 py-1" 
-                style={{ 
-                  fontStretch: 'condensed', 
-                  animation: defconStatus.level <= 3 ? 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite' : undefined,
-                  color: defconStatus.color,
-                  borderColor: defconStatus.color
-                }}
-              >
-                <span>DEFCON {defconStatus.level}</span>
-              </div>
-              
-              <a 
-                href="https://wildcatter.com/login"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden sm:flex items-center gap-2 text-xs text-gray-400 hover:text-[#DAA520] transition-colors cursor-pointer uppercase"
-                style={{ fontStretch: 'condensed' }}
-              >
-                <span>GET</span>
-                <img src="/w-icon.svg" alt="W" className="w-6 h-6" />
-                <span className="text-[#DAA520]">ENERGY INTELLIGENCE™</span>
-                <span>ON iOS</span>
-              </a>
+            <div 
+              className="flex items-center gap-1 text-xs font-bold tracking-[0.2em] border px-2 py-1" 
+              style={{ 
+                fontStretch: 'condensed', 
+                animation: defconStatus.level <= 3 ? 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite' : undefined,
+                color: defconStatus.color,
+                borderColor: defconStatus.color
+              }}
+            >
+              <span>DEFCON {defconStatus.level}</span>
             </div>
+            
+            <a 
+              href="https://wildcatter.com/login"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:flex items-center gap-2 text-xs text-gray-400 hover:text-[#DAA520] transition-colors cursor-pointer uppercase"
+              style={{ fontStretch: 'condensed' }}
+            >
+              <span>GET</span>
+              <img src="/w-icon.svg" alt="W" className="w-6 h-6" />
+              <span className="text-[#DAA520]">ENERGY INTELLIGENCE™</span>
+              <span>ON iOS</span>
+            </a>
           </div>
         </div>
 
@@ -863,6 +861,19 @@ export default function TerminalPage() {
               </div>
             </SortableContext>
           </DndContext>
+        </div>
+      </div>
+
+      <div className="bg-red-600 border-t border-red-500 px-3 sm:px-6 py-2 w-full">
+        <div className="flex items-center justify-center text-center">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 16h2v2h-2v-2zm0-6h2v4h-2v-4z"/>
+            </svg>
+            <span className="text-white text-xs sm:text-sm font-medium">
+              <strong>BETA:</strong> <span className="hidden sm:inline">This terminal is in beta testing. </span>All data should be independently verified. Not investment advice.
+            </span>
+          </div>
         </div>
       </div>
 
