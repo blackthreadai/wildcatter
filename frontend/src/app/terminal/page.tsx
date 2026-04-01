@@ -490,6 +490,16 @@ export default function TerminalPage() {
     });
   };
 
+  const formatDateTimeMobile = (date: Date) => {
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const yy = String(date.getFullYear()).slice(-2);
+    const h = String(date.getHours()).padStart(2, '0');
+    const m = String(date.getMinutes()).padStart(2, '0');
+    const tz = date.toLocaleTimeString('en-US', { timeZoneName: 'short' }).split(' ').pop();
+    return `${mm}/${dd}/${yy} ${h}:${m} ${tz}`;
+  };
+
   return (
     <div className="min-h-screen bg-gray-950">
       <style jsx global>{`
@@ -789,7 +799,8 @@ export default function TerminalPage() {
         <div className="bg-gray-800 border-b border-gray-700 py-2 px-3 sm:px-6 pb-3">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-8">
             <span className="text-white text-xs sm:text-sm font-thin tracking-[0.1em] uppercase" style={{ fontStretch: 'condensed' }}>
-              {formatDateTime(currentTime)}
+              <span className="hidden sm:inline">{formatDateTime(currentTime)}</span>
+              <span className="sm:hidden">{formatDateTimeMobile(currentTime)}</span>
             </span>
             <div className="flex items-center gap-4 sm:gap-8">
               <div 
