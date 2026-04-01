@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 
 // Cache for 2 hours
-let cache: { data: unknown; ts: number } | null = null;
+let cache: { data: unknown; ts: number; ver: number } | null = null;
 const CACHE_MS = 2 * 60 * 60 * 1000;
+const CACHE_VER = 2;
+const EIA_KEY = process.env.EIA_API_KEY || 'VhDcsSa1FuMvhz8ZAG5yWQEnGy5xXadKrUOP2qYj';
 
 // ── EIA Weekly Storage ──────────────────────────────────────────────
 async function fetchEIAStorage(apiKey: string) {
@@ -16,9 +18,17 @@ async function fetchEIAStorage(apiKey: string) {
     { series: 'NW2_EPG0_SWO_R33_BCF', region: 'Pacific' },
   ];
 
-  const results = [];
+  const capacityMap: Record<string, number> = {
+    'US Lower 48': 4900,
+    'East': 1028,
+    'Midwest': 1143,
+    'South Central': 1472,
+    'Mountain': 174,
+    'Pacific': 83,
+  };
 
-  for (const { series, region } of seriesIds) {
+  // Fetch all regions in parallel instead of sequentially
+  const results = await Promise.all(seriesIds.map(async ({ series, region }) => {
     try {
       const url = `https://api.eia.gov/v2/natural-gas/stor/wkly/data/?api_key=${apiKey}&frequency=weekly&data[0]=value&facets[process][]=SWO&facets[series][]=${series}&sort[0][column]=period&sort[0][direction]=desc&length=60`;
       const resp = await fetch(url, {
@@ -28,39 +38,22 @@ async function fetchEIAStorage(apiKey: string) {
       const json = await resp.json();
       const rows = json?.response?.data || [];
 
-      if (rows.length === 0) continue;
+      if (rows.length === 0) return null;
 
       const current = parseFloat(rows[0].value);
       const currentPeriod = rows[0].period;
-
-      // Weekly change = current - previous week
       const prevWeek = rows.length > 1 ? parseFloat(rows[1].value) : null;
       const weeklyChange = prevWeek !== null ? current - prevWeek : 0;
-
-      // Year ago = find row ~52 weeks back
       const yearAgoRow = rows.find((_: unknown, i: number) => i >= 50 && i <= 54);
       const yearAgoLevel = yearAgoRow ? parseFloat(yearAgoRow.value) : current;
-
-      // 5-year avg = average of values at ~52, ~104, ~156, ~208, ~260 weeks back (approx)
-      // We only have 60 rows, so use what we can
       const fiveYearValues = rows.filter((_: unknown, i: number) => i >= 50 && i <= 55).map((r: { value: string }) => parseFloat(r.value));
       const fiveYearAvg = fiveYearValues.length > 0
         ? fiveYearValues.reduce((a: number, b: number) => a + b, 0) / fiveYearValues.length
         : current;
-
-      // Capacity estimates (EIA doesn't expose exact capacity, use known values)
-      const capacityMap: Record<string, number> = {
-        'US Lower 48': 4900,
-        'East': 1028,
-        'Midwest': 1143,
-        'South Central': 1472,
-        'Mountain': 174,
-        'Pacific': 83,
-      };
       const capacity = capacityMap[region] || 4900;
       const utilizationRate = (current / capacity) * 100;
 
-      results.push({
+      return {
         region,
         current: Math.round(current),
         capacity,
@@ -70,13 +63,14 @@ async function fetchEIAStorage(apiKey: string) {
         fiveYearAvg: Math.round(fiveYearAvg),
         unit: 'BCF',
         lastUpdated: currentPeriod,
-      });
+      };
     } catch (err) {
       console.error(`EIA storage fetch error for ${region}:`, err);
+      return null;
     }
-  }
+  }));
 
-  return results;
+  return results.filter((r): r is NonNullable<typeof r> => r !== null);
 }
 
 // ── EU Storage from AGSI (GIE) ─────────────────────────────────────
@@ -208,12 +202,11 @@ async function fetchLNG(apiKey: string) {
 // ── Main handler ────────────────────────────────────────────────────
 export async function GET() {
   try {
-    if (cache && Date.now() - cache.ts < CACHE_MS) {
+    if (cache && cache.ver === CACHE_VER && Date.now() - cache.ts < CACHE_MS) {
       return NextResponse.json(cache.data);
     }
 
-    let eiaApiKey: string | undefined;
-    try { eiaApiKey = process.env.EIA_API_KEY; } catch { /* */ }
+    const eiaApiKey = EIA_KEY;
 
     // Fetch all data in parallel
     const [storageUS, storageEU, prices, lng] = await Promise.all([
@@ -243,7 +236,7 @@ export async function GET() {
       source: 'EIA / Yahoo Finance / AGSI',
     };
 
-    cache = { data, ts: Date.now() };
+    cache = { data, ts: Date.now(), ver: CACHE_VER };
     return NextResponse.json(data);
 
   } catch (error) {
