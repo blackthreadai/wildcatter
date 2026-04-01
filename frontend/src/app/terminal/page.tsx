@@ -97,11 +97,15 @@ const defaultWidgets: Widget[] = [
 function DraggableWidget({ 
   widget, 
   isHidden, 
-  onToggleVisibility 
+  onToggleVisibility,
+  onRefresh,
+  refreshKey,
 }: { 
   widget: Widget;
   isHidden: boolean;
   onToggleVisibility: (widgetId: string) => void;
+  onRefresh: (widgetId: string) => void;
+  refreshKey: number;
 }) {
   const [widgetTooltip, setWidgetTooltip] = useState<string | null>(null);
   
@@ -219,6 +223,28 @@ function DraggableWidget({
           <button
             onClick={(e) => {
               e.stopPropagation();
+              onRefresh(widget.id);
+            }}
+            onMouseEnter={() => setWidgetTooltip('refresh')}
+            onMouseLeave={() => setWidgetTooltip(null)}
+            className="text-[#DAA520] pointer-events-auto p-1 hover:text-white transition-colors"
+          >
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
+          {widgetTooltip === 'refresh' && (
+            <div className="absolute top-full right-0 mt-2 px-3 py-2 bg-black text-[#DAA520] text-xs font-medium whitespace-nowrap z-50 rounded border border-[#DAA520]">
+              Refresh Module
+              <div className="absolute bottom-full right-2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-[#DAA520]"></div>
+            </div>
+          )}
+        </div>
+
+        <div className="relative">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
               onToggleVisibility(widget.id);
             }}
             onMouseEnter={() => setWidgetTooltip('visibility')}
@@ -280,7 +306,7 @@ function DraggableWidget({
         </div>
       )}
       
-      <div className="h-full w-full overflow-hidden relative">
+      <div className="h-full w-full overflow-hidden relative" key={`${widget.id}-${refreshKey}`}>
         {renderWidget()}
       </div>
     </div>
@@ -300,6 +326,11 @@ export default function TerminalPage() {
   const [showHidden, setShowHidden] = useState(false);
   const [showHomepagePopup, setShowHomepagePopup] = useState(false);
   const [hoveredTooltip, setHoveredTooltip] = useState<string | null>(null);
+  const [refreshKeys, setRefreshKeys] = useState<Record<string, number>>({});
+
+  const handleRefreshWidget = (widgetId: string) => {
+    setRefreshKeys(prev => ({ ...prev, [widgetId]: (prev[widgetId] || 0) + 1 }));
+  };
 
   // Tailwind safelist for dynamic classes (ensures they're not purged)
   // col-span-2 row-span-2 col-span-3 md:col-span-2 md:row-span-2 lg:col-span-3
@@ -814,6 +845,8 @@ export default function TerminalPage() {
                     widget={widget}
                     isHidden={hiddenWidgets.includes(widget.id)}
                     onToggleVisibility={toggleWidgetVisibility}
+                    onRefresh={handleRefreshWidget}
+                    refreshKey={refreshKeys[widget.id] || 0}
                   />
                 ))}
               </div>
