@@ -4,9 +4,10 @@ export const maxDuration = 20;
 
 let cache: { data: unknown; ts: number; ver: number } | null = null;
 const CACHE_MS = 6 * 60 * 60 * 1000;
-const CACHE_VER = 3; // bump to bust cache on deploy
+const CACHE_VER = 4; // bump to bust cache on deploy
 
 const FRED_KEY = process.env.FRED_API_KEY || '61cf53e2891a727efe4e48f18f6545f2';
+const EIA_KEY = process.env.EIA_API_KEY || 'VhDcsSa1FuMvhz8ZAG5yWQEnGy5xXadKrUOP2qYj';
 
 // ── EIA: US Product Supplied (demand proxy) by product ──────────────
 async function fetchUSProductSupplied(apiKey: string) {
@@ -144,7 +145,7 @@ export async function GET() {
       return NextResponse.json(cache.data);
     }
 
-    const eiaKey = process.env.EIA_API_KEY;
+    const eiaKey = EIA_KEY;
 
     // Fetch all data in parallel
     const [usSupplied, intlData, usPMI, cnPMI, bdi, indProd] = await Promise.all([
