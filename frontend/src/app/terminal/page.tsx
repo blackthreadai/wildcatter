@@ -859,21 +859,20 @@ export default function TerminalPage() {
                   />
                 ))}
               </div>
+              <div className="col-span-full bg-red-600 border-t border-red-500 px-3 sm:px-6 py-2 w-full mt-2">
+                <div className="flex items-center justify-center text-center">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 16h2v2h-2v-2zm0-6h2v4h-2v-4z"/>
+                    </svg>
+                    <span className="text-white text-xs sm:text-sm font-medium">
+                      <strong>BETA:</strong> <span className="hidden sm:inline">This terminal is in beta testing. </span>All data should be independently verified. Not investment advice.
+                    </span>
+                  </div>
+                </div>
+              </div>
             </SortableContext>
           </DndContext>
-        </div>
-      </div>
-
-      <div className="bg-red-600 border-t border-red-500 px-3 sm:px-6 py-2 w-full">
-        <div className="flex items-center justify-center text-center">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99zM11 16h2v2h-2v-2zm0-6h2v4h-2v-4z"/>
-            </svg>
-            <span className="text-white text-xs sm:text-sm font-medium">
-              <strong>BETA:</strong> <span className="hidden sm:inline">This terminal is in beta testing. </span>All data should be independently verified. Not investment advice.
-            </span>
-          </div>
         </div>
       </div>
 
