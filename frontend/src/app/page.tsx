@@ -83,11 +83,11 @@ export default function LandingPage() {
         </div>
 
         {/* Stats - bottom of hero */}
-        <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-16 py-10 border-t border-white/[0.06]">
+        <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-16 py-10 border-t border-b border-white/[0.06]">
           {[
             { num: '4', label: 'Independent Apps' },
             { num: '24/7', label: 'Real-Time Updates' },
-            { num: '1 Million+', label: 'Energy Industry Assets' },
+            { num: '1 MILLION+', label: 'Energy Industry Assets' },
           ].map((s, i) => (
             <div key={i} className="text-center">
               <div className="text-4xl font-extralight text-[#DAA520] tracking-[2px]">{s.num}</div>
