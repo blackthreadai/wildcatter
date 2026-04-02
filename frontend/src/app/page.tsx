@@ -1,9 +1,12 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function LandingPage() {
   const router = useRouter();
+  const [contactForm, setContactForm] = useState({ name: '', email: '', company: '', message: '' });
+  const [contactSent, setContactSent] = useState(false);
 
   return (
     <div className="min-h-screen text-gray-200 antialiased relative">
@@ -34,6 +37,7 @@ export default function LandingPage() {
         <div className="flex items-center gap-8">
           <a href="#products" className="text-[13px] tracking-[1px] uppercase text-gray-500 hover:text-gray-200 transition-colors">Products</a>
           <a href="#pricing" className="text-[13px] tracking-[1px] uppercase text-gray-500 hover:text-gray-200 transition-colors">Pricing</a>
+          <a href="#contact" className="text-[13px] tracking-[1px] uppercase text-gray-500 hover:text-gray-200 transition-colors">Contact</a>
         </div>
         <div className="flex items-center gap-4">
           <button
@@ -228,6 +232,85 @@ export default function LandingPage() {
         >
           Open Terminal
         </button>
+      </section>
+
+      {/* Contact */}
+      <section id="contact" className="py-24 px-12 border-t border-white/[0.06]">
+        <div className="max-w-[600px] mx-auto">
+          <div className="text-[10px] font-medium tracking-[3px] uppercase text-[#DAA520] mb-4 text-center">Contact</div>
+          <h2 className="text-[40px] font-extralight tracking-[4px] uppercase text-white mb-4 text-center">Get in touch</h2>
+          <p className="text-base font-light text-gray-500 text-center mb-12">
+            Questions, partnerships, or enterprise inquiries. We&apos;ll get back to you within 24 hours.
+          </p>
+
+          {contactSent ? (
+            <div className="text-center py-16">
+              <div className="text-[#DAA520] text-lg font-light mb-2">Message sent.</div>
+              <p className="text-sm text-gray-500">We&apos;ll be in touch shortly.</p>
+            </div>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                // TODO: wire to API endpoint
+                setContactSent(true);
+              }}
+              className="space-y-5"
+            >
+              <div className="grid grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-[11px] tracking-[2px] uppercase text-gray-500 mb-2">Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={contactForm.name}
+                    onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                    className="w-full bg-[#111] border border-white/[0.07] rounded-lg px-4 py-3 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-[#DAA520]/50 transition-colors"
+                    placeholder="Your name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] tracking-[2px] uppercase text-gray-500 mb-2">Email</label>
+                  <input
+                    type="email"
+                    required
+                    value={contactForm.email}
+                    onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                    className="w-full bg-[#111] border border-white/[0.07] rounded-lg px-4 py-3 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-[#DAA520]/50 transition-colors"
+                    placeholder="you@company.com"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-[11px] tracking-[2px] uppercase text-gray-500 mb-2">Company</label>
+                <input
+                  type="text"
+                  value={contactForm.company}
+                  onChange={(e) => setContactForm({ ...contactForm, company: e.target.value })}
+                  className="w-full bg-[#111] border border-white/[0.07] rounded-lg px-4 py-3 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-[#DAA520]/50 transition-colors"
+                  placeholder="Company name (optional)"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] tracking-[2px] uppercase text-gray-500 mb-2">Message</label>
+                <textarea
+                  required
+                  rows={5}
+                  value={contactForm.message}
+                  onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                  className="w-full bg-[#111] border border-white/[0.07] rounded-lg px-4 py-3 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-[#DAA520]/50 transition-colors resize-none"
+                  placeholder="How can we help?"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full py-3.5 bg-[#DAA520] text-[#0a0a0a] rounded-lg text-xs font-semibold tracking-[2px] uppercase hover:bg-[#c4941c] transition-all"
+              >
+                Send Message
+              </button>
+            </form>
+          )}
+        </div>
       </section>
 
       {/* Footer */}
