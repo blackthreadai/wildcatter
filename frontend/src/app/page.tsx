@@ -11,9 +11,9 @@ export default function LandingPage() {
       <div
         className="fixed inset-0 -z-10"
         style={{
-          background: 'linear-gradient(-45deg, #0a0a0a, #0f0f0f, #0a0a0a, #111111, #0a0a0a, #0d0d0d, #080808, #0a0a0a)',
-          backgroundSize: '400% 400%',
-          animation: 'gradientShift 25s ease infinite',
+          background: 'linear-gradient(-45deg, #0a0a0a, #110f08, #0a0a0a, #0d0b06, #0a0a0a, #12100a, #080808, #0f0c07, #0a0a0a, #0e0c08, #080808, #0a0a0a)',
+          backgroundSize: '600% 600%',
+          animation: 'gradientShift 30s ease infinite',
         }}
       />
       <style>{`
