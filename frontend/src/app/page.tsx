@@ -50,9 +50,8 @@ export default function LandingPage() {
         <div className="text-[10px] font-medium tracking-[3px] uppercase text-[#DAA520] border border-[#DAA520]/30 rounded-full px-5 py-1.5 mb-10 relative">
           Energy Intelligence Platform
         </div>
-        {/* HERO TEXT - swap in your pick */}
         <h1 className="text-[52px] font-extralight tracking-[6px] uppercase text-white leading-[1.15] mb-5 relative max-w-[800px]">
-          Know the <span className="text-[#DAA520] font-light">market</span><br />before it moves
+          Energy <span className="text-[#DAA520] font-light">intelligence</span><br />delivered
         </h1>
         <p className="text-lg font-light text-gray-500 max-w-[560px] mb-12 tracking-[0.5px] relative">
           Real-time energy data, operational tools, and market intelligence built for professionals who move fast.
