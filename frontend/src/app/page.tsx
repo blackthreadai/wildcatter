@@ -62,7 +62,7 @@ export default function LandingPage() {
           YOUR EDGE IS IN THE DATA
         </div>
         <h1 className="text-[48px] font-extralight tracking-[3px] text-white leading-[1.15] mb-5 relative whitespace-nowrap">
-          Energy intelligence.&nbsp; <span className="text-[#DAA520] font-light">Delivered.</span>
+          Energy intelligence. <span className="text-[#DAA520] font-light">Delivered.</span>
         </h1>
         <p className="text-lg font-light text-gray-500 max-w-[560px] mb-12 tracking-[0.5px] relative">
           Real-time energy data, operational tools, and market intelligence built for professionals who move fast.
