@@ -53,12 +53,12 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-[100px] pb-0 relative">
+      <section className="min-h-screen flex flex-col items-center text-center px-6 pt-[100px] pb-0 relative" style={{ justifyContent: 'start', paddingTop: 'calc(50vh - 200px)' }}>
         <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(218,165,32,0.06) 0%, transparent 70%)' }} />
         <div className="text-[10px] font-medium tracking-[3px] uppercase text-[#DAA520] border border-[#DAA520]/30 rounded-full px-5 py-1.5 mb-10 relative">
-          Energy Intelligence Platform
+          YOUR EDGE IS IN THE DATA
         </div>
-        <h1 className="text-[52px] font-extralight tracking-[6px] uppercase text-white leading-[1.15] mb-5 relative max-w-[800px]">
+        <h1 className="text-[52px] font-extralight tracking-[4px] text-white leading-[1.15] mb-5 relative max-w-[800px]">
           Energy intelligence.<br /><span className="text-[#DAA520] font-light">Delivered.</span>
         </h1>
         <p className="text-lg font-light text-gray-500 max-w-[560px] mb-12 tracking-[0.5px] relative">
