@@ -7,6 +7,7 @@ export default function LandingPage() {
   const router = useRouter();
   const [contactForm, setContactForm] = useState({ name: '', email: '', company: '', message: '' });
   const [contactSent, setContactSent] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen text-gray-200 antialiased relative">
@@ -28,18 +29,21 @@ export default function LandingPage() {
           100% { background-position: 0% 50%; }
         }
       `}</style>
+
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-12 py-4 bg-[#0a0a0a]/85 backdrop-blur-xl border-b border-white/[0.06]">
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 md:px-12 py-4 bg-[#0a0a0a]/85 backdrop-blur-xl border-b border-white/[0.06]">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 border-[1.5px] border-[#DAA520] rounded-md flex items-center justify-center text-[#DAA520] font-bold text-base">W</div>
           <span className="text-[14px] font-light tracking-[2.8px] uppercase text-[#DAA520]">Wildcatter</span>
         </div>
-        <div className="flex items-center gap-8">
+
+        {/* Desktop nav */}
+        <div className="hidden md:flex items-center gap-8">
           <a href="#products" className="text-[13px] tracking-[1px] uppercase text-gray-500 hover:text-gray-200 transition-colors">Products</a>
           <a href="#pricing" className="text-[13px] tracking-[1px] uppercase text-gray-500 hover:text-gray-200 transition-colors">Pricing</a>
           <a href="#contact" className="text-[13px] tracking-[1px] uppercase text-gray-500 hover:text-gray-200 transition-colors">Contact</a>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-4">
           <button
             onClick={() => router.push('/login')}
             className="text-[13px] tracking-[1px] uppercase text-gray-500 hover:text-gray-200 transition-colors"
@@ -53,21 +57,46 @@ export default function LandingPage() {
             Get Started
           </button>
         </div>
+
+        {/* Mobile hamburger */}
+        <button
+          className="md:hidden flex flex-col gap-1.5 p-2"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span className={`block w-5 h-[1.5px] bg-[#DAA520] transition-transform ${menuOpen ? 'rotate-45 translate-y-[4.5px]' : ''}`} />
+          <span className={`block w-5 h-[1.5px] bg-[#DAA520] transition-opacity ${menuOpen ? 'opacity-0' : ''}`} />
+          <span className={`block w-5 h-[1.5px] bg-[#DAA520] transition-transform ${menuOpen ? '-rotate-45 -translate-y-[4.5px]' : ''}`} />
+        </button>
       </nav>
 
+      {/* Mobile menu overlay */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl pt-20 px-6 md:hidden">
+          <div className="flex flex-col gap-6 py-8">
+            <a href="#products" onClick={() => setMenuOpen(false)} className="text-lg tracking-[2px] uppercase text-gray-300">Products</a>
+            <a href="#pricing" onClick={() => setMenuOpen(false)} className="text-lg tracking-[2px] uppercase text-gray-300">Pricing</a>
+            <a href="#contact" onClick={() => setMenuOpen(false)} className="text-lg tracking-[2px] uppercase text-gray-300">Contact</a>
+            <div className="border-t border-white/[0.06] pt-6 flex flex-col gap-4">
+              <button onClick={() => { router.push('/login'); setMenuOpen(false); }} className="text-lg tracking-[2px] uppercase text-gray-500">Login</button>
+              <button onClick={() => { router.push('/register'); setMenuOpen(false); }} className="py-3 border border-[#DAA520] rounded-lg text-[#DAA520] text-sm tracking-[2px] uppercase font-medium">Get Started</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hero */}
-      <section className="min-h-screen flex flex-col items-center text-center px-6 pt-[100px] pb-0 relative" style={{ justifyContent: 'start', paddingTop: 'calc(50vh - 200px)' }}>
+      <section className="min-h-screen flex flex-col items-center text-center px-5 md:px-6 pt-[100px] pb-0 relative" style={{ justifyContent: 'start', paddingTop: 'calc(50vh - 200px)' }}>
         <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(218,165,32,0.06) 0%, transparent 70%)' }} />
-        <div className="text-[10px] font-medium tracking-[3px] uppercase text-[#DAA520] border border-[#DAA520]/30 rounded-full px-5 py-1.5 mb-10 relative">
+        <div className="text-[9px] md:text-[10px] font-medium tracking-[3px] uppercase text-[#DAA520] border border-[#DAA520]/30 rounded-full px-5 py-1.5 mb-8 md:mb-10 relative">
           YOUR EDGE IS IN THE DATA
         </div>
-        <h1 className="text-[48px] font-extralight tracking-[3px] text-white leading-[1.15] mb-5 relative whitespace-nowrap">
+        <h1 className="text-[28px] sm:text-[36px] md:text-[48px] font-extralight tracking-[2px] md:tracking-[3px] text-white leading-[1.2] mb-4 md:mb-5 relative">
           Energy intelligence. <span className="text-[#DAA520] font-light">Delivered.</span>
         </h1>
-        <p className="text-lg font-light text-gray-500 max-w-[560px] mb-12 tracking-[0.5px] relative">
+        <p className="text-base md:text-lg font-light text-gray-500 max-w-[560px] mb-10 md:mb-12 tracking-[0.5px] relative px-2">
           Real-time energy data, operational tools, and market intelligence built for professionals who move fast.
         </p>
-        <div className="flex gap-4 relative">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 relative w-full sm:w-auto px-4 sm:px-0">
           <button
             onClick={() => router.push('/register')}
             className="px-10 py-3.5 bg-[#DAA520] text-[#0a0a0a] rounded-lg text-[13px] font-semibold tracking-[2px] uppercase hover:bg-[#c4941c] transition-all"
@@ -76,39 +105,39 @@ export default function LandingPage() {
           </button>
           <a
             href="#products"
-            className="px-10 py-3.5 border border-gray-700 text-gray-200 rounded-lg text-[13px] tracking-[2px] uppercase hover:border-gray-500 transition-all"
+            className="px-10 py-3.5 border border-gray-700 text-gray-200 rounded-lg text-[13px] tracking-[2px] uppercase hover:border-gray-500 transition-all text-center"
           >
             View Products
           </a>
         </div>
 
         {/* Stats - bottom of hero */}
-        <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-16 py-10 border-t border-b border-white/[0.06]">
+        <div className="absolute bottom-0 left-0 right-0 flex flex-col sm:flex-row justify-center items-center gap-6 sm:gap-16 py-6 sm:py-10 border-t border-b border-white/[0.06]">
           {[
             { num: '4', label: 'Independent Apps' },
             { num: '24/7', label: 'Real-Time Updates' },
             { num: '1 MILLION+', label: 'Energy Industry Assets' },
           ].map((s, i) => (
             <div key={i} className="text-center">
-              <div className="text-4xl font-extralight text-[#DAA520] tracking-[2px]">{s.num}</div>
-              <div className="text-[11px] text-gray-600 tracking-[2px] uppercase mt-1">{s.label}</div>
+              <div className="text-2xl sm:text-4xl font-extralight text-[#DAA520] tracking-[2px]">{s.num}</div>
+              <div className="text-[10px] sm:text-[11px] text-gray-600 tracking-[2px] uppercase mt-1">{s.label}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* Products */}
-      <section id="products" className="py-24 px-12 max-w-[1100px] mx-auto">
+      <section id="products" className="py-16 md:py-24 px-5 md:px-12 max-w-[1100px] mx-auto">
         <div className="text-[10px] font-medium tracking-[3px] uppercase text-[#DAA520] mb-4">Products</div>
-        <h2 className="text-[40px] font-extralight tracking-[4px] uppercase text-white mb-4">Four apps, one platform</h2>
-        <p className="text-base font-light text-gray-500 max-w-[520px] mb-12">
+        <h2 className="text-[28px] md:text-[40px] font-extralight tracking-[3px] md:tracking-[4px] uppercase text-white mb-4">Four apps, one platform</h2>
+        <p className="text-sm md:text-base font-light text-gray-500 max-w-[520px] mb-8 md:mb-12">
           Everything you need to monitor, analyze, trade, and operate in energy markets.
         </p>
 
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
           {/* Terminal - Featured */}
-          <div className="col-span-2 bg-[#111] border border-[#DAA520]/35 rounded-[14px] p-9">
-            <div className="flex gap-12 items-center">
+          <div className="md:col-span-2 bg-[#111] border border-[#DAA520]/35 rounded-[14px] p-6 md:p-9">
+            <div className="flex flex-col md:flex-row gap-6 md:gap-12 md:items-center">
               <div className="flex-1">
                 <div className="w-11 h-11 rounded-[10px] border-[1.5px] border-[#DAA520] flex items-center justify-center text-xl font-bold text-[#DAA520] mb-5">W</div>
                 <div className="text-base font-light tracking-[2.8px] uppercase text-[#DAA520] mb-2">Energy Terminal</div>
@@ -117,8 +146,8 @@ export default function LandingPage() {
                 </p>
                 <div className="text-[13px] text-[#DAA520]">Free with every account</div>
               </div>
-              <div className="flex-1 h-[280px] bg-[#171717] rounded-[10px] border border-gray-800 overflow-hidden p-4">
-                <div className="grid grid-cols-3 gap-2 h-full">
+              <div className="flex-1 h-[200px] md:h-[280px] bg-[#171717] rounded-[10px] border border-gray-800 overflow-hidden p-3 md:p-4">
+                <div className="grid grid-cols-3 gap-1.5 md:gap-2 h-full">
                   {[
                     { title: 'WTI Crude', w: '80%' },
                     { title: 'Nat Gas', w: '65%' },
@@ -127,11 +156,11 @@ export default function LandingPage() {
                     { title: 'Sanctions', w: '70%' },
                     { title: 'Rig Count', w: '50%' },
                   ].map((m, i) => (
-                    <div key={i} className="bg-[#1e1e1e] rounded-md p-2.5 border border-gray-800">
-                      <div className="text-[8px] tracking-[1.5px] uppercase text-[#DAA520] mb-1.5">{m.title}</div>
-                      <div className="h-[3px] rounded-full mb-1" style={{ background: 'rgba(218,165,32,0.4)', width: m.w }} />
-                      <div className="h-[3px] bg-gray-700 rounded-full mb-1 w-[60%]" />
-                      <div className="h-[3px] bg-gray-700 rounded-full" />
+                    <div key={i} className="bg-[#1e1e1e] rounded-md p-2 md:p-2.5 border border-gray-800">
+                      <div className="text-[7px] md:text-[8px] tracking-[1.5px] uppercase text-[#DAA520] mb-1 md:mb-1.5">{m.title}</div>
+                      <div className="h-[2px] md:h-[3px] rounded-full mb-1" style={{ background: 'rgba(218,165,32,0.4)', width: m.w }} />
+                      <div className="h-[2px] md:h-[3px] bg-gray-700 rounded-full mb-1 w-[60%]" />
+                      <div className="h-[2px] md:h-[3px] bg-gray-700 rounded-full" />
                     </div>
                   ))}
                 </div>
@@ -140,7 +169,7 @@ export default function LandingPage() {
           </div>
 
           {/* Intelligence */}
-          <div className="bg-[#111] border border-white/[0.07] rounded-[14px] p-9 hover:border-gray-700 transition-colors">
+          <div className="bg-[#111] border border-white/[0.07] rounded-[14px] p-6 md:p-9 hover:border-gray-700 transition-colors">
             <div className="w-11 h-11 rounded-[10px] border-[1.5px] border-[#DAA520] flex items-center justify-center text-xl font-bold text-[#DAA520] mb-5">W</div>
             <div className="text-base font-light tracking-[2.8px] uppercase text-[#DAA520] mb-2">Energy Intelligence</div>
             <p className="text-sm font-light text-gray-500 mb-4 leading-relaxed">
@@ -150,7 +179,7 @@ export default function LandingPage() {
           </div>
 
           {/* Exchange */}
-          <div className="bg-[#111] border border-white/[0.07] rounded-[14px] p-9 opacity-60">
+          <div className="bg-[#111] border border-white/[0.07] rounded-[14px] p-6 md:p-9 opacity-60">
             <div className="w-11 h-11 rounded-[10px] border-[1.5px] border-gray-700 flex items-center justify-center text-xl font-bold text-gray-700 mb-5">W</div>
             <div className="text-base font-light tracking-[2.8px] uppercase text-gray-600 mb-2">Energy Exchange</div>
             <p className="text-sm font-light text-gray-500 mb-4 leading-relaxed">
@@ -159,8 +188,8 @@ export default function LandingPage() {
             <div className="text-[10px] tracking-[2px] uppercase text-gray-600">Coming Soon</div>
           </div>
 
-          {/* Operations - full width */}
-          <div className="col-span-2 bg-[#111] border border-white/[0.07] rounded-[14px] p-9 opacity-60">
+          {/* Operations */}
+          <div className="md:col-span-2 bg-[#111] border border-white/[0.07] rounded-[14px] p-6 md:p-9 opacity-60">
             <div className="w-11 h-11 rounded-[10px] border-[1.5px] border-gray-700 flex items-center justify-center text-xl font-bold text-gray-700 mb-5">W</div>
             <div className="text-base font-light tracking-[2.8px] uppercase text-gray-600 mb-2">Energy Operations</div>
             <p className="text-sm font-light text-gray-500 mb-4 leading-relaxed max-w-[520px]">
@@ -172,15 +201,15 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-24 px-12 max-w-[800px] mx-auto border-t border-white/[0.06] text-center">
+      <section id="pricing" className="py-16 md:py-24 px-5 md:px-12 max-w-[800px] mx-auto border-t border-white/[0.06] text-center">
         <div className="text-[10px] font-medium tracking-[3px] uppercase text-[#DAA520] mb-4">Pricing</div>
-        <h2 className="text-[40px] font-extralight tracking-[4px] uppercase text-white mb-12">Start free, scale when ready</h2>
+        <h2 className="text-[28px] md:text-[40px] font-extralight tracking-[3px] md:tracking-[4px] uppercase text-white mb-8 md:mb-12">Start free, scale when ready</h2>
 
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
           {/* Free */}
-          <div className="p-10 bg-[#111] border border-white/[0.07] rounded-[14px] text-left">
+          <div className="p-7 md:p-10 bg-[#111] border border-white/[0.07] rounded-[14px] text-left">
             <div className="text-xs tracking-[2.5px] uppercase text-gray-500 mb-4">Terminal</div>
-            <div className="text-5xl font-extralight text-white mb-1">$0 <span className="text-base text-gray-600 font-normal">/month</span></div>
+            <div className="text-4xl md:text-5xl font-extralight text-white mb-1">$0 <span className="text-sm md:text-base text-gray-600 font-normal">/month</span></div>
             <div className="text-[13px] text-gray-600 mb-7">Free forever</div>
             <ul className="space-y-0">
               {['27 live data modules', 'Real-time energy prices', 'OPEC+ production monitor', 'Prediction markets', 'AI price forecasts', 'Interactive world map'].map((item, i) => (
@@ -199,9 +228,9 @@ export default function LandingPage() {
           </div>
 
           {/* Pro */}
-          <div className="p-10 bg-[#111] border border-[#DAA520]/40 rounded-[14px] text-left">
+          <div className="p-7 md:p-10 bg-[#111] border border-[#DAA520]/40 rounded-[14px] text-left">
             <div className="text-xs tracking-[2.5px] uppercase text-gray-500 mb-4">Terminal + Intelligence</div>
-            <div className="text-5xl font-extralight text-white mb-1">$19 <span className="text-base text-gray-600 font-normal">/month</span></div>
+            <div className="text-4xl md:text-5xl font-extralight text-white mb-1">$19 <span className="text-sm md:text-base text-gray-600 font-normal">/month</span></div>
             <div className="text-[13px] text-gray-600 mb-7">Everything in Terminal, plus</div>
             <ul className="space-y-0">
               {['Basin-level analytics', 'Operator profiles and rankings', 'Production data aggregation', 'Competitive intelligence', 'Custom data exports', 'Priority support'].map((item, i) => (
@@ -222,10 +251,10 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="text-center py-28 px-12 relative">
+      <section className="text-center py-16 md:py-28 px-5 md:px-12 relative">
         <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 50% 60% at 50% 50%, rgba(218,165,32,0.05) 0%, transparent 70%)' }} />
-        <h2 className="text-4xl font-extralight tracking-[6px] uppercase text-white mb-4 relative">See it live</h2>
-        <p className="text-base text-gray-500 font-light mb-10 relative">The Terminal is free. No credit card. No trial period. Just data.</p>
+        <h2 className="text-2xl md:text-4xl font-extralight tracking-[4px] md:tracking-[6px] uppercase text-white mb-4 relative">See it live</h2>
+        <p className="text-sm md:text-base text-gray-500 font-light mb-8 md:mb-10 relative">The Terminal is free. No credit card. No trial period. Just data.</p>
         <button
           onClick={() => router.push('/terminal')}
           className="px-10 py-3.5 bg-[#DAA520] text-[#0a0a0a] rounded-lg text-[13px] font-semibold tracking-[2px] uppercase hover:bg-[#c4941c] transition-all relative"
@@ -235,11 +264,11 @@ export default function LandingPage() {
       </section>
 
       {/* Contact */}
-      <section id="contact" className="py-24 px-12 border-t border-white/[0.06]">
+      <section id="contact" className="py-16 md:py-24 px-5 md:px-12 border-t border-white/[0.06]">
         <div className="max-w-[600px] mx-auto">
           <div className="text-[10px] font-medium tracking-[3px] uppercase text-[#DAA520] mb-4 text-center">Contact</div>
-          <h2 className="text-[40px] font-extralight tracking-[4px] uppercase text-white mb-4 text-center">Get in touch</h2>
-          <p className="text-base font-light text-gray-500 text-center mb-12">
+          <h2 className="text-[28px] md:text-[40px] font-extralight tracking-[3px] md:tracking-[4px] uppercase text-white mb-4 text-center">Get in touch</h2>
+          <p className="text-sm md:text-base font-light text-gray-500 text-center mb-8 md:mb-12">
             Questions, partnerships, or enterprise inquiries. We&apos;ll get back to you within 24 hours.
           </p>
 
@@ -252,12 +281,11 @@ export default function LandingPage() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                // TODO: wire to API endpoint
                 setContactSent(true);
               }}
-              className="space-y-5"
+              className="space-y-4 md:space-y-5"
             >
-              <div className="grid grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
                 <div>
                   <label className="block text-[11px] tracking-[2px] uppercase text-gray-500 mb-2">Name</label>
                   <input
@@ -314,7 +342,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="flex justify-between items-center px-12 py-8 border-t border-white/[0.06]">
+      <footer className="flex flex-col sm:flex-row justify-between items-center gap-4 px-5 md:px-12 py-6 md:py-8 border-t border-white/[0.06]">
         <p className="text-xs text-white/40">&copy; 2026 Wildcatter, LLC. All Rights Reserved.</p>
         <div className="flex gap-6">
           {['Terms', 'Privacy', 'Contact'].map((l, i) => (
