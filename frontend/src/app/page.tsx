@@ -85,7 +85,7 @@ export default function LandingPage() {
       )}
 
       {/* Hero */}
-      <section className="min-h-screen flex flex-col items-center text-center px-5 md:px-6 pt-[100px] pb-0 relative" style={{ justifyContent: 'start', paddingTop: 'calc(50vh - 200px)' }}>
+      <section className="min-h-screen flex flex-col items-center text-center px-5 md:px-6 pb-0 relative" style={{ justifyContent: 'start', paddingTop: 'min(calc(50vh - 200px), 25vh)' }}>
         <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(218,165,32,0.06) 0%, transparent 70%)' }} />
         <div className="text-[9px] md:text-[10px] font-medium tracking-[3px] uppercase text-[#DAA520] border border-[#DAA520]/30 rounded-full px-5 py-1.5 mb-8 md:mb-10 relative">
           YOUR EDGE IS IN THE DATA
@@ -96,7 +96,7 @@ export default function LandingPage() {
         <p className="text-base md:text-lg font-light text-gray-500 max-w-[560px] mb-10 md:mb-12 tracking-[0.5px] relative px-2">
           Real-time energy data, operational tools, and market intelligence built for professionals who move fast.
         </p>
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 relative w-full sm:w-auto px-4 sm:px-0">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 relative w-full sm:w-auto px-4 sm:px-0 mb-12 sm:mb-0">
           <button
             onClick={() => router.push('/register')}
             className="px-10 py-3.5 bg-[#DAA520] text-[#0a0a0a] rounded-lg text-[13px] font-semibold tracking-[2px] uppercase hover:bg-[#c4941c] transition-all"
@@ -112,7 +112,7 @@ export default function LandingPage() {
         </div>
 
         {/* Stats - bottom of hero */}
-        <div className="absolute bottom-0 left-0 right-0 flex flex-col sm:flex-row justify-center items-center gap-6 sm:gap-16 py-6 sm:py-10 border-t border-b border-white/[0.06]">
+        <div className="relative sm:absolute sm:bottom-0 left-0 right-0 flex flex-col sm:flex-row justify-center items-center gap-5 sm:gap-16 py-6 sm:py-10 border-t border-b border-white/[0.06] mt-auto">
           {[
             { num: '4', label: 'Independent Apps' },
             { num: '24/7', label: 'Real-Time Updates' },
