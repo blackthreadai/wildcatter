@@ -33,7 +33,6 @@ export default function LandingPage() {
         </div>
         <div className="flex items-center gap-8">
           <a href="#products" className="text-[13px] tracking-[1px] uppercase text-gray-500 hover:text-gray-200 transition-colors">Products</a>
-          <a href="#features" className="text-[13px] tracking-[1px] uppercase text-gray-500 hover:text-gray-200 transition-colors">Features</a>
           <a href="#pricing" className="text-[13px] tracking-[1px] uppercase text-gray-500 hover:text-gray-200 transition-colors">Pricing</a>
         </div>
         <div className="flex items-center gap-4">
@@ -82,10 +81,9 @@ export default function LandingPage() {
         {/* Stats - bottom of hero */}
         <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-16 py-10 border-t border-white/[0.06]">
           {[
-            { num: '27+', label: 'Live Data Modules' },
-            { num: '15', label: 'Prediction Markets' },
+            { num: '4', label: 'Specific Applications' },
             { num: '24/7', label: 'Real-Time Updates' },
-            { num: '13', label: 'OPEC+ Countries' },
+            { num: '1M+', label: 'Energy Assets' },
           ].map((s, i) => (
             <div key={i} className="text-center">
               <div className="text-4xl font-extralight text-[#DAA520] tracking-[2px]">{s.num}</div>
@@ -166,32 +164,6 @@ export default function LandingPage() {
             </p>
             <div className="text-[10px] tracking-[2px] uppercase text-gray-600">Coming Soon</div>
           </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section id="features" className="py-24 px-12 max-w-[1100px] mx-auto border-t border-white/[0.06]">
-        <div className="text-[10px] font-medium tracking-[3px] uppercase text-[#DAA520] mb-4">Terminal Features</div>
-        <h2 className="text-[40px] font-extralight tracking-[4px] uppercase text-white mb-4">Built for speed</h2>
-        <p className="text-base font-light text-gray-500 max-w-[520px] mb-12">
-          Every module pulls live data. No mock numbers. No delayed feeds. Just the market, right now.
-        </p>
-
-        <div className="grid grid-cols-3 gap-6">
-          {[
-            { num: '01', title: 'Energy Markets', desc: 'WTI, Brent, natural gas, RBOB, heating oil. Live prices from NYMEX with futures curves.' },
-            { num: '02', title: 'OPEC+ Monitor', desc: 'Production data for 13 member countries. Quotas, compliance rates, and meeting schedules.' },
-            { num: '03', title: 'AI Forecasts', desc: 'Technical analysis with RSI, MACD, support/resistance computed from 3-month price history.' },
-            { num: '04', title: 'Prediction Markets', desc: '15 live energy-related markets from Polymarket. Geopolitical risk priced in real-time.' },
-            { num: '05', title: 'Sanctions Tracker', desc: 'OFAC compliance monitoring. Sanctioned entities, vessel tracking, and enforcement actions.' },
-            { num: '06', title: 'World Map', desc: 'Global view with weather alerts, seismic activity, drilling rigs, pipelines, and shipping lanes.' },
-          ].map((f, i) => (
-            <div key={i} className="p-8 bg-[#111] border border-white/[0.07] rounded-xl">
-              <div className="text-[32px] font-extralight text-[#DAA520] mb-3">{f.num}</div>
-              <div className="text-sm font-medium text-gray-200 tracking-[1px] uppercase mb-2">{f.title}</div>
-              <p className="text-[13px] text-gray-500 leading-relaxed font-light">{f.desc}</p>
-            </div>
-          ))}
         </div>
       </section>
 
