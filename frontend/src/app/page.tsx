@@ -36,22 +36,30 @@ export default function LandingPage() {
           <a href="#features" className="text-[13px] tracking-[1px] uppercase text-gray-500 hover:text-gray-200 transition-colors">Features</a>
           <a href="#pricing" className="text-[13px] tracking-[1px] uppercase text-gray-500 hover:text-gray-200 transition-colors">Pricing</a>
         </div>
-        <button
-          onClick={() => router.push('/login')}
-          className="px-6 py-2 border border-[#DAA520] rounded-md text-[#DAA520] text-xs tracking-[1.5px] uppercase font-medium hover:bg-[#DAA520] hover:text-[#0a0a0a] transition-all"
-        >
-          Get Started
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => router.push('/login')}
+            className="text-[13px] tracking-[1px] uppercase text-gray-500 hover:text-gray-200 transition-colors"
+          >
+            Login
+          </button>
+          <button
+            onClick={() => router.push('/register')}
+            className="px-6 py-2 border border-[#DAA520] rounded-md text-[#DAA520] text-xs tracking-[1.5px] uppercase font-medium hover:bg-[#DAA520] hover:text-[#0a0a0a] transition-all"
+          >
+            Get Started
+          </button>
+        </div>
       </nav>
 
       {/* Hero */}
-      <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-[120px] pb-20 relative">
+      <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-[100px] pb-0 relative">
         <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(218,165,32,0.06) 0%, transparent 70%)' }} />
         <div className="text-[10px] font-medium tracking-[3px] uppercase text-[#DAA520] border border-[#DAA520]/30 rounded-full px-5 py-1.5 mb-10 relative">
           Energy Intelligence Platform
         </div>
         <h1 className="text-[52px] font-extralight tracking-[6px] uppercase text-white leading-[1.15] mb-5 relative max-w-[800px]">
-          Energy <span className="text-[#DAA520] font-light">intelligence</span><br />delivered
+          Energy intelligence.<br /><span className="text-[#DAA520] font-light">Delivered.</span>
         </h1>
         <p className="text-lg font-light text-gray-500 max-w-[560px] mb-12 tracking-[0.5px] relative">
           Real-time energy data, operational tools, and market intelligence built for professionals who move fast.
@@ -61,7 +69,7 @@ export default function LandingPage() {
             onClick={() => router.push('/register')}
             className="px-10 py-3.5 bg-[#DAA520] text-[#0a0a0a] rounded-lg text-[13px] font-semibold tracking-[2px] uppercase hover:bg-[#c4941c] transition-all"
           >
-            Start Free
+            Get Started
           </button>
           <a
             href="#products"
@@ -70,22 +78,22 @@ export default function LandingPage() {
             View Products
           </a>
         </div>
-      </section>
 
-      {/* Stats */}
-      <div className="flex justify-center gap-16 py-12 border-t border-b border-white/[0.06]">
-        {[
-          { num: '27+', label: 'Live Data Modules' },
-          { num: '15', label: 'Prediction Markets' },
-          { num: '24/7', label: 'Real-Time Updates' },
-          { num: '13', label: 'OPEC+ Countries' },
-        ].map((s, i) => (
-          <div key={i} className="text-center">
-            <div className="text-4xl font-extralight text-[#DAA520] tracking-[2px]">{s.num}</div>
-            <div className="text-[11px] text-gray-600 tracking-[2px] uppercase mt-1">{s.label}</div>
-          </div>
-        ))}
-      </div>
+        {/* Stats - bottom of hero */}
+        <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-16 py-10 border-t border-white/[0.06]">
+          {[
+            { num: '27+', label: 'Live Data Modules' },
+            { num: '15', label: 'Prediction Markets' },
+            { num: '24/7', label: 'Real-Time Updates' },
+            { num: '13', label: 'OPEC+ Countries' },
+          ].map((s, i) => (
+            <div key={i} className="text-center">
+              <div className="text-4xl font-extralight text-[#DAA520] tracking-[2px]">{s.num}</div>
+              <div className="text-[11px] text-gray-600 tracking-[2px] uppercase mt-1">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* Products */}
       <section id="products" className="py-24 px-12 max-w-[1100px] mx-auto">
