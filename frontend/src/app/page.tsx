@@ -6,12 +6,30 @@ export default function LandingPage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-200 antialiased">
+    <div className="min-h-screen text-gray-200 antialiased relative">
+      {/* Animated dark gradient background */}
+      <div
+        className="fixed inset-0 -z-10"
+        style={{
+          background: 'linear-gradient(-45deg, #0a0a0a, #0f0f0f, #0a0a0a, #111111, #0a0a0a, #0d0d0d, #080808, #0a0a0a)',
+          backgroundSize: '400% 400%',
+          animation: 'gradientShift 25s ease infinite',
+        }}
+      />
+      <style>{`
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          25% { background-position: 100% 0%; }
+          50% { background-position: 100% 50%; }
+          75% { background-position: 0% 100%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}</style>
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-12 py-4 bg-[#0a0a0a]/85 backdrop-blur-xl border-b border-white/[0.06]">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 border-[1.5px] border-[#DAA520] rounded-md flex items-center justify-center text-[#DAA520] font-bold text-base">W</div>
-          <span className="text-[15px] font-semibold tracking-[2px] uppercase text-[#DAA520]">Wildcatter</span>
+          <span className="text-[14px] font-light tracking-[2.8px] uppercase text-[#DAA520]">Wildcatter</span>
         </div>
         <div className="flex items-center gap-8">
           <a href="#products" className="text-[13px] tracking-[1px] uppercase text-gray-500 hover:text-gray-200 transition-colors">Products</a>
